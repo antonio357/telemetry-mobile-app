@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "telemetry-mobile-app",
+    "slug": "telemetry-mobile-app",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
