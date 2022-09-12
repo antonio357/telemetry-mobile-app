@@ -1,51 +1,45 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-function getWsStatus(wsConnectionStatesNum) {
+function getWsStatus(code) {
   const wsConnectionStates = {
     0: 'CONNECTING',
     1: 'OPEN',
     2: 'CLOSING',
-    3: 'CLOSED', 
+    3: 'CLOSED',
   }
 
-  return wsConnectionStates[wsConnectionStatesNum]
+  return wsConnectionStates[code]
 }
 
+let ws = new WebSocket('ws://192.168.1.199:81')
+let autoReconnect = true
+let wsReceivingLogs = false
+let waitingPong = false
 
+ws.onopen = obj => console.log(`WS = ${ws.url} onopen: \nwebsocket client connected to websocket server ${ws.url}`)
+ws.onclose = close => console.log(`WS = ${ws.url} onclose: \nclose.code = ${close.code}, close.reason = ${close.reason}`)
+ws.onerror = error => console.log(`WS = ${ws.url} onerror: \nerror.message = ${error.message}`)
+ws.onmessage = message => {
+  console.log(`WS = ${ws.url} onmessage: \nmessage.data = ${message.data}`)
+  if (message.data == "pong") waitingPong = false
+}
+
+setInterval(() => {
+  // this is necessary cause of WARNNING_1
+  if (waitingPong) ws.close(ws.CLOSED, "oncheckalive periodically ping timeout")
+  // if ws connection is off ws.send("ping") will generate an onerror event that closes the connection and updates ws.readyState to ws.CLOSED, WARNNING_1 this only works if esp is connected to energy.
+  if (!wsReceivingLogs) {
+    ws.send("ping")
+    waitingPong = true
+  } 
+  else waitingPong = false
+  if (ws.readyState == ws.CLOSED || ws.readyState == ws.CLOSING && autoReconnect) ws = new WebSocket(ws.url)
+  console.log(`WS = ${ws.url} oncheckalive: \nreadyState = ${getWsStatus(ws.readyState)}`)
+}, 5000);
 
 export default function App() {
-  const ws = new WebSocket('ws://192.168.1.199:81');
-  
-  ws.onopen = () => {
-    // connection opened
-    // ws.send('something'); // send a message
-    console.log('websocket client connected to server', getWsStatus(ws.readyState));
-  };
-  
-  ws.onmessage = (e) => {
-    // a message was received
-    console.log(e.data, getWsStatus(ws.readyState));
-  };
-  
-  ws.onerror = (e) => {
-    // an error occurred
-    console.log(e.message, getWsStatus(ws.readyState));
-  };
-  
-  ws.onclose = (e) => {
-    // connection closed
-    console.log(e.code, e.reason, getWsStatus(ws.readyState));
-  };
-
-  useEffect(obj => {
-    console.log(`ws.url changed with obj = ${obj} and url = ${ws.url}`);
-  }, [ws.url])
-
-  useEffect(obj => {
-    console.log(`ws.readyState changed with obj = ${obj} and readyState = ${getWsStatus(ws.readyState)}`);
-  }, [ws.readyState])
 
   return (
     <View style={styles.container}>
