@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
 // repo da lib https://github.com/nathanboktae/robust-websocket
+import RobustWebSocket from 'robust-websocket';
 
-var ws = new RobustWebSocket('ws://echo.websocket.org/', {
+
+var ws = new RobustWebSocket('ws://192.168.1.199:81/', {
    // The number of milliseconds to wait before a connection is considered to have timed out. Defaults to 4 seconds.
    timeout: 4000,
   // A function that given a CloseEvent or an online event (https://developer.mozilla.org/en-US/docs/Online_and_offline_events) and the `RobustWebSocket`,
