@@ -2,6 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+// repo da lib https://github.com/nathanboktae/robust-websocket
+
 export default function App() {
   return (
     <View style={styles.container}>
