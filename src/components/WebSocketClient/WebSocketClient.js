@@ -1,4 +1,12 @@
-class WebSocketClient {
+import React, { Component } from "react";
+import { View } from "react-native-web";
+import { Children } from "react";
+import ChildComponent from "./ChildComponent";
+
+
+const wsConnectionUrl = 'ws://192.168.1.199:81'
+
+class WebSocketClient extends Component {
     constructor(props) {
         super(props);
 
@@ -15,7 +23,7 @@ class WebSocketClient {
 
     timeout = 250; // Initial timeout duration as a class variable
 
-    getStatusString(code) {
+    getStatusString() {
         const connectionStates = {
             0: 'CONNECTING',
             1: 'OPEN',
@@ -33,7 +41,7 @@ class WebSocketClient {
      * This function establishes the connect with the websocket and also ensures constant reconnection if connection closes
      */
     connect = () => {
-        var ws = new WebSocket('ws://192.168.1.199:81');
+        var ws = new WebSocket(wsConnectionUrl);
         let that = this; // cache the this
         var connectInterval;
 
@@ -80,6 +88,13 @@ class WebSocketClient {
         const { ws } = this.state;
         if (!ws || ws.readyState == WebSocket.CLOSED) this.connect(); //check if websocket instance is closed, if so call `connect` function.
     };
+
+    render() {
+        setInterval(() => {
+            console.log(`ws state = ${this.getStatusString()}`)
+        }, 2000)
+        return <ChildComponent websocket={this.state.ws} />
+    }
 }
 
 export default WebSocketClient
