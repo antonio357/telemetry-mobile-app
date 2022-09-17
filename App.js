@@ -4,7 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import WebSocketClient from './WebSocketClient';
 
-var here = new WebSocketClient({ url: 'ws://192.168.1.199:81' });
+const wsClient = new WebSocketClient({ url: 'ws://192.168.1.199:81' });
+wsClient.connect()
 
 export default function App() {
 

@@ -3,12 +3,11 @@ const wsConnectionUrl = 'ws://192.168.1.199:81'
 class WebSocketClient {
     constructor(config) {
         const { url, timeout } = config
-        
+
         this._url = url
         this._timeout = timeout || 1000
         this._connectInterval
         this._ws
-        this._connect()
     }
 
     _getStatusString() {
@@ -26,7 +25,7 @@ class WebSocketClient {
      * @function connect
      * This function establishes the connect with the websocket and also ensures constant reconnection if connection closes
      */
-    _connect() {
+    connect() {
         delete this._ws
         this._ws = new WebSocket(this._url);
 
@@ -56,13 +55,17 @@ class WebSocketClient {
 
             this._ws.close();
         };
+
+        this._ws.onmessage = msg => {
+            console.log(`msg = ${msg.data}`)
+        }
     };
 
     /**
      * utilited by the @function connect to check if the connection is close, if so attempts to reconnect
      */
     _reconnect() {
-        if (!this._ws || this._ws.readyState == WebSocket.CLOSED) this._connect(); //check if websocket instance is closed, if so call `connect` function.
+        if (!this._ws || this._ws.readyState == WebSocket.CLOSED) this.connect(); //check if websocket instance is closed, if so call `connect` function.
     };
 }
 
