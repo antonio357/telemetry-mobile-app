@@ -8,6 +8,11 @@ class WebSocketClient {
         this._timeout = timeout || 1000
         this._connectInterval
         this._ws
+        this.previousMsgTime = null
+        this.actualMsgTime = null
+        this.intervals = []
+        this.startedLogsTime = Date.now()
+        this.stoped = false
     }
 
     _getStatusString() {
@@ -33,6 +38,7 @@ class WebSocketClient {
             console.log("connected websocket main component");
 
             clearTimeout(this._connectInterval); // clear Interval on onopen of websocket connection
+            this._ws.send('start logs')
         };
 
         this._ws.onclose = e => {
@@ -57,7 +63,16 @@ class WebSocketClient {
         };
 
         this._ws.onmessage = msg => {
-            console.log(`msg = ${msg.data}`)
+            this.previousMsgTime = this.actualMsgTime
+            this.actualMsgTime = Date.now()
+            // console.log(`msg = ${msg.data}`)
+            if (this.previousMsgTime && this.actualMsgTime) this.intervals.push(this.actualMsgTime - this.previousMsgTime)
+            if (!this.stoped && Date.now() - this.startedLogsTime >= 30000) {
+                this._ws.send('stop logs')
+                this.stoped = true
+                console.log(`${this.intervals.length + 1} logs received, mean time = ${this.intervals.reduce((a, b) => a + b, 0) / this.intervals.length}, min time = ${Math.min(...this.intervals)}, max time = ${Math.max(...this.intervals)}`)
+                console.log(`this.intervals = ${this.intervals}`)
+            }
         }
     };
 
