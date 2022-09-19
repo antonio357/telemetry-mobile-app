@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 
-import { styles } from '../../../AppStyles';
+import { styles } from '../../../App.styles';
 
 
 export default function Sensores({ navigation }) {
