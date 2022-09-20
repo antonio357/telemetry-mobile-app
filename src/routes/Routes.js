@@ -1,5 +1,5 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Sniffer from '../screens/sniffer/Sniffer';
+import Sniffers from '../screens/sniffers/Sniffers';
 import Sensores from '../screens/sensores/Sensores';
 import Videos from '../screens/videos/Videos';
 import Recording from '../screens/recording/Recording';
@@ -22,8 +22,8 @@ export function AppRoutes() {
       }}
     >
       <Screen
-        name="sniffer"
-        component={Sniffer}
+        name="sniffers"
+        component={Sniffers}
         options={{
           drawerIcon: () => <Ionicons name="ios-hardware-chip-sharp" size={defaultIconStyles.size} color={defaultIconStyles.color} />
         }}
