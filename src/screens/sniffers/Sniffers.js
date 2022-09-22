@@ -3,34 +3,17 @@ import { SafeAreaView, View, FlatList, StyleSheet, Text, StatusBar } from "react
 import { ScreenBase } from "../common/ScreenBase";
 import { Sniffer } from "../../components/sniffer/Sniffer";
 
-import { styles } from '../../../App.styles';
+import { styles } from './Sniffers.styles';
 
-
-const stylesSniffer = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 20,
-  },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-  },
-  title: {
-    fontSize: 32,
-  },
-});
 
 let DATA = [];
 for (let index = 0; index < 30; index++) {
   DATA.push({ id: `${index}`, title: `item ${index}` })
 }
 
-
 const Item = ({ title }) => (
-  <View style={stylesSniffer.item}>
-    <Text style={stylesSniffer.title}>{title}</Text>
+  <View>
+    <Text>{title}</Text>
   </View>
 );
 
@@ -40,7 +23,7 @@ export default function Sniffers({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={stylesSniffer.container}>
+    <SafeAreaView style={styles.view}>
       <FlatList
         data={DATA}
         renderItem={renderItem}
