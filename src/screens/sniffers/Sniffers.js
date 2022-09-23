@@ -1,15 +1,9 @@
 import React from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, StatusBar } from "react-native";
+import { SafeAreaView, View, FlatList, Text, StatusBar } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
-import { Sniffer } from "../../components/sniffer/Sniffer";
-
+import { observer, inject } from 'mobx-react';
 import { styles } from './Sniffers.styles';
 
-
-let DATA = [];
-for (let index = 0; index < 30; index++) {
-  DATA.push({ id: `${index}`, title: `item ${index}` })
-}
 
 const Item = ({ title }) => (
   <View>
@@ -17,7 +11,14 @@ const Item = ({ title }) => (
   </View>
 );
 
-export default function Sniffers({ navigation }) {
+function Sniffers({ navigation, SniffersStore }) {
+  const { registeredSniffers } = SniffersStore;
+
+  for (let index = 0; index < 50; index++) {
+    SniffersStore.registerSniffer();
+    
+  }
+
   const renderItem = ({ item }) => (
     <Item title={item.title} />
   );
@@ -25,7 +26,7 @@ export default function Sniffers({ navigation }) {
   return (
     <SafeAreaView style={styles.view}>
       <FlatList
-        data={DATA}
+        data={registeredSniffers}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -33,3 +34,5 @@ export default function Sniffers({ navigation }) {
     </SafeAreaView>
   );
 }
+
+export default inject('SniffersStore')(observer(Sniffers));
