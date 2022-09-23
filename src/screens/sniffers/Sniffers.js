@@ -6,31 +6,19 @@ import { styles } from './Sniffers.styles';
 import { RegisteredSniffer } from '../../components/sniffer/Sniffer';
 
 
-const Item = ({ title }) => (
-  <View>
-    <Text>{title}</Text>
-  </View>
-);
-
 function Sniffers({ navigation, SniffersStore }) {
   const registeredSniffers = SniffersStore.registeredSniffers;
-
-  for (let index = 0; index < 2; index++) {
-    SniffersStore.registerSniffer({
-      id: index,
-      name: 'nome do sniffer',
-      title: 'título do sniffer',
-      url: 'url do websocket server',
-      status: 'desconectado',
-    });
-  }
+  const wsClients = SniffersStore.wsClients;
 
   return (
     <SafeAreaView style={styles.view}>
       <FlatList
         data={registeredSniffers}
         // this function needs to destruct item, so do not rename it
-        renderItem={({ item }) => <RegisteredSniffer {...item} />}
+        renderItem={({ item }) => {
+          console.log(`wsClients = ${wsClients[0].connect || 'não tem wsClients'}`);
+          return <RegisteredSniffer {...item} connect={wsClients[0].connect} disconnect={wsClients[0].disconnect}/>
+        }}
         keyExtractor={item => item.id}
       />
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />

@@ -2,7 +2,9 @@ import { Text, View, Button } from "react-native";
 import { styles } from "./Sniffer.styles";
 import { Ionicons } from '@expo/vector-icons';
 
-export function RegisteredSniffer({ name, url, status }) {
+export function RegisteredSniffer({ name, url, status, connect, disconnect }) {
+  // const wsClients = SniffersStore.wsClients;
+  // console.log(`SniffersStore = ${Object.keys(SniffersStore) || 'não tem store'}`);
   const statusColor = {
     "desconectado": "#666666",
     "conectado": "#8FF399",
@@ -18,21 +20,11 @@ export function RegisteredSniffer({ name, url, status }) {
         <Text style={[styles.font]}>{status}</Text>
       </View>
       <View style={styles.buttons}>
-        <Button style={styles.button}
+        <Button style={styles.button} onPress={() => connect()}
           title='Conectar' />
-        <Button style={styles.button}
+        <Button style={styles.button} onPress={() => disconnect()}
           title='Desconectar' />
       </View>
-    </View>
-    //     <View style={[styles.card, styles.shadowProp]}>  
-    //     <View>  
-    //       <Text style={styles.heading}>  
-    //         React Native Box Shadow (Shadow Props)  
-    //       </Text>  
-    //     </View>  
-    //     <Text>  
-    // Using the elevation style prop to apply box-shadow for iOS devices  
-    //     </Text>  
-    //   </View>  
+    </View> 
   );
 }
