@@ -16,7 +16,6 @@ function Sniffers({ navigation, SniffersStore }) {
 
   for (let index = 0; index < 50; index++) {
     SniffersStore.registerSniffer();
-    
   }
 
   const renderItem = ({ item }) => (
