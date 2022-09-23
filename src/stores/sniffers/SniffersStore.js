@@ -1,4 +1,4 @@
-import {makeObservable, observable, action} from 'mobx';
+import { makeObservable, observable, action } from 'mobx';
 
 
 class SniffersStore {
@@ -11,16 +11,8 @@ class SniffersStore {
     })
   }
 
-  registerSniffer() {
-    this.registeredSniffers.push({
-      id: 'id do sniffer',
-      name: 'nome do sniffer',
-      title: 'sniffer title',
-      webSocketServer: {
-        url: 'url do websocket server',
-        status: 'desconectado',
-      }
-    })
+  registerSniffer(sniffer) {
+    this.registeredSniffers.push(sniffer);
   }
 }
 
