@@ -8,7 +8,7 @@ function Observer({ ObservableStore }) {
   return (
     <View style={styles.view}>
       <Text>counter = {counter}</Text>
-      <Button onPress={() => add()} title='count' />
+      <Button onPress={add} title='count' />
     </View>
   );
 }
