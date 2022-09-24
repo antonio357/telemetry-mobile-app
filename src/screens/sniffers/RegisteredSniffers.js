@@ -1,4 +1,4 @@
-import { SafeAreaView, FlatList } from "react-native";
+import { View } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import RegisteredSniffer from '../../components/sniffer/RegisteredSniffer';
 import { observer, inject } from 'mobx-react';
@@ -6,20 +6,16 @@ import { styles } from './RegisteredSniffers.styles';
 
 
 function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
-  const { registeredSniffers } = RegisteredSniffersStore;
+  const { registeredSniffers, register } = RegisteredSniffersStore;
 
   return (
-    <SafeAreaView style={styles.view}>
-      <FlatList
-        data={registeredSniffers}
-        renderItem={({ item }) => <RegisteredSniffer {...item} />}
-        keyExtractor={item => item.url}
-      />
+    <View style={styles.view}>
+      {registeredSniffers.map(sniffer => <RegisteredSniffer key={sniffer.url} {...sniffer} />)}
       <ScreenBase openRoutesMenu={() => {
         navigation.openDrawer();
-        RegisteredSniffersStore.register();
+        register();
       }} />
-    </SafeAreaView>
+    </View>
   );
 }
 
