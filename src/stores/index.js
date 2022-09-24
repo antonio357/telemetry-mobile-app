@@ -1,9 +1,10 @@
-import SniffersStore from "./sniffers/SniffersStore";
-import WsSocket from '../components/sniffer/wsSocket';
+import RegisteredSniffersStore from "./sniffers/RegisteredSniffers.store";
+import WsClientStore from "./socket/WsClient.store";
 
-const Stores = {
-  SniffersStore,
-  WsSocket,
+
+const Stores = {  
+  RegisteredSniffersStore,
+  WsClientStore,
 }
 
 export default Stores;
