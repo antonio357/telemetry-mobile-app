@@ -1,5 +1,5 @@
 import React from 'react';
-import Stores from './src/stores'
+import Stores from './src/stores';
 import { Provider } from 'mobx-react';
 import 'react-native-gesture-handler';
 import { Routes } from './src/routes/Context';
