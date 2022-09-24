@@ -15,7 +15,7 @@ class RegisteredSniffersStore {
     })
   }
 
-  register() {
+  register = () => {
     console.log(`registered new sniffer`);
     this.counter += 1;
     this.registeredSniffers.push({
