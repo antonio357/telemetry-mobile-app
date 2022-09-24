@@ -29,7 +29,7 @@ class WsClientStore {
     else return 'There is no websocket'
   }
 
-  connect() {
+  connect = () => {
     console.log(`connecting ...`);
     this.connectionStatus = 'conectado';
     // this.ws = new WebSocket(this.url);
@@ -49,11 +49,11 @@ class WsClientStore {
     // this.ws.onmessage = message => console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
   }
 
-  disconnect() {
+  disconnect = () => {
     console.log(`disconnecting ...`);
     this.connectionStatus = 'desconectado';
     if (this.ws) this.ws.close();
   }
 }
 
-export default WsClientStore;
+export default new WsClientStore();
