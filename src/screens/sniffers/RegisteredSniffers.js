@@ -6,16 +6,13 @@ import { styles } from './RegisteredSniffers.styles';
 
 
 function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
-  const { registeredSniffers, register, getWsClient } = RegisteredSniffersStore;
+  const { registeredSniffers, register, connect, disconnect } = RegisteredSniffersStore;
 
   return (
     <View style={styles.view}>
       {registeredSniffers.map(sniffer => {
-        const wsClient = getWsClient(sniffer.url);
-        console.log(`wsClient = ${Object.keys(wsClient)}, values = ${Object.values(wsClient)}`);
-        console.log(`sniffer = ${Object.keys(sniffer)}, values = ${Object.values(sniffer)}`);
-        const item = {...sniffer, ...wsClient};
-        return <RegisteredSniffer {...item} />;
+        const item = {...sniffer, connect: () => connect(sniffer.url), disconnect: () => disconnect(sniffer.url)};
+        return <RegisteredSniffer key={item.url} {...item} />;
       })}
       <ScreenBase openRoutesMenu={() => {
         navigation.openDrawer();
