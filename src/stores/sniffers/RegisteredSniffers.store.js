@@ -47,7 +47,7 @@ class RegisteredSniffersStore {
 
   addPresentLogs = log => {
     const consts = {
-      socketTransferRateInMili: 200,
+      socketTransferRateInMili: 300,
       timelineInSeconds: 5,
     }
     const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili) ; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)

@@ -12,7 +12,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
 
   return (
     <View style={styles.view}>
-      <Button title="get logs" onPress={() => getLogsInTime(10)} />
+      <Button title="get logs" onPress={() => getLogsInTime(5)} />
       <Text>logs = {presentLogs.length}</Text>
 
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
