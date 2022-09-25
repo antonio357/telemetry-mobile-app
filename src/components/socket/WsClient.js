@@ -28,6 +28,10 @@ class WsClient {
     else return 'There is no websocket'
   }
 
+  send = cmd => {
+    this.ws.send(cmd);
+  }
+
   connect = () => {
     console.log(`connecting ...`);
     if (this.ws) this.ws = null; 
@@ -46,7 +50,12 @@ class WsClient {
       console.log(`ws = ${this.url} onerror: \nerror.message = ${error.message}`);
       this.ws.close();
     }
-    this.ws.onmessage = message => console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
+    this.ws.onmessage = message => {
+      // console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
+      const { addPresentLogs } = RegisteredSniffersStore;
+      const {rand1} = JSON.parse(message.data);
+      addPresentLogs(rand1);
+    }
   }
 
   disconnect = () => {
