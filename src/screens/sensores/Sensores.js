@@ -12,25 +12,25 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
 
   return (
     <View style={styles.view}>
-      <Button title="get logs" onPress={() => getLogsInTime(5)} />
+      <Button title="get logs" onPress={() => getLogsInTime(10)} />
       <Text>logs = {presentLogs.length}</Text>
 
-      <VictoryChart
-        theme={VictoryTheme.material}
-      >
-        <VictoryLine
-          style={{
-            data: { stroke: "#c43a31" },
-            parent: { border: "1px solid #ccc" }
-          }}
-          // { x: 1, y: 2 }
-          data={presentLogs.map(item => {
-            counter += 1;
-            return { x: counter, y: item };
-          })}
-        />
-      </VictoryChart>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+      <View>
+        <VictoryChart
+          theme={VictoryTheme.material}
+        >
+          <VictoryLine
+            style={{
+              data: { stroke: "#c43a31" },
+              parent: { border: "1px solid #ccc" }
+            }}
+            data={presentLogs}
+            x={item => item.x}
+            y={item => item.y}
+          />
+        </VictoryChart>
+      </View>
     </View>
   );
 }

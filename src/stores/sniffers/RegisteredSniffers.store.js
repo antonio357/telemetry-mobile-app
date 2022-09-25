@@ -13,6 +13,7 @@ class RegisteredSniffersStore {
     new WsClient('Sniffer pré cadastrado', 'ws://192.168.1.199:81'),
   ];
 
+  counter = -1;
   presentLogs = [];
 
   constructor() {
@@ -29,6 +30,8 @@ class RegisteredSniffersStore {
   }
 
   getLogsInTime = seconds => {
+    console.log(`presentLogs = ${JSON.stringify(this.presentLogs)}`);
+    this.clearPresentLogs();
     this.startLogs();
     setTimeout(() => this.stopLogs(), seconds * 1000);
   }
@@ -43,13 +46,19 @@ class RegisteredSniffersStore {
   }
 
   addPresentLogs = log => {
-    const limit = 1000; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
+    const consts = {
+      socketTransferRateInMili: 200,
+      timelineInSeconds: 5,
+    }
+    const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili) ; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
     if (this.presentLogs.length >= limit) this.presentLogs.shift();
-    this.presentLogs.push(log);
+    this.counter += 1;
+    this.presentLogs.push({y: log, x: this.counter});
   }
 
   clearPresentLogs = () => {
     this.presentLogs = [];
+    this.counter = -1;
   }
 
   register = () => {
