@@ -53,7 +53,8 @@ class WsClient {
     this.ws.onmessage = message => {
       // console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
       const { addPresentLogs } = RegisteredSniffersStore;
-      addPresentLogs(message.data);
+      const {rand1} = JSON.parse(message.data);
+      addPresentLogs(rand1);
     }
   }
 
