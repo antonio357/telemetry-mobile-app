@@ -13,14 +13,43 @@ class RegisteredSniffersStore {
     new WsClient('Sniffer pré cadastrado', 'ws://192.168.1.199:81'),
   ];
 
+  presentLogs = [];
+
   constructor() {
     makeObservable(this, {
       registeredSniffers: observable,
+      presentLogs: observable,
       register: action,
       connect: action,
       disconnect: action,
       updateSnifferStatus: action,
+      addPresentLogs: action,
+      clearPresentLogs: action,
     })
+  }
+
+  getLogsInTime = seconds => {
+    this.startLogs();
+    setTimeout(() => this.stopLogs(), seconds * 1000);
+  }
+
+  startLogs = () => {
+    this.wsClients.forEach(socket => socket.send('start logs'));
+  }
+
+  stopLogs = () => {
+    console.log(`called stop logs`);
+    this.wsClients.forEach(socket => socket.send('stop logs'));
+  }
+
+  addPresentLogs = log => {
+    const limit = 1000; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
+    if (this.presentLogs.length >= limit) this.presentLogs.shift();
+    this.presentLogs.push(log);
+  }
+
+  clearPresentLogs = () => {
+    this.presentLogs = [];
   }
 
   register = () => {
@@ -29,7 +58,7 @@ class RegisteredSniffersStore {
       url: 'ws://192.168.1.199:81',
       status: 'desconectado',
     });
-    this.wsClients.push(new WsClient('Sniffer pré cadastrado','ws://192.168.1.199:81'));
+    this.wsClients.push(new WsClient('Sniffer pré cadastrado', 'ws://192.168.1.199:81'));
   }
 
   updateSnifferStatus = (url, status) => {
