@@ -28,6 +28,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
             data={presentLogs}
             x={item => item.x}
             y={item => item.y}
+            animate={false}
           />
         </VictoryChart>
       </View>
