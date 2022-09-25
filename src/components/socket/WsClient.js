@@ -1,3 +1,5 @@
+import RegisteredSniffersStore from '../../stores/sniffers/RegisteredSniffers.store';
+
 class WsClient {
   name = '';
   url = '';
@@ -28,13 +30,17 @@ class WsClient {
 
   connect = () => {
     console.log(`connecting ...`);
+    if (this.ws) this.ws = null; 
     this.ws = new WebSocket(this.url);
     this.ws.onopen = open => {
       console.log(`ws = ${this.url} onopen: \nwebsocket client connected to websocket server ${this.url}`);
+      const { updateSnifferStatus } = RegisteredSniffersStore;
+      updateSnifferStatus(this.url, 'conectado');
     }
     this.ws.onclose = close => {
       console.log(`ws = ${this.url} onclose: \nclose.code = ${close.code}, close.reason = ${close.reason}`);
-      this.ws = null;
+      const { updateSnifferStatus } = RegisteredSniffersStore;
+      updateSnifferStatus(this.url, 'desconectado');
     }
     this.ws.onerror = error => {
       console.log(`ws = ${this.url} onerror: \nerror.message = ${error.message}`);
