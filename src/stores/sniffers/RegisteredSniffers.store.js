@@ -28,7 +28,7 @@ class RegisteredSniffersStore {
     })
     this.register('pré cadastrado', 'ws://192.168.1.199:81');
     // this.setCheckwsClientsThread(true);
-    this.presentLogsBufferThread = setInterval(this.updateLogs, 600);
+    this.presentLogsBufferThread = setInterval(this.updateLogs, 300);
   }
 
   updateLogs = () => {
