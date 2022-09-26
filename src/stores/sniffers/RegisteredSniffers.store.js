@@ -97,7 +97,7 @@ class RegisteredSniffersStore {
   }
 
   clearPresentLogs = () => {
-    this.presentLogs = [];
+    this.presentLogsBuffer = [];
     this.counter = -1;
   }
 
