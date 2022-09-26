@@ -6,7 +6,7 @@ import { styles } from './RegisteredSniffers.styles';
 
 
 function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
-  const { registeredSniffers, register, connect, disconnect } = RegisteredSniffersStore;
+  const { registeredSniffers, connect, disconnect } = RegisteredSniffersStore;
 
   return (
     <View style={styles.view}>
@@ -16,7 +16,7 @@ function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
       })}
       <ScreenBase openRoutesMenu={() => {
         navigation.openDrawer();
-        register();
+        // register();
       }} />
     </View>
   );
