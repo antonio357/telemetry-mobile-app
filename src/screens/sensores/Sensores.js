@@ -7,12 +7,12 @@ import { VictoryLine, VictoryTheme, VictoryChart } from 'victory-native';
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
   // console.log(`RegisteredSniffersStore = ${JSON.stringify(RegisteredSniffersStore)}`);
-  const { presentLogs, getLogsInTime } = RegisteredSniffersStore;
-  let counter = -1;
+  const { presentLogs, getLogsInTime, graphUpdateCount } = RegisteredSniffersStore;
 
+  graphUpdateCount();
   return (
     <View style={styles.view}>
-      <Button title="get logs" onPress={() => getLogsInTime(5)} />
+      <Button title="get logs" onPress={() => getLogsInTime(10)} />
       <Text>logs = {presentLogs.length}</Text>
 
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
