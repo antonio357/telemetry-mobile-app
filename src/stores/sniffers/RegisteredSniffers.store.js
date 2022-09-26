@@ -7,6 +7,7 @@ class RegisteredSniffersStore {
   wsClients = [];
 
   counter = -1;
+  presentLogsUpdatesCounter = 0;
   presentLogs = [];
   presentLogsBuffer = [];
   presentLogsBufferThread = null
@@ -31,9 +32,10 @@ class RegisteredSniffersStore {
   }
 
   updateLogs = () => {
-    if (this.presentLogsBuffer.length > 0);
-    this.presentLogs = [...this.presentLogs, ...this.presentLogsBuffer];
-    this.presentLogsBuffer = [];
+    if (this.presentLogsBuffer.length > 0) {
+      this.presentLogs = [...this.presentLogs, ...this.presentLogsBuffer];
+      this.presentLogsBuffer = [];
+    }
   }
 
   getRegisteredSniffer = url => {
