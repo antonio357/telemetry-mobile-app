@@ -3,7 +3,7 @@ import { styles } from "./RegisteredSniffer.styles";
 import { Ionicons } from '@expo/vector-icons';
 
 
-function RegisteredSniffer({name, url, status, connect, disconnect}) {
+function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) {
   const statusColor = {
     "desconectado": "#666666",
     "conectado": "#8FF399",
@@ -20,6 +20,12 @@ function RegisteredSniffer({name, url, status, connect, disconnect}) {
         <Button style={styles.button} onPress={() => connect(url)} title='Conectar' />
         <Button style={styles.button} onPress={() => disconnect(url)} title='Desconectar' />
       </View>
+      {status == 'conectado' && (
+        <View>
+          {sensors.length == 0 && (<Text>sniffer has no ports connected</Text>)}
+          {sensors.length > 0 && sensors.map(port => <Text key={port.portName}>{port.portName} {port.sensorType}</Text>)}
+        </View>
+      )}
     </View>
   );
 }

@@ -39,6 +39,7 @@ class WsClient {
     this.ws.onopen = open => {
       console.log(`ws = ${this.url} onopen: \nwebsocket client connected to websocket server ${this.url}`);
       const { updateSnifferStatus } = RegisteredSniffersStore;
+      this.send("ports");
       updateSnifferStatus(this.url, 'conectado');
     }
     this.ws.onclose = close => {
@@ -52,9 +53,16 @@ class WsClient {
     }
     this.ws.onmessage = message => {
       // console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
-      const { addPresentLogs } = RegisteredSniffersStore;
-      const {rand1} = JSON.parse(message.data);
-      addPresentLogs(rand1);
+      const {connectedPorts, logs} = JSON.parse(message.data);
+      if (logs) {
+        const { addPresentLogs } = RegisteredSniffersStore;
+        const {rand1} = JSON.parse(message.data);
+        addPresentLogs(rand1);
+      }
+      else if (connectedPorts) {
+        const { registerConnectedPorts } = RegisteredSniffersStore;
+        registerConnectedPorts(this.getUrl(), connectedPorts)
+      }
     }
   }
 

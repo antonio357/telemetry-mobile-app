@@ -26,10 +26,21 @@ class RegisteredSniffersStore {
       updateSnifferStatus: action,
       addPresentLogs: action,
       clearPresentLogs: action,
+      registerConnectedPorts: action,
     })
     this.register('pré cadastrado', 'ws://192.168.1.199:81');
     // this.setCheckwsClientsThread(true);
     this.presentLogsBufferThread = setInterval(this.updateLogs, 500);
+  }
+
+  // getConnectedPorts = url => {
+  //   const ws = this.wsClients.find(socket => socket.getUrl() == url);
+    
+  // } 
+
+  registerConnectedPorts = (url, ports) => {
+    const sniffer = this.getRegisteredSniffer(url);
+    sniffer.sensors = ports.map(port => {return {sensorType: undefined, portName: port}});
   }
 
   graphUpdateCount = () => {
@@ -106,6 +117,7 @@ class RegisteredSniffersStore {
       name: name,
       url: url,
       status: 'desconectado',
+      sensors: [],
     });
     this.wsClients.push(new WsClient(name, url));
   }
