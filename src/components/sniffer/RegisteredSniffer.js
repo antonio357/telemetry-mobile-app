@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Text, View, Button } from "react-native";
 import { styles } from "./RegisteredSniffer.styles";
 import { Ionicons } from '@expo/vector-icons';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 
 function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) {
@@ -8,6 +10,20 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) 
     "desconectado": "#666666",
     "conectado": "#8FF399",
   }[status];
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(undefined);
+  // const [items, setItems] = useState([
+  //   { label: 'undefined', value: undefined },
+  //   { label: 'touch', value: 'touch' },
+  //   { label: 'ultrasonic', value: 'ultrasonic' }
+  // ]);
+
+  const items = [
+    { label: 'undefined', value: undefined },
+    { label: 'touch', value: 'touch' },
+    { label: 'ultrasonic', value: 'ultrasonic' }
+  ];
 
   return (
     <View style={[styles.card, styles.shadowProp]}>
@@ -23,7 +39,20 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) 
       {status == 'conectado' && (
         <View>
           {sensors.length == 0 && (<Text>sniffer has no ports connected</Text>)}
-          {sensors.length > 0 && sensors.map(port => <Text key={port.portName}>{port.portName} {port.sensorType}</Text>)}
+          {sensors.length > 0 && sensors.map(port => (
+            <View key={port.portName} styles={styles.container}>
+              <Text >{port.portName} {port.sensorType}</Text>
+              <DropDownPicker
+                placeholder={'Define sensor type'}
+                key={port.portName}
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+              />
+            </View>
+          ))}
         </View>
       )}
     </View>
