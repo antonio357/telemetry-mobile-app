@@ -3,23 +3,23 @@ import WsClient from '../../components/socket/WsClient';
 
 
 class RegisteredSniffersStore {
-  registeredSniffers = [{
-    name: 'Sniffer pré cadastrado',
-    url: 'ws://192.168.1.199:81',
-    status: 'desconectado',
-  }];
-
-  wsClients = [
-    new WsClient('Sniffer pré cadastrado', 'ws://192.168.1.199:81'),
-  ];
+  registeredSniffers = [];
+  wsClients = [];
 
   counter = -1;
+  presentLogsUpdatesCounter = 0;
+  graphUpdatesCounter = 0;
   presentLogs = [];
+  presentLogsBuffer = [];
+  presentLogsBufferThread = null
+
+  wsClientsCheckerThread = null;
 
   constructor() {
     makeObservable(this, {
       registeredSniffers: observable,
       presentLogs: observable,
+      updateLogs: action,
       register: action,
       connect: action,
       disconnect: action,
@@ -27,13 +27,52 @@ class RegisteredSniffersStore {
       addPresentLogs: action,
       clearPresentLogs: action,
     })
+    this.register('pré cadastrado', 'ws://192.168.1.199:81');
+    // this.setCheckwsClientsThread(true);
+    this.presentLogsBufferThread = setInterval(this.updateLogs, 500);
   }
+
+  graphUpdateCount = () => {
+    this.graphUpdatesCounter += 1;
+  }
+
+  updateLogs = () => {
+    if (this.presentLogsBuffer.length > 0) {
+      this.presentLogs = [...this.presentLogsBuffer];
+      // this.presentLogsBuffer = [];
+      this.presentLogsUpdatesCounter += 1;
+    }
+  }
+
+  getRegisteredSniffer = url => {
+    return this.registeredSniffers.find(sniffer => sniffer.url == url);
+  }
+
+  // setCheckwsClientsThread = bool => {
+  //   if (bool) {
+  //     if (!this.wsClientsCheckerThread) {
+  //       this.wsClientsCheckerThread = setTimeout(() => {
+  //         this.wsClients.forEach(socket => {
+  //           if (socket.isConnected()) socket.send('ping');
+  //         });
+  //       }, 2000);
+  //     }
+  //   }
+  //   else {
+  //     if (this.wsClientsCheckerThread) {
+  //       clearInterval(this.wsClientsCheckerThread);
+  //       this.wsClientsCheckerThread = null;
+  //     }
+  //   }
+  // }
 
   getLogsInTime = seconds => {
     console.log(`presentLogs = ${JSON.stringify(this.presentLogs)}`);
     this.clearPresentLogs();
     this.startLogs();
     setTimeout(() => this.stopLogs(), seconds * 1000);
+    this.presentLogsUpdatesCounter = 0;
+    this.graphUpdatesCounter = 0;
   }
 
   startLogs = () => {
@@ -43,6 +82,7 @@ class RegisteredSniffersStore {
   stopLogs = () => {
     console.log(`called stop logs`);
     this.wsClients.forEach(socket => socket.send('stop logs'));
+    console.log(`this.presentLogsUpdatesCounter = ${this.presentLogsUpdatesCounter}, this.graphUpdatesCounter = ${this.graphUpdatesCounter};`);
   }
 
   addPresentLogs = log => {
@@ -50,24 +90,24 @@ class RegisteredSniffersStore {
       socketTransferRateInMili: 300,
       timelineInSeconds: 5,
     }
-    const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili) ; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
-    if (this.presentLogs.length >= limit) this.presentLogs.shift();
+    const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili); // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
+    if (this.presentLogsBuffer.length >= limit) this.presentLogsBuffer.shift();
     this.counter += 1;
-    this.presentLogs.push({y: log, x: this.counter});
+    this.presentLogsBuffer.push({ y: log, x: this.counter });
   }
 
   clearPresentLogs = () => {
-    this.presentLogs = [];
+    this.presentLogsBuffer = [];
     this.counter = -1;
   }
 
-  register = () => {
+  register = (name, url) => {
     this.registeredSniffers.push({
-      name: 'Sniffer pré cadastrado',
-      url: 'ws://192.168.1.199:81',
+      name: name,
+      url: url,
       status: 'desconectado',
     });
-    this.wsClients.push(new WsClient('Sniffer pré cadastrado', 'ws://192.168.1.199:81'));
+    this.wsClients.push(new WsClient(name, url));
   }
 
   updateSnifferStatus = (url, status) => {
