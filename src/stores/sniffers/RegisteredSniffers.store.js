@@ -9,8 +9,8 @@ class RegisteredSniffersStore {
   counter = -1;
   presentLogsUpdatesCounter = 0;
   graphUpdatesCounter = 0;
-  presentLogs = [];
-  presentLogsBuffer = [];
+  presentLogs = {};
+  presentLogsBuffer = {};
   presentLogsBufferThread = null
 
   wsClientsCheckerThread = null;
@@ -39,7 +39,7 @@ class RegisteredSniffersStore {
 
   // getConnectedPorts = url => {
   //   const ws = this.wsClients.find(socket => socket.getUrl() == url);
-    
+
   // } 
 
   toggleSensorTypeSelectionOpen = (url, portName) => {
@@ -58,7 +58,7 @@ class RegisteredSniffersStore {
 
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
-    sniffer.sensors = ports.map(port => {return {sensorType: undefined, portName: port, selectOpen: false}});
+    sniffer.sensors = ports.map(port => { return { sensorType: undefined, portName: port, selectOpen: false } });
   }
 
   setSensorType = (url, portName, sensorType) => {
@@ -75,11 +75,27 @@ class RegisteredSniffersStore {
   }
 
   updateLogs = () => {
-    if (this.presentLogsBuffer.length > 0) {
-      this.presentLogs = [...this.presentLogsBuffer];
-      // this.presentLogsBuffer = [];
-      this.presentLogsUpdatesCounter += 1;
+    // if (this.presentLogsBuffer.length > 0) {
+    //   this.presentLogs = [...this.presentLogsBuffer];
+    //   // this.presentLogsBuffer = [];
+    //   this.presentLogsUpdatesCounter += 1;
+    // }
+
+    if (Object.keys(this.presentLogsBuffer).length > 0) {
+      Object.keys(this.presentLogsBuffer).forEach(url => {
+        if (!this.presentLogs[url]) {
+          this.presentLogs[url] = {};
+          Object.keys(this.presentLogsBuffer[url]).forEach(port => {
+            this.presentLogs[url][port] = [];
+          });
+        }
+        Object.keys(this.presentLogsBuffer[url]).forEach(port => {
+          this.presentLogs[url][port] = [...this.presentLogsBuffer[url][port]];
+        });
+        this.presentLogsUpdatesCounter += 1;
+      });
     }
+    console.log(`this.presentLogs = ${JSON.stringify(this.presentLogs)}`);
   }
 
   getRegisteredSniffer = url => {
@@ -123,19 +139,32 @@ class RegisteredSniffersStore {
     console.log(`this.presentLogsUpdatesCounter = ${this.presentLogsUpdatesCounter}, this.graphUpdatesCounter = ${this.graphUpdatesCounter};`);
   }
 
-  addPresentLogs = log => {
+  addPresentLogs = (url, logs) => {
     const consts = {
       socketTransferRateInMili: 300,
       timelineInSeconds: 5,
     }
     const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili); // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
-    if (this.presentLogsBuffer.length >= limit) this.presentLogsBuffer.shift();
-    this.counter += 1;
-    this.presentLogsBuffer.push({ y: log, x: this.counter });
+    // if (this.presentLogsBuffer.length >= limit) this.presentLogsBuffer.shift();
+    // this.counter += 1;
+    // this.presentLogsBuffer.push({ y: logs, x: this.counter });
+    if (!this.presentLogsBuffer[url]) {
+      this.presentLogsBuffer[url] = {};
+      Object.keys(logs[0]).forEach(port => {
+        this.presentLogsBuffer[url][port] = [];
+      });
+    }
+    logs.forEach(log => {
+      Object.keys(log).forEach(port => {
+        if (this.presentLogsBuffer[url][port].length >= limit) this.presentLogsBuffer[url][port].shift();
+        this.presentLogsBuffer[url][port].push({ y: log[port], x: this.counter });
+      });
+      this.counter += 1;
+    });
   }
 
   clearPresentLogs = () => {
-    this.presentLogsBuffer = [];
+    this.presentLogsBuffer = {};
     this.counter = -1;
   }
 

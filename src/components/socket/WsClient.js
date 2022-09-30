@@ -34,7 +34,7 @@ class WsClient {
 
   connect = () => {
     console.log(`connecting ...`);
-    if (this.ws) this.ws = null; 
+    if (this.ws) this.ws = null;
     this.ws = new WebSocket(this.url);
     this.ws.onopen = open => {
       console.log(`ws = ${this.url} onopen: \nwebsocket client connected to websocket server ${this.url}`);
@@ -52,12 +52,11 @@ class WsClient {
       this.ws.close();
     }
     this.ws.onmessage = message => {
-      // console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
-      const {connectedPorts, logs} = JSON.parse(message.data);
+      console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
+      const { connectedPorts, logs } = JSON.parse(message.data);
       if (logs) {
         const { addPresentLogs } = RegisteredSniffersStore;
-        const {rand1} = JSON.parse(message.data);
-        addPresentLogs(rand1);
+        addPresentLogs(this.getUrl(), logs);
       }
       else if (connectedPorts) {
         const { registerConnectedPorts } = RegisteredSniffersStore;
