@@ -45,9 +45,9 @@ class RegisteredSniffersStore {
   toggleSensorTypeSelectionOpen = (url, portName) => {
     const sniffer = this.getRegisteredSniffer(url);
     const port = sniffer.sensors.find(port => port.portName == portName);
-    console.log(`before toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
+    // console.log(`before toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
     port.selectOpen = !port.selectOpen;
-    console.log(`after toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
+    // console.log(`after toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
   }
 
   getSelectOpen = (url, portName) => {
@@ -62,12 +62,12 @@ class RegisteredSniffersStore {
   }
 
   setSensorType = (url, portName, sensorType) => {
-    console.log(`setSensorType(${url}, ${portName}, ${sensorType})`);
+    // console.log(`setSensorType(${url}, ${portName}, ${sensorType})`);
     const sniffer = this.getRegisteredSniffer(url);
     const port = sniffer.sensors.find(port => port.portName == portName);
-    console.log(`before setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
+    // console.log(`before setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
     port.sensorType = sensorType;
-    console.log(`after setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
+    // console.log(`after setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
   }
 
   graphUpdateCount = () => {
@@ -95,7 +95,7 @@ class RegisteredSniffersStore {
         this.presentLogsUpdatesCounter += 1;
       });
     }
-    console.log(`this.presentLogs = ${JSON.stringify(this.presentLogs)}`);
+    // console.log(`this.presentLogs = ${JSON.stringify(this.presentLogs)}`);
   }
 
   getRegisteredSniffer = url => {
@@ -121,7 +121,7 @@ class RegisteredSniffersStore {
   // }
 
   getLogsInTime = seconds => {
-    console.log(`presentLogs = ${JSON.stringify(this.presentLogs)}`);
+    // console.log(`presentLogs = ${JSON.stringify(this.presentLogs)}`);
     this.clearPresentLogs();
     this.startLogs();
     setTimeout(() => this.stopLogs(), seconds * 1000);
@@ -134,9 +134,9 @@ class RegisteredSniffersStore {
   }
 
   stopLogs = () => {
-    console.log(`called stop logs`);
+    // console.log(`called stop logs`);
     this.wsClients.forEach(socket => socket.send('stop logs'));
-    console.log(`this.presentLogsUpdatesCounter = ${this.presentLogsUpdatesCounter}, this.graphUpdatesCounter = ${this.graphUpdatesCounter};`);
+    // console.log(`this.presentLogsUpdatesCounter = ${this.presentLogsUpdatesCounter}, this.graphUpdatesCounter = ${this.graphUpdatesCounter};`);
   }
 
   addPresentLogs = (url, logs) => {
@@ -144,7 +144,7 @@ class RegisteredSniffersStore {
       socketTransferRateInMili: 300,
       timelineInSeconds: 5,
     }
-    const limit = parseInt(1000 * consts.timelineInSeconds / consts.socketTransferRateInMili); // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
+    const limit = 100; // 1 log a cada 10 ms, 1000 logs a cada 10000ms (10 segundos)
     // if (this.presentLogsBuffer.length >= limit) this.presentLogsBuffer.shift();
     // this.counter += 1;
     // this.presentLogsBuffer.push({ y: logs, x: this.counter });
@@ -181,7 +181,7 @@ class RegisteredSniffersStore {
   updateSnifferStatus = (url, status) => {
     const sniffer = this.registeredSniffers.filter(sniffer => sniffer.url == url)[0];
     if (sniffer) sniffer.status = status;
-    console.log(`updateSnifferStatus(${url}, ${status}) -> \nthis.registeredSniffers.filter(sniffer => sniffer.url == ${url})[0].status = ${this.registeredSniffers.filter(sniffer => sniffer.url == url)[0].status}`);
+    // console.log(`updateSnifferStatus(${url}, ${status}) -> \nthis.registeredSniffers.filter(sniffer => sniffer.url == ${url})[0].status = ${this.registeredSniffers.filter(sniffer => sniffer.url == url)[0].status}`);
   }
 
   connect = url => {

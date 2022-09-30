@@ -33,26 +33,26 @@ class WsClient {
   }
 
   connect = () => {
-    console.log(`connecting ...`);
+    // console.log(`connecting ...`);
     if (this.ws) this.ws = null;
     this.ws = new WebSocket(this.url);
     this.ws.onopen = open => {
-      console.log(`ws = ${this.url} onopen: \nwebsocket client connected to websocket server ${this.url}`);
+      // console.log(`ws = ${this.url} onopen: \nwebsocket client connected to websocket server ${this.url}`);
       const { updateSnifferStatus } = RegisteredSniffersStore;
       this.send("ports");
       updateSnifferStatus(this.url, 'conectado');
     }
     this.ws.onclose = close => {
-      console.log(`ws = ${this.url} onclose: \nclose.code = ${close.code}, close.reason = ${close.reason}`);
+      // console.log(`ws = ${this.url} onclose: \nclose.code = ${close.code}, close.reason = ${close.reason}`);
       const { updateSnifferStatus } = RegisteredSniffersStore;
       updateSnifferStatus(this.url, 'desconectado');
     }
     this.ws.onerror = error => {
-      console.log(`ws = ${this.url} onerror: \nerror.message = ${error.message}`);
+      // console.log(`ws = ${this.url} onerror: \nerror.message = ${error.message}`);
       this.ws.close();
     }
     this.ws.onmessage = message => {
-      console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
+      // console.log(`ws = ${this.ws.url} onmessage: \nmessage.data = ${message.data}`);
       const { connectedPorts, logs } = JSON.parse(message.data);
       if (logs) {
         const { addPresentLogs } = RegisteredSniffersStore;
@@ -66,7 +66,7 @@ class WsClient {
   }
 
   disconnect = () => {
-    console.log(`disconnecting ...`);
+    // console.log(`disconnecting ...`);
     if (this.ws) this.ws.close();
   }
 }
