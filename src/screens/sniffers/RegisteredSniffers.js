@@ -6,12 +6,12 @@ import { styles } from './RegisteredSniffers.styles';
 
 
 function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
-  const { registeredSniffers, connect, disconnect } = RegisteredSniffersStore;
+  const { registeredSniffers, connect, disconnect, setSensorType, toggleSensorTypeSelectionOpen, getSelectOpen } = RegisteredSniffersStore;
 
   return (
     <View style={styles.view}>
       {registeredSniffers.map(sniffer => {
-        const item = {...sniffer, connect: () => connect(sniffer.url), disconnect: () => disconnect(sniffer.url)};
+        const item = {...sniffer, connect: connect, disconnect: disconnect, setSensorType: setSensorType, toggleSensorTypeSelectionOpen: toggleSensorTypeSelectionOpen, getSelectOpen: getSelectOpen};
         return <RegisteredSniffer key={item.url} {...item} />;
       })}
       <ScreenBase openRoutesMenu={() => {

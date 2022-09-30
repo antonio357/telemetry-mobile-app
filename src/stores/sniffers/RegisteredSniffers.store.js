@@ -27,6 +27,10 @@ class RegisteredSniffersStore {
       addPresentLogs: action,
       clearPresentLogs: action,
       registerConnectedPorts: action,
+      setSensorType: action,
+      toggleSensorTypeSelectionOpen: action,
+      getSelectOpen: action,
+
     })
     this.register('pré cadastrado', 'ws://192.168.1.199:81');
     // this.setCheckwsClientsThread(true);
@@ -38,9 +42,32 @@ class RegisteredSniffersStore {
     
   // } 
 
+  toggleSensorTypeSelectionOpen = (url, portName) => {
+    const sniffer = this.getRegisteredSniffer(url);
+    const port = sniffer.sensors.find(port => port.portName == portName);
+    console.log(`before toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
+    port.selectOpen = !port.selectOpen;
+    console.log(`after toggleSensorTypeSelectionOpen(${url}, ${portName}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.selectOpen = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).selectOpen}`);
+  }
+
+  getSelectOpen = (url, portName) => {
+    const sniffer = this.getRegisteredSniffer(url);
+    const port = sniffer.sensors.find(port => port.portName == portName);
+    return port.selectOpen;
+  }
+
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
-    sniffer.sensors = ports.map(port => {return {sensorType: undefined, portName: port}});
+    sniffer.sensors = ports.map(port => {return {sensorType: undefined, portName: port, selectOpen: false}});
+  }
+
+  setSensorType = (url, portName, sensorType) => {
+    console.log(`setSensorType(${url}, ${portName}, ${sensorType})`);
+    const sniffer = this.getRegisteredSniffer(url);
+    const port = sniffer.sensors.find(port => port.portName == portName);
+    console.log(`before setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
+    port.sensorType = sensorType;
+    console.log(`after setSensorType(${url}, ${portName}, ${sensorType}) -> sniffer.url = ${this.getRegisteredSniffer(url).url} -> port.portName = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).portName} -> port.sensorType = ${this.getRegisteredSniffer(url).sensors.find(port => port.portName == portName).sensorType}`);
   }
 
   graphUpdateCount = () => {

@@ -5,25 +5,40 @@ import { Ionicons } from '@expo/vector-icons';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 
-function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) {
+function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(sensorType);
+  const [items, setItems] = useState([
+    { label: 'undefined', value: undefined },
+    { label: 'touch', value: 'touch' },
+    { label: 'ultrasonic', value: 'ultrasonic' }
+  ]);
+
+  return (
+    <View>
+      <Text>{portName}</Text>
+      <DropDownPicker
+        placeholder={'Define sensor type'}
+        zIndex={zIndex}
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        onChangeValue={value => setSensorType(url, portName, value)}
+      />
+    </View>
+  );
+}
+
+
+function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, setSensorType }) {
   const statusColor = {
     "desconectado": "#666666",
     "conectado": "#8FF399",
   }[status];
 
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(undefined);
-  // const [items, setItems] = useState([
-  //   { label: 'undefined', value: undefined },
-  //   { label: 'touch', value: 'touch' },
-  //   { label: 'ultrasonic', value: 'ultrasonic' }
-  // ]);
-
-  const items = [
-    { label: 'undefined', value: undefined },
-    { label: 'touch', value: 'touch' },
-    { label: 'ultrasonic', value: 'ultrasonic' }
-  ];
+  let counter = sensors.length + 1;
 
   return (
     <View style={[styles.card, styles.shadowProp]}>
@@ -39,20 +54,11 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors }) 
       {status == 'conectado' && (
         <View>
           {sensors.length == 0 && (<Text>sniffer has no ports connected</Text>)}
-          {sensors.length > 0 && sensors.map(port => (
-            <View key={port.portName} styles={styles.container}>
-              <Text >{port.portName} {port.sensorType}</Text>
-              <DropDownPicker
-                placeholder={'Define sensor type'}
-                key={port.portName}
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-              />
-            </View>
-          ))}
+          {sensors.length > 0 && sensors.map(port => {
+            counter -= 1;
+            const definition = {url, ...port, zIndex: counter, setSensorType: setSensorType};
+            return <DefineSensor key={port.portName} {...definition} />
+          })}
         </View>
       )}
     </View>
