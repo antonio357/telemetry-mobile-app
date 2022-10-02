@@ -28,7 +28,6 @@ function Chart({ url, port, data }) {
 }
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
-  // // console.log(`RegisteredSniffersStore = ${JSON.stringify(RegisteredSniffersStore)}`);
   const { presentLogs, getLogsInTime } = RegisteredSniffersStore;
 
   const definition1 = { url: "url", port: "port", data: [{ "y": 39, "x": 1 }, { "y": 65, "x": 3 }] };
@@ -36,7 +35,6 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   {Object.keys(presentLogs).map(url => {
     Object.keys(presentLogs[url]).map(port => {
       const definition = { url: url, port: port, data: presentLogs[url][port] };
-      // console.log(`chart = ${JSON.stringify(definition)}`);
       chartsArray.push(<Chart {...definition} />);
     })
   })}
@@ -47,35 +45,6 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
 
       <ScrollView>
         {chartsArray.map(item => item)}
-        {/* <VictoryChart
-          theme={VictoryTheme.material}
-        >
-          <VictoryLine
-            style={{
-              data: { stroke: "#c43a31" },
-              parent: { border: "1px solid #ccc" }
-            }}
-            data={[{ y: 42, x: 0 }, { y: 51, x: 1 }]}
-            x={item => item.x}
-            y={item => item.y}
-            animate={false}
-          />
-        </VictoryChart>
-
-        <VictoryChart
-          theme={VictoryTheme.material}
-        >
-          <VictoryLine
-            style={{
-              data: { stroke: "#c43a31" },
-              parent: { border: "1px solid #ccc" }
-            }}
-            data={[{ y: 42, x: 0 }, { y: 51, x: 1 }]}
-            x={item => item.x}
-            y={item => item.y}
-            animate={false}
-          />
-        </VictoryChart> */}
       </ScrollView>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
