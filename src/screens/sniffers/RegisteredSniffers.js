@@ -16,7 +16,6 @@ function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
       })}
       <ScreenBase openRoutesMenu={() => {
         navigation.openDrawer();
-        // register();
       }} />
     </View>
   );
