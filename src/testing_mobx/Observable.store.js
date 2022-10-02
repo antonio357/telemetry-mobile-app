@@ -16,7 +16,7 @@ class ObservableStore {
    * reference https://www.youtube.com/watch?v=pKvA6IQUnaM&t=576s&ab_channel=IagoBranco
    */
   add = () => {
-    console.log(`incrementing counter = ${this.counter}`);
+    // console.log(`incrementing counter = ${this.counter}`);
     this.counter += 1;
   }
 }

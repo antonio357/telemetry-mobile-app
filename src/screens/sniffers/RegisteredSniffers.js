@@ -11,12 +11,11 @@ function RegisteredSniffers({ navigation, RegisteredSniffersStore }) {
   return (
     <View style={styles.view}>
       {registeredSniffers.map(sniffer => {
-        const item = {...sniffer, connect: () => connect(sniffer.url), disconnect: () => disconnect(sniffer.url)};
+        const item = {...sniffer, connect: connect, disconnect: disconnect};
         return <RegisteredSniffer key={item.url} {...item} />;
       })}
       <ScreenBase openRoutesMenu={() => {
         navigation.openDrawer();
-        // register();
       }} />
     </View>
   );
