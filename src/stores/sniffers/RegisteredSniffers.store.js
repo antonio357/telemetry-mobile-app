@@ -54,6 +54,20 @@ class RegisteredSniffersStore {
     const sniffer = this.getRegisteredSniffer(url);
     const port = sniffer.sensors.find(port => port.portName == portName);
     port.sensorType = sensorType;
+
+    // send information for sniffer
+    const socket = this.getWsClient(url);
+    if (socket) {
+      socket.send(JSON.stringify({
+        cmd: 'port config',
+        portName: portName,
+        sensorType: sensorType
+      }));
+    }
+  }
+
+  getWsClient = url => {
+    return this.wsClients.find(socket => socket.getUrl() == url);
   }
 
   // logs rendering methods
