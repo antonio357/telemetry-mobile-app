@@ -17,7 +17,7 @@ function Chart({ url, port, data }) {
             data: { stroke: "#c43a31" },
             parent: { border: "1px solid #ccc" }
           }}
-          data={[]}
+          data={data}
           x={item => item.x}
           y={item => item.y}
           animate={false}
@@ -29,7 +29,7 @@ function Chart({ url, port, data }) {
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
   // // console.log(`RegisteredSniffersStore = ${JSON.stringify(RegisteredSniffersStore)}`);
-  const { presentLogs, getLogsInTime, graphUpdateCount } = RegisteredSniffersStore;
+  const { presentLogs, getLogsInTime } = RegisteredSniffersStore;
 
   const definition1 = { url: "url", port: "port", data: [{ "y": 39, "x": 1 }, { "y": 65, "x": 3 }] };
   let chartsArray = [];
@@ -41,7 +41,6 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
     })
   })}
 
-  graphUpdateCount();
   return (
     <View style={styles.view}>
       <Button title="get logs" onPress={() => getLogsInTime(10)} />
