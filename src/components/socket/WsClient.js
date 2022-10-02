@@ -59,7 +59,7 @@ class WsClient {
       }
       else if (connectedPorts) {
         const { registerConnectedPorts } = RegisteredSniffersStore;
-        registerConnectedPorts(this.getUrl(), connectedPorts)
+        registerConnectedPorts(this.getUrl(), connectedPorts);
       }
     }
   }
