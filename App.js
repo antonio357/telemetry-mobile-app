@@ -167,7 +167,7 @@
 // }
 
 
-import { Canvas, Skia, Path, PathOp } from "@shopify/react-native-skia";
+import { Canvas, Skia, Path } from "@shopify/react-native-skia";
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -219,22 +219,8 @@ class LineChart {
     let counter = 0;
     for (let i = 0; i < vector.length; i++) {
       counter += 1;
-      // setTimeout(() => this.pushData(vector[i]), 20 * counter);
       this.pushData(vector[i])
     }
-    // setTimeout(() => {
-    //   let dms = this.path.toCmds();
-    //   for (let i = 0; i < 10; i++) dms.shift();
-    //   this.path.rewind();
-    //   setTimeout(() => {
-    //     this.path.moveTo(dms[0][1], dms[0][2]);
-    //     for (let i = 1; i < dms.length; i++) {
-    //       this.path.lineTo(dms[i][1], dms[i][2])
-    //     }
-    //   }, 2000);
-    //   // this.path.toCmds().push(this.path.toCmds())
-    // }, 2000);
-
   }
 
   getPath = () => {
@@ -246,14 +232,7 @@ const App = () => {
   const lineChart = new LineChart([0, 100], [0, 255]);
   const path = lineChart.getPath();
 
-  // const vector = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0];
-  // const vector = [];
-  // for (let i = 0; i < 10000; i++) {
-  //   // vector.push(i % 6);
-  //   vector.push(Math.floor(Math.random() * 256));
-  // }
   setInterval(() => lineChart.pushData(Math.random() * 256), 1);
-  // lineChart.loadDataVector(vector);
 
   return (
     <Canvas style={{ flex: 1, heigh: 500 }} mode='continuous' debug={true} >
