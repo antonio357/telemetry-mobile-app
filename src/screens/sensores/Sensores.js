@@ -19,7 +19,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   const allPortChart = getAllPortChart();
   for (let i = 0; i < allPortChart.length; i++) {
     chartsArray.push(
-      <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
+      <Canvas key={allPortChart[i].url} style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
         <Path path={allPortChart[i].path.getPath()} style="stroke" color="tomato" strokeWidth={3} />
       </Canvas>
     );
