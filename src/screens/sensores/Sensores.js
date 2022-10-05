@@ -26,18 +26,30 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   }
 
   const [render, setRender] = useState(false);
-
-  setInterval(() => {
-    if (render) {
-      for (let i = 0; i < allPortChart.length; i++) {
-        allPortChart[i].path.pushData(Math.random() * 256);
-      }
-    }
-  }, 50);
+  const [thread, setThread] = useState(null);
 
   return (
     <View style={{ margin: viewMarging, width: viewWidth }}>
-      <Button title="get logs" onPress={() => setRender(!render)} />
+      <Button title={render ? "stop logs" : "get logs"} onPress={() => {
+        if (allPortChart.length > 0) {
+          if (render) {
+            setRender(false);
+            clearTimeout(thread);
+            setThread(null);
+          } else {
+            setRender(true);
+            setThread(setInterval(() => {
+              for (let i = 0; i < allPortChart.length; i++) {
+                allPortChart[i].path.pushData(Math.random() * 256);
+              }
+            }, 100));
+          }
+        } else {
+          setRender(false);
+          clearInterval(thread);
+          setThread(null);
+        }
+      }} />
       <ScrollView>
         {chartsArray}
       </ScrollView>
