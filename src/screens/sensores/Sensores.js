@@ -79,21 +79,23 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
     }
   }, 50);
 
-  const padding = 24;
+  const viewMarging = 24;
   const strokeWidth = 16;
   const screeWidth = Dimensions.get('window').width;
-  const viewWidth = screeWidth - (2 * padding);
+  const viewWidth = screeWidth - (2 * viewMarging);
   const drawWidth = viewWidth - (strokeWidth * 2);
 
   return (
-    <View style={{margin: padding, height: viewWidth, width: viewWidth}}>
+    <View style={{ margin: viewMarging, width: viewWidth }}>
       <Button title="get logs" onPress={() => setRender(!render)} />
-      <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
-        <Path path={lineChart.getPath()} style="stroke" color="tomato" strokeWidth={3} />
-      </Canvas>
-      <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
-        <Path path={lineChart1.getPath()} style="stroke" color="turquoise" strokeWidth={3} />
-      </Canvas>
+      <ScrollView>
+        <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
+          <Path path={lineChart.getPath()} style="stroke" color="tomato" strokeWidth={3} />
+        </Canvas>
+        <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
+          <Path path={lineChart1.getPath()} style="stroke" color="turquoise" strokeWidth={3} />
+        </Canvas>
+      </ScrollView>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
   );
