@@ -52,9 +52,7 @@ class LineChart {
   }
 
   loadDataVector = vector => {
-    let counter = 0;
     for (let i = 0; i < vector.length; i++) {
-      counter += 1;
       this.pushData(vector[i])
     }
   }
