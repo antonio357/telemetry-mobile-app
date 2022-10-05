@@ -3,7 +3,7 @@ module.exports = function(api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      'react-native-reanimated/plugin', // swipe animation
+      'react-native-reanimated/plugin', // swipe animation and skia dependency
     ]
   };
 };
