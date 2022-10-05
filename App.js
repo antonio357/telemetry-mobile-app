@@ -167,7 +167,7 @@
 // }
 
 
-import { Canvas, Skia, Path } from "@shopify/react-native-skia";
+import { Canvas, Skia, Path} from "@shopify/react-native-skia";
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -191,7 +191,7 @@ class LineChart {
   }
 
   pushData = data => {
-    const limit = 100;
+    const limit = 50;
     let tmpComands = this.path.toCmds();
     if (tmpComands.length > 0) {
       if (tmpComands.length < limit) {
@@ -232,11 +232,13 @@ const App = () => {
   const lineChart = new LineChart([0, 100], [0, 255]);
   const path = lineChart.getPath();
 
-  setInterval(() => lineChart.pushData(Math.random() * 256), 100);
+  setInterval(() => {
+    lineChart.pushData(Math.random() * 256);
+  }, 50);
 
   return (
-    <Canvas style={{ flex: 1, heigh: 500 }} mode='continuous' debug={true} >
-      <Path path={path} style="stroke" color="red" strokeWidth={3} />
+    <Canvas style={{ flex: 1, maxHeight: 300 }} mode='continuous' debug={true} >
+      <Path path={path} style="stroke" color="tomato" strokeWidth={3} />
     </Canvas>
   );
 }
