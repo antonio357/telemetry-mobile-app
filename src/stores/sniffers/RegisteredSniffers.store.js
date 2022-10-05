@@ -1,6 +1,64 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
+import { Skia } from "@shopify/react-native-skia";
 
+
+class LineChart {
+  constructor(xScale, yScale) {
+    this.xScale = {
+      min: xScale[0],
+      max: xScale[1],
+    }
+    this.yScale = {
+      min: yScale[0],
+      max: yScale[1],
+    }
+    this.path = Skia.Path.Make();
+    this.pathStatus = {
+      moved: false,
+    }
+    this.lastXAxisIndex = 0;
+    this.axisScale = {
+      x: 5,
+      y: 1,
+    };
+  }
+
+  pushData = data => {
+    const limit = 50;
+    let tmpComands = this.path.toCmds();
+    if (tmpComands.length > 0) {
+      if (tmpComands.length < limit) {
+        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+      } else {
+        this.lastXAxisIndex -= 1;
+        for (let i = tmpComands.length - 1; i > 0; i--) {
+          tmpComands[i][1] = tmpComands[i - 1][1];
+        }
+        this.path.rewind();
+        this.path.moveTo(tmpComands[1][1], tmpComands[1][2]);
+        for (let i = 2; i < tmpComands.length; i++) {
+          this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
+        }
+        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+      }
+    }
+    else {
+      this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+    }
+    this.lastXAxisIndex += 1;
+  }
+
+  loadDataVector = vector => {
+    for (let i = 0; i < vector.length; i++) {
+      this.pushData(vector[i])
+    }
+  }
+
+  getPath = () => {
+    return this.path;
+  }
+}
 
 class RegisteredSniffersStore {
   // wsClient connections
@@ -13,6 +71,18 @@ class RegisteredSniffersStore {
   presentLogs = {};
   presentLogsBuffer = {};
   presentLogsBufferThread = null
+
+  // path to the port and sensortype
+  // example:
+  // portChart = [
+  //   {
+  //     url: 'ws://192.168.1.199:81',
+  //     port: 'port1',
+  //     chart: new LineChart([0, 100], [0, 255]),
+  //   },
+  //   ...
+  // ]
+  portChart = []
 
   constructor() {
     makeObservable(this, {
@@ -45,6 +115,48 @@ class RegisteredSniffersStore {
   }
 
   // ports and sensors
+  getAllPortChart = () => {
+    return this.portChart;
+  }
+  getPortChart = (wsClientUrl, portName) => {
+    this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
+  }
+  // getPortChartPath = (wsClientUrl, portName) => {
+  //   const portChartRef = this.getPortChart(wsClientUrl, portName);
+  //   if (portChartRef) {
+  //     return portChartRef.getPath();
+  //   }
+  // }
+  createChart = () => {
+    return new LineChart([0, 100], [0, 255]);
+  }
+  setPortChart = (wsClientUrl, portName) => {
+    const portChartRef = this.getPortChart(wsClientUrl, portName);
+    if (portChartRef) {
+      portChartRef.chart = this.createChart();
+    } else {
+      this.portChart.push(
+        {
+          url: wsClientUrl,
+          port: portName,
+          path: this.createChart(),
+        }
+      );
+    }
+  }
+  removePortChart = (wsClientUrl, portName) => {
+    const portChartIndex = this.portChart.findIndex(port => port.url == wsClientUrl && port.port == portName);
+    if (portChartIndex > -1) {
+      this.portChart.splice(portChartIndex, 1);
+    }
+  }
+  // pushDataPortChart = data => {
+  //   const portChartRef = this.getPortChart(wsClientUrl, portName);
+  //   if (portChartRef) {
+  //     portChartRef.pushData(data);
+  //   }
+  // }
+
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
     sniffer.sensors = ports.map(port => { return { sensorType: undefined, portName: port, selectOpen: false } });
@@ -63,6 +175,13 @@ class RegisteredSniffersStore {
         portName: portName,
         sensorType: sensorType
       }));
+    }
+
+    // conifigure its sensor chart
+    if (sensorType) {
+      this.setPortChart(url, portName);
+    } else {
+      this.removePortChart(url, portName);
     }
   }
 
