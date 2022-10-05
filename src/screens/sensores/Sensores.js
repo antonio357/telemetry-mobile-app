@@ -90,10 +90,6 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
       </Canvas>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
-    // <View style={styles.view}>
-    //   <Button title="get logs" onPress={() => getLogsInTime(10)} />
-    //   <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-    // </View>
   );
 }
 
