@@ -3,6 +3,7 @@ import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { styles } from '../../../App.styles';
 import { Canvas, Skia, Path, SkiaView } from "@shopify/react-native-skia";
+import { useState } from "react";
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -66,11 +67,16 @@ class LineChart {
 function Sensores({ navigation, RegisteredSniffersStore }) {
   const { presentLogs, getLogsInTime } = RegisteredSniffersStore;
 
+  const [render, setRender] = useState(false);
+
   const lineChart = new LineChart([0, 100], [0, 255]);
-  const path = lineChart.getPath();
+  const lineChart1 = new LineChart([0, 100], [0, 255]);
 
   setInterval(() => {
-    lineChart.pushData(Math.random() * 256);
+    if (render) {
+      lineChart.pushData(Math.random() * 256);
+      lineChart1.pushData(Math.random() * 256);
+    }
   }, 50);
 
   const padding = 24;
@@ -81,12 +87,12 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
 
   return (
     <View style={{margin: padding, height: viewWidth, width: viewWidth}}>
-      <Button title="get logs" onPress={() => getLogsInTime(10)} />
+      <Button title="get logs" onPress={() => setRender(!render)} />
       <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
-        <Path path={path} style="stroke" color="tomato" strokeWidth={3} />
+        <Path path={lineChart.getPath()} style="stroke" color="tomato" strokeWidth={3} />
       </Canvas>
       <Canvas style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
-        <Path path={path} style="stroke" color="turquoise" strokeWidth={3} />
+        <Path path={lineChart1.getPath()} style="stroke" color="turquoise" strokeWidth={3} />
       </Canvas>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
