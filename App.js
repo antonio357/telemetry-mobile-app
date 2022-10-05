@@ -191,24 +191,24 @@ class LineChart {
   }
 
   pushData = data => {
-    const limit = 100;
+    const limit = 20;
     let tmpComands = this.path.toCmds();
     if (tmpComands.length > 0) {
       if (tmpComands.length < limit) {
         this.path.lineTo(this.dataCounter * this.axisScale.x, data * this.axisScale.y);
       } else {
-        this.dataCounter = 0;
-        tmpComands.shift();
-        let counter = 0; 
-        for (let i = 0; i < tmpComands.length; i++) {
-          counter += 1;
-          tmpComands[i][1] = counter * this.axisScale.x;
+        // this.dataCounter = 0;
+        this.dataCounter -= 1;
+        // tmpComands.shift();
+        for (let i = tmpComands.length - 1; i > 0; i--) {
+          tmpComands[i][1] = tmpComands[i - 1][1];
         }
         this.path.rewind();
-        this.path.moveTo(tmpComands[0][1], tmpComands[0][2]);
+        // this.path.moveTo(tmpComands[1][1], tmpComands[1][2]);
         for (let i = 1; i < tmpComands.length; i++) {
           this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
         }
+        this.path.lineTo(this.dataCounter * this.axisScale.x, data * this.axisScale.y);
       }
     }
      else {
@@ -221,7 +221,7 @@ class LineChart {
     let counter = 0;
     for (let i = 0; i < vector.length; i++) {
       counter += 1;
-      setTimeout(() => this.pushData(vector[i]), 10 * counter);
+      setTimeout(() => this.pushData(vector[i]), 50 * counter);
     }
     // setTimeout(() => {
     //   let dms = this.path.toCmds();
@@ -249,7 +249,7 @@ const App = () => {
 
   // const vector = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0];
   const vector = [];
-  for (let i = 0; i < 50000; i++) {
+  for (let i = 0; i < 500; i++) {
     // vector.push(i % 6);
     vector.push(Math.floor(Math.random() * 256));
   }
