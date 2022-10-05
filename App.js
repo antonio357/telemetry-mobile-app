@@ -167,7 +167,7 @@
 // }
 
 
-import { Canvas, Skia, Path} from "@shopify/react-native-skia";
+import { Canvas, Skia, Path } from "@shopify/react-native-skia";
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -209,7 +209,7 @@ class LineChart {
         this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       }
     }
-     else {
+    else {
       this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
     }
     this.lastXAxisIndex += 1;
