@@ -183,7 +183,7 @@ class LineChart {
     this.pathStatus = {
       moved: false,
     }
-    this.dataCounter = 0;
+    this.lastXAxisIndex = 0;
     this.axisScale = {
       x: 5,
       y: 1,
@@ -195,9 +195,9 @@ class LineChart {
     let tmpComands = this.path.toCmds();
     if (tmpComands.length > 0) {
       if (tmpComands.length < limit) {
-        this.path.lineTo(this.dataCounter * this.axisScale.x, data * this.axisScale.y);
+        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       } else {
-        this.dataCounter -= 1;
+        this.lastXAxisIndex -= 1;
         for (let i = tmpComands.length - 1; i > 0; i--) {
           tmpComands[i][1] = tmpComands[i - 1][1];
         }
@@ -206,13 +206,13 @@ class LineChart {
         for (let i = 2; i < tmpComands.length; i++) {
           this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
         }
-        this.path.lineTo(this.dataCounter * this.axisScale.x, data * this.axisScale.y);
+        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       }
     }
      else {
-      this.path.moveTo(this.dataCounter * this.axisScale.x, data * this.axisScale.y);
+      this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
     }
-    this.dataCounter += 1;
+    this.lastXAxisIndex += 1;
   }
 
   loadDataVector = vector => {
@@ -232,7 +232,7 @@ const App = () => {
   const lineChart = new LineChart([0, 100], [0, 255]);
   const path = lineChart.getPath();
 
-  setInterval(() => lineChart.pushData(Math.random() * 256), 1);
+  setInterval(() => lineChart.pushData(Math.random() * 256), 100);
 
   return (
     <Canvas style={{ flex: 1, heigh: 500 }} mode='continuous' debug={true} >
