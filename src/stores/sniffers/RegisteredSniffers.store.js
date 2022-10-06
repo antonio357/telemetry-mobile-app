@@ -72,11 +72,6 @@ class RegisteredSniffersStore {
   // observables for sniffers screens
   registeredSniffers = [];
 
-  // for logs screen
-  presentLogs = {};
-  presentLogsBuffer = {};
-  presentLogsBufferThread = null
-
   // path to the port and sensortype
   // example:
   // portChart = [
@@ -107,20 +102,12 @@ class RegisteredSniffersStore {
       setSensorType: action,
 
       // logs rendering methods
-      presentLogs: observable,
-      updateLogs: action,
-      addPresentLogs: action,
-      clearPresentLogs: action,
-
       lastCmdToAllWsClients: observable,
       startLogs: action,
       stopLogs: action,
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
-
-    // thread for updating logs to render charts
-    // this.presentLogsBufferThread = setInterval(this.updateLogs, 500);
 
     // thread gets logs from WsClient buffers and pushes them to the charts
     this.loadLogsThread = setInterval(this.getWsClientsBufferedLogs, 0);
@@ -143,16 +130,8 @@ class RegisteredSniffersStore {
     return this.portChart;
   }
   getPortChart = (wsClientUrl, portName) => {
-    // console.log(`getPortChart(${wsClientUrl}, ${portName})`);
-    // console.log(`this.portChart = ${JSON.stringify(this.portChart)}`);
     return this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
   }
-  // getPortChartPath = (wsClientUrl, portName) => {
-  //   const portChartRef = this.getPortChart(wsClientUrl, portName);
-  //   if (portChartRef) {
-  //     return portChartRef.getPath();
-  //   }
-  // }
   createChart = () => {
     return new LineChart([0, 100], [0, 255]);
   }
@@ -182,7 +161,6 @@ class RegisteredSniffersStore {
   }
   pushDataPortChart = (wsClientUrl, portName, dataVector) => {
     const portChartRef = this.getPortChart(wsClientUrl, portName);
-    // console.log(`portChartRef = ${JSON.stringify(portChartRef)}`);
     if (portChartRef) {
       portChartRef.chart.loadDataVector(dataVector.map(log => log.value));
     }
@@ -190,7 +168,7 @@ class RegisteredSniffersStore {
 
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
-    sniffer.sensors = ports.map(port => { return { sensorType: undefined, portName: port, selectOpen: false } });
+    sniffer.sensors = ports.map(port => { return { sensorType: undefined, portName: port } });
   }
 
   setSensorType = (url, portName, sensorType) => {
@@ -221,50 +199,10 @@ class RegisteredSniffersStore {
   }
 
   // logs rendering methods
-  updateLogs = () => {
-    if (Object.keys(this.presentLogsBuffer).length > 0) {
-      Object.keys(this.presentLogsBuffer).forEach(url => {
-        if (!this.presentLogs[url]) {
-          this.presentLogs[url] = {};
-          Object.keys(this.presentLogsBuffer[url]).forEach(port => {
-            this.presentLogs[url][port] = [];
-          });
-        }
-        Object.keys(this.presentLogsBuffer[url]).forEach(port => {
-          this.presentLogs[url][port] = [...this.presentLogsBuffer[url][port]];
-        });
-        this.presentLogsUpdatesCounter += 1;
-      });
-    }
-  }
-
   getLogsInTime = seconds => {
     this.clearPresentLogs();
     this.startLogs();
     setTimeout(() => this.stopLogs(), seconds * 1000);
-    this.presentLogsUpdatesCounter = 0;
-    this.graphUpdatesCounter = 0;
-  }
-
-  addPresentLogs = (url, logs) => {
-    if (!this.presentLogsBuffer[url]) {
-      this.presentLogsBuffer[url] = {};
-      Object.keys(logs[0]).forEach(port => {
-        this.presentLogsBuffer[url][port] = [];
-      });
-    }
-    logs.forEach(log => {
-      Object.keys(log).forEach(port => {
-        if (this.presentLogsBuffer[url][port].length >= 100) this.presentLogsBuffer[url][port].shift();
-        this.presentLogsBuffer[url][port].push({ y: log[port], x: this.counter });
-      });
-      this.counter += 1;
-    });
-  }
-
-  clearPresentLogs = () => {
-    this.presentLogsBuffer = {};
-    this.counter = -1;
   }
 
   // sniffers registration methods

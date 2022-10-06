@@ -59,10 +59,9 @@ class WsClient {
         for (let i = 0; i < ports.length; i++) {
           this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
         }
-
-        // mandar pro database
       }
       else if (connectedPorts) {
+        // { connectedPorts: ["port1", "port2"] };
         const { registerConnectedPorts } = RegisteredSniffersStore;
         registerConnectedPorts(this.getUrl(), connectedPorts);
       }
@@ -78,7 +77,7 @@ class WsClient {
     let logs = {};
     for (let i = 0; i < ports.length; i++) {
       logs[ports[i]] = this.logsBuffer[ports[i]].splice(0, logsQuantByPort);
-    } 
+    }
     return logs;
   }
 
