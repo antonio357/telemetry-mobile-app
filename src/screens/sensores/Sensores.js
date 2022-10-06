@@ -19,8 +19,8 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   const allPortChart = getAllPortChart();
   for (let i = 0; i < allPortChart.length; i++) {
     chartsArray.push(
-      <Canvas key={allPortChart[i].url} style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
-        <Path path={allPortChart[i].path.getPath()} style="stroke" color="tomato" strokeWidth={3} />
+      <Canvas key={`${allPortChart[i].url}${allPortChart[i].port}`} style={{ width: viewWidth, height: viewWidth }} mode='continuous' debug={true} >
+        <Path path={allPortChart[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={3} />
       </Canvas>
     );
   }
@@ -40,7 +40,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
             setRender(true);
             setThread(setInterval(() => {
               for (let i = 0; i < allPortChart.length; i++) {
-                allPortChart[i].path.pushData(Math.random() * 256);
+                allPortChart[i].chart.pushData(Math.random() * 256);
               }
             }, 100));
           }

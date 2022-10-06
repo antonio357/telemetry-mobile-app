@@ -139,7 +139,7 @@ class RegisteredSniffersStore {
         {
           url: wsClientUrl,
           port: portName,
-          path: this.createChart(),
+          chart: this.createChart(),
         }
       );
     }
