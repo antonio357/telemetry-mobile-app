@@ -4,6 +4,7 @@ class WsClient {
   name = '';
   url = '';
   ws = null;
+  logsBuffer = {};
 
   constructor(name, url) {
     this.name = name;
@@ -54,8 +55,12 @@ class WsClient {
     this.ws.onmessage = message => {
       const { connectedPorts, logs } = JSON.parse(message.data);
       if (logs) {
-        const { addPresentLogs } = RegisteredSniffersStore;
-        addPresentLogs(this.getUrl(), logs);
+        const ports = Object.keys(logs);
+        for (let i = 0; i < ports.length; i++) {
+          this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
+        }
+
+        // mandar pro database
       }
       else if (connectedPorts) {
         const { registerConnectedPorts } = RegisteredSniffersStore;
@@ -66,6 +71,23 @@ class WsClient {
 
   disconnect = () => {
     if (this.ws) this.ws.close();
+  }
+
+  getLogs = (logsQuantByPort = 1) => {
+    const ports = Object.keys(this.logsBuffer);
+    let logs = {};
+    for (let i = 0; i < ports.length; i++) {
+      logs[ports[i]] = this.logsBuffer[ports[i]].splice(0, logsQuantByPort);
+    } 
+    return logs;
+  }
+
+  setLogsBufferPort = portName => {
+    this.logsBuffer[portName] = this.logsBuffer[portName] ? [...this.logsBuffer[portName]] : [];
+  }
+
+  removeLogsBufferPort = portName => {
+    delete this.logsBuffer[portName];
   }
 }
 
