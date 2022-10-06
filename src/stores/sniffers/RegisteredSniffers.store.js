@@ -51,6 +51,7 @@ class LineChart {
 
   loadDataVector = vector => {
     for (let i = 0; i < vector.length; i++) {
+      // console.log(`vector[${i}] = ${vector[i]}`);
       this.pushData(vector[i])
     }
   }
@@ -61,8 +62,12 @@ class LineChart {
 }
 
 class RegisteredSniffersStore {
+  // register last command sent to all wsClients
+  lastCmdToAllWsClients = "stop logs";
+
   // wsClient connections
   wsClients = [];
+  loadLogsThread = null;
 
   // observables for sniffers screens
   registeredSniffers = [];
@@ -88,7 +93,7 @@ class RegisteredSniffersStore {
     makeObservable(this, {
       // observables for sniffers screens
       registeredSniffers: observable,
-      
+
       // sniffers registration methods
       register: action,
 
@@ -106,12 +111,31 @@ class RegisteredSniffersStore {
       updateLogs: action,
       addPresentLogs: action,
       clearPresentLogs: action,
+
+      lastCmdToAllWsClients: observable,
+      startLogs: action,
+      stopLogs: action,
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
 
     // thread for updating logs to render charts
-    this.presentLogsBufferThread = setInterval(this.updateLogs, 500);
+    // this.presentLogsBufferThread = setInterval(this.updateLogs, 500);
+
+    // thread gets logs from WsClient buffers and pushes them to the charts
+    this.loadLogsThread = setInterval(this.getWsClientsBufferedLogs, 0);
+  }
+
+  getWsClientsBufferedLogs = () => {
+    let logs; 
+    let ports;
+    for (let i = 0; i < this.wsClients.length; i++) {
+      logs = this.wsClients[i].getLogs(100);
+      ports = Object.keys(logs);
+      for (let j = 0; j < ports.length; j++) {
+        this.pushDataPortChart(this.wsClients[i].getUrl(), ports[j], logs[ports[j]]);
+      }
+    }
   }
 
   // ports and sensors
@@ -119,7 +143,9 @@ class RegisteredSniffersStore {
     return this.portChart;
   }
   getPortChart = (wsClientUrl, portName) => {
-    this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
+    // console.log(`getPortChart(${wsClientUrl}, ${portName})`);
+    // console.log(`this.portChart = ${JSON.stringify(this.portChart)}`);
+    return this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
   }
   // getPortChartPath = (wsClientUrl, portName) => {
   //   const portChartRef = this.getPortChart(wsClientUrl, portName);
@@ -132,6 +158,7 @@ class RegisteredSniffersStore {
   }
   setPortChart = (wsClientUrl, portName) => {
     const portChartRef = this.getPortChart(wsClientUrl, portName);
+    const wsClient = this.getWsClient(wsClientUrl);
     if (portChartRef) {
       portChartRef.chart = this.createChart();
     } else {
@@ -142,20 +169,24 @@ class RegisteredSniffersStore {
           chart: this.createChart(),
         }
       );
+      wsClient.setLogsBufferPort(portName);
     }
   }
   removePortChart = (wsClientUrl, portName) => {
     const portChartIndex = this.portChart.findIndex(port => port.url == wsClientUrl && port.port == portName);
+    const wsClient = this.getWsClient(wsClientUrl);
     if (portChartIndex > -1) {
       this.portChart.splice(portChartIndex, 1);
+      wsClient.removeLogsBufferPort(portName);
     }
   }
-  // pushDataPortChart = data => {
-  //   const portChartRef = this.getPortChart(wsClientUrl, portName);
-  //   if (portChartRef) {
-  //     portChartRef.pushData(data);
-  //   }
-  // }
+  pushDataPortChart = (wsClientUrl, portName, dataVector) => {
+    const portChartRef = this.getPortChart(wsClientUrl, portName);
+    // console.log(`portChartRef = ${JSON.stringify(portChartRef)}`);
+    if (portChartRef) {
+      portChartRef.chart.loadDataVector(dataVector.map(log => log.value));
+    }
+  }
 
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
@@ -268,10 +299,12 @@ class RegisteredSniffersStore {
   }
 
   startLogs = () => {
+    this.lastCmdToAllWsClients = "start logs";
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
 
   stopLogs = () => {
+    this.lastCmdToAllWsClients = "stop logs";
     this.wsClients.forEach(socket => socket.send('stop logs'));
   }
 }
