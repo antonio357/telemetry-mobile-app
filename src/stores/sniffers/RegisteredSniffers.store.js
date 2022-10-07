@@ -46,6 +46,8 @@ class LineChart {
         this.yCmds.splice(0, 1);
         this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
         this.yCmds.push(data * this.axisScale.y);
+        // this.path.offset()
+        // this.path.interpolate
         // this.path.rewind();
         // this.path.moveTo(this.xCmds[0], this.yCmds[0]);
         for (let i = 1; i < this.xCmds.length; i++) {
