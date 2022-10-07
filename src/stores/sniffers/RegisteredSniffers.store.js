@@ -3,6 +3,11 @@ import WsClient from '../../components/socket/WsClient';
 import { Skia } from "@shopify/react-native-skia";
 
 
+const fpsConsts = {
+  threadCycleTime: 0,
+  threadGetLogs: 1000,
+  pathDataLimit: 300,
+};
 class LineChart {
   constructor(xScale, yScale) {
     this.xScale = {
@@ -22,28 +27,35 @@ class LineChart {
       x: 5,
       y: 1,
     };
+    this.xCmds = []
+    this.yCmds = []
   }
 
-  pushData = data => {
-    const limit = 50;
-    let tmpComands = this.path.toCmds();
-    if (tmpComands.length > 0) {
-      if (tmpComands.length < limit) {
+  pushData = data => { // a operação this.path.toCmds() gera legs
+    if (this.xCmds.length > 0) {
+      if (this.xCmds.length < fpsConsts.pathDataLimit) {
+        this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
+        this.yCmds.push(data * this.axisScale.y);
         this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       } else {
         this.lastXAxisIndex -= 1;
-        for (let i = tmpComands.length - 1; i > 0; i--) {
-          tmpComands[i][1] = tmpComands[i - 1][1];
+        for (let i = this.xCmds.length - 1; i > 0; i--) {
+          this.xCmds[i] = this.xCmds[i - 1];
         }
+        this.xCmds.splice(0, 1);
+        this.yCmds.splice(0, 1);
+        this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
+        this.yCmds.push(data * this.axisScale.y);
         this.path.rewind();
-        this.path.moveTo(tmpComands[1][1], tmpComands[1][2]);
-        for (let i = 2; i < tmpComands.length; i++) {
-          this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
+        this.path.moveTo(this.xCmds[0], this.yCmds[0]);
+        for (let i = 1; i < this.xCmds.length; i++) {
+          this.path.lineTo(this.xCmds[i], this.yCmds[i]);
         }
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       }
     }
     else {
+      this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
+      this.yCmds.push(data * this.axisScale.y);
       this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
     }
     this.lastXAxisIndex += 1;
@@ -110,14 +122,14 @@ class RegisteredSniffersStore {
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
 
     // thread gets logs from WsClient buffers and pushes them to the charts
-    this.loadLogsThread = setInterval(this.getWsClientsBufferedLogs, 0);
+    this.loadLogsThread = setInterval(this.getWsClientsBufferedLogs, fpsConsts.threadCycleTime);
   }
 
   getWsClientsBufferedLogs = () => {
-    let logs; 
+    let logs;
     let ports;
     for (let i = 0; i < this.wsClients.length; i++) {
-      logs = this.wsClients[i].getLogs(100);
+      logs = this.wsClients[i].getLogs(fpsConsts.threadGetLogs);
       ports = Object.keys(logs);
       for (let j = 0; j < ports.length; j++) {
         this.pushDataPortChart(this.wsClients[i].getUrl(), ports[j], logs[ports[j]]);
