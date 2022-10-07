@@ -3,10 +3,48 @@ import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { StyleSheet } from "react-native";
+import { useState } from "react";
 
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
   const { getAllPortChart, lastCmdToAllWsClients, startLogs, stopLogs } = RegisteredSniffersStore;
+  
+  const [port1PathString, setPort1PathString] = useState("");
+  const [port2PathString, setPort2PathString] = useState("");
+  // let port1PathString = "";
+  // let port2PathString = "";
+  let port1PathStringBuffer = [];
+  let port2PathStringBuffer = [];
+  let xIndexCounter = 0;
+  const limit = 1000;
+
+  setInterval(() => {
+    if (port1PathStringBuffer.length >= limit) {
+      xIndexCounter -= 1;
+      for (let i = port1PathStringBuffer.length - 1; i > 0; i--) {
+        port1PathStringBuffer[i][0] = port1PathStringBuffer[i - 1][0];
+        port2PathStringBuffer[i][0] = port2PathStringBuffer[i - 1][0];
+      }
+      port1PathStringBuffer.shift();
+      port2PathStringBuffer.shift();
+      port1PathStringBuffer.push([xIndexCounter * 5, Math.random() * 256]);
+      port2PathStringBuffer.push([xIndexCounter * 5, Math.random() * 256]);
+    } else {
+      port1PathStringBuffer.push([xIndexCounter * 5, Math.random() * 256]);
+      port2PathStringBuffer.push([xIndexCounter * 5, Math.random() * 256]);
+    }
+    let tmpPort1PathString = `M ${port1PathStringBuffer[0][0]} ${port1PathStringBuffer[0][1]}`;
+    let tmpPort2PathString = `M ${port2PathStringBuffer[0][0]} ${port2PathStringBuffer[0][1]}`;
+    for (let i = 1; i < port1PathStringBuffer.length; i++) {
+      tmpPort1PathString += ` L ${port1PathStringBuffer[i][0]} ${port1PathStringBuffer[i][1]}`;
+      tmpPort2PathString += ` L ${port2PathStringBuffer[i][0]} ${port2PathStringBuffer[i][1]}`;
+    }
+    setPort1PathString(tmpPort1PathString);
+    setPort2PathString(tmpPort2PathString);
+    // port1PathString = tmpPort1PathString;
+    // port2PathString = tmpPort2PathString;
+    xIndexCounter += 1;
+  }, 100);
 
   const viewMarging = 24;
   const strokeWidth = 16;
@@ -34,19 +72,20 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
 
   let CanvasList = [];
   const portCharts = getAllPortChart();
-  let CanvasStyle;
   for (let i = 0; i < portCharts.length; i++) {
-    CanvasStyle = styles.Canvas;
     if (i == portCharts.length - 1) {
-      CanvasStyle = styles.LastCanvas;
+      CanvasList.push(
+        <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={styles.LastCanvas} mode='continuous' debug={true} >
+          <Path path={port2PathString} style="stroke" color="tomato" strokeWidth={2} />
+        </Canvas>
+      );
     } else {
-      CanvasStyle = styles.Canvas;
+      CanvasList.push(
+        <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={styles.Canvas} mode='continuous' debug={true} >
+          <Path path={port1PathString} style="stroke" color="tomato" strokeWidth={2} />
+        </Canvas>
+      );
     }
-    CanvasList.push(
-      <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={CanvasStyle} mode='continuous' debug={true} >
-        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={2} />
-      </Canvas>
-    );
   }
 
   return (

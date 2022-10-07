@@ -6,7 +6,7 @@ import { Skia } from "@shopify/react-native-skia";
 const fpsConsts = {
   threadCycleTime: 0,
   threadGetLogs: 1000,
-  pathDataLimit: 300,
+  pathDataLimit: 1000,
 };
 class LineChart {
   constructor(xScale, yScale) {
@@ -36,7 +36,7 @@ class LineChart {
       if (this.xCmds.length < fpsConsts.pathDataLimit) {
         this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
         this.yCmds.push(data * this.axisScale.y);
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+        // this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
       } else {
         this.lastXAxisIndex -= 1;
         for (let i = this.xCmds.length - 1; i > 0; i--) {
@@ -46,17 +46,17 @@ class LineChart {
         this.yCmds.splice(0, 1);
         this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
         this.yCmds.push(data * this.axisScale.y);
-        this.path.rewind();
-        this.path.moveTo(this.xCmds[0], this.yCmds[0]);
+        // this.path.rewind();
+        // this.path.moveTo(this.xCmds[0], this.yCmds[0]);
         for (let i = 1; i < this.xCmds.length; i++) {
-          this.path.lineTo(this.xCmds[i], this.yCmds[i]);
+          // this.path.lineTo(this.xCmds[i], this.yCmds[i]);
         }
       }
     }
     else {
       this.xCmds.push(this.lastXAxisIndex * this.axisScale.x);
       this.yCmds.push(data * this.axisScale.y);
-      this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+      // this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
     }
     this.lastXAxisIndex += 1;
   }
@@ -70,6 +70,14 @@ class LineChart {
 
   getPath = () => {
     return this.path;
+  }
+
+  getPathString = () => {
+    let pathString = `M ${this.xCmds[0]} ${this.yCmds[0]}`;
+    for (let i = 1; i < this.xCmds.length; i++) {
+      pathString += ` L ${this.xCmds[i]} ${this.yCmds[i]}`;
+    }
+    return pathString;
   }
 }
 
@@ -96,6 +104,15 @@ class RegisteredSniffersStore {
   // ]
   portChart = []
 
+  // {
+  //   `${url}${port}`: "M 128 0 L 168 80 L 256 93 L 192 155 L 207 244 L 128 202 L 49 244 L 64 155 L 0 93 L 88 80 L 128 0",
+  //   ... 
+  // }
+  pathStrings = {
+    'ws://192.168.1.199:81port1': "",
+    'ws://192.168.1.199:81port2': "",
+  }
+
   constructor() {
     makeObservable(this, {
       // observables for sniffers screens
@@ -117,6 +134,10 @@ class RegisteredSniffersStore {
       lastCmdToAllWsClients: observable,
       startLogs: action,
       stopLogs: action,
+
+      // here
+      pathStrings: observable,
+      pushDataPortChart: action,
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
@@ -160,6 +181,7 @@ class RegisteredSniffersStore {
           chart: this.createChart(),
         }
       );
+      this.pathStrings[`${wsClientUrl}${portName}`] = ""
       wsClient.setLogsBufferPort(portName);
     }
   }
@@ -176,6 +198,8 @@ class RegisteredSniffersStore {
     if (portChartRef) {
       portChartRef.chart.loadDataVector(dataVector.map(log => log.value));
     }
+
+    this.pathStrings[`${wsClientUrl}${portName}`] = portChartRef.chart.getPathString();
   }
 
   registerConnectedPorts = (url, ports) => {
