@@ -44,7 +44,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
     }
     CanvasList.push(
       <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={CanvasStyle} mode='continuous' debug={true} >
-        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={2} />
+        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={1} />
       </Canvas>
     );
   }

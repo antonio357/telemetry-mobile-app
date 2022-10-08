@@ -22,31 +22,36 @@ class LineChart {
       x: 5,
       y: 1,
     };
+    this.happened = false;
+  }
+
+  delayAndPrint = (str='', num=100000000) => { // 100000000
+    if (str) console.log(str);
+    let counter = num;
+    while (counter > 0) counter -= 1;
   }
 
   pushData = data => {
-    const limit = 50;
-    let tmpComands = this.path.toCmds();
-    if (tmpComands.length > 0) {
-      if (tmpComands.length < limit) {
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
-      } else {
-        this.lastXAxisIndex -= 1;
-        for (let i = tmpComands.length - 1; i > 0; i--) {
-          tmpComands[i][1] = tmpComands[i - 1][1];
-        }
-        this.path.rewind();
-        this.path.moveTo(tmpComands[1][1], tmpComands[1][2]);
-        for (let i = 2; i < tmpComands.length; i++) {
-          this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
-        }
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+    let totalLength = 250;
+    const logsExpected = 5000;
+    const grain = totalLength / logsExpected;
+    if (this.path.countPoints <= 0) { // Path vazio
+      this.path.lineTo(0, data);
+    } else { // Path já tem ao menos um dado
+      if (this.path.getLastPt().x >= totalLength) { // Path ta cheio
+        // corta o inicício
+        const trim = (grain / (this.path.getLastPt().x - this.path.getPoint(0).x));
+        // console.log(`trim = ${trim}`);
+        this.path.trim(trim, 1); 
+        // move pra o ponto x = 0
+        const offset = 0 - this.path.getPoint(0).x;
+        // console.log(`offset = ${offset}`);
+        this.path.offset(offset, 0);
+        // this.path.moveTo(this.path.getLastPt().x, this.path.getLastPt().y);
       }
+      const newX = this.path.getLastPt().x + grain;
+      this.path.lineTo(newX, data);
     }
-    else {
-      this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
-    }
-    this.lastXAxisIndex += 1;
   }
 
   loadDataVector = vector => {
@@ -117,7 +122,7 @@ class RegisteredSniffersStore {
     let logs; 
     let ports;
     for (let i = 0; i < this.wsClients.length; i++) {
-      logs = this.wsClients[i].getLogs(100);
+      logs = this.wsClients[i].getLogs(120);
       ports = Object.keys(logs);
       for (let j = 0; j < ports.length; j++) {
         this.pushDataPortChart(this.wsClients[i].getUrl(), ports[j], logs[ports[j]]);
