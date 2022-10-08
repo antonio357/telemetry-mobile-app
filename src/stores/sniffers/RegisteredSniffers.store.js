@@ -28,6 +28,7 @@ class LineChart {
 
   pushData = data => {
     let totalLength = 300;
+    const how_many_times = 20; // min = 1, quanto maior mais ajuda na performance, pq economiza na quantidade de operações na operação de trim e de offset, deve crescer com a quantidade de logs esperado (faixa de tempo), quantos logs existiram nessa faixa de tempo, pra evitar de fazer um trim grande e visualmente parecer que comeu um pedaço do grágico
     const logsExpected = 10000;
     const grain = totalLength / logsExpected;
     if (this.path.countPoints <= 0) { // Path vazio
@@ -35,7 +36,7 @@ class LineChart {
     } else { // Path já tem ao menos um dado
       if (this.path.getLastPt().x >= totalLength) { // Path ta cheio
         // corta o inicício
-        this.path.trim(grain / totalLength, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
+        this.path.trim(grain / totalLength * how_many_times, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
         // move pra o ponto x = 0
         this.path.offset(0 - this.path.getPoint(0).x, 0);
         // this.path.moveTo(this.path.getLastPt().x, this.path.getLastPt().y);
