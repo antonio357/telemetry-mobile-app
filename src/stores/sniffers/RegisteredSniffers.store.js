@@ -14,6 +14,7 @@ class LineChart {
       max: yScale[1],
     }
     this.path = Skia.Path.Make();
+    this.path.setIsVolatile(true);
     this.pathStatus = {
       moved: false,
     }
@@ -25,31 +26,22 @@ class LineChart {
     this.happened = false;
   }
 
-  delayAndPrint = (str='', num=100000000) => { // 100000000
-    if (str) console.log(str);
-    let counter = num;
-    while (counter > 0) counter -= 1;
-  }
-
   pushData = data => {
-    let totalLength = 250;
-    const logsExpected = 5000;
+    let totalLength = 300;
+    const logsExpected = 10000;
     const grain = totalLength / logsExpected;
     if (this.path.countPoints <= 0) { // Path vazio
       this.path.lineTo(0, data);
     } else { // Path já tem ao menos um dado
       if (this.path.getLastPt().x >= totalLength) { // Path ta cheio
         // corta o inicício
-        const trim = (grain / (this.path.getLastPt().x - this.path.getPoint(0).x));
-        // console.log(`trim = ${trim}`);
-        this.path.trim(trim, 1); 
+        this.path.trim(grain / totalLength, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
         // move pra o ponto x = 0
-        const offset = 0 - this.path.getPoint(0).x;
-        // console.log(`offset = ${offset}`);
-        this.path.offset(offset, 0);
+        this.path.offset(0 - this.path.getPoint(0).x, 0);
         // this.path.moveTo(this.path.getLastPt().x, this.path.getLastPt().y);
       }
       const newX = this.path.getLastPt().x + grain;
+      // this.path.setIsVolatile()
       this.path.lineTo(newX, data);
     }
   }
