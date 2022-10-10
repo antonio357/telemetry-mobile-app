@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
-import { Skia } from "@shopify/react-native-skia";
+import { Skia, Path } from "@shopify/react-native-skia";
 
 
 class LineChart {
@@ -14,6 +14,7 @@ class LineChart {
       max: yScale[1],
     }
     this.path = Skia.Path.Make();
+    this.path.setIsVolatile(false);
     this.pathStatus = {
       moved: false,
     }
@@ -27,7 +28,7 @@ class LineChart {
 
   pushData = data => {
     let totalLength = 300;
-    const how_many_times = 20; // min = 1, quanto maior mais ajuda na performance, pq economiza na quantidade de operações na operação de trim e de offset, deve crescer com a quantidade de logs esperado (faixa de tempo), quantos logs existiram nessa faixa de tempo, pra evitar de fazer um trim grande e visualmente parecer que comeu um pedaço do grágico
+    const how_many_times = 200; // min = 1, quanto maior mais ajuda na performance, pq economiza na quantidade de operações na operação de trim e de offset, deve crescer com a quantidade de logs esperado (faixa de tempo), quantos logs existiram nessa faixa de tempo, pra evitar de fazer um trim grande e visualmente parecer que comeu um pedaço do grágico
     const logsExpected = 10000;
     const grain = totalLength / logsExpected;
     if (this.path.countPoints <= 0) { // Path vazio
