@@ -14,7 +14,6 @@ class LineChart {
       max: yScale[1],
     }
     this.path = Skia.Path.Make();
-    this.path.setIsVolatile(true);
     this.pathStatus = {
       moved: false,
     }
