@@ -15,15 +15,10 @@ class LineChart {
     }
     this.path = Skia.Path.Make();
     this.path.setIsVolatile(false);
-    this.pathStatus = {
-      moved: false,
-    }
-    this.lastXAxisIndex = 0;
     this.axisScale = {
       x: 5,
       y: 1,
     };
-    this.happened = false;
   }
 
   pushData = data => {
@@ -39,17 +34,14 @@ class LineChart {
         this.path.trim(grain / totalLength * how_many_times, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
         // move pra o ponto x = 0
         this.path.offset(0 - this.path.getPoint(0).x, 0);
-        // this.path.moveTo(this.path.getLastPt().x, this.path.getLastPt().y);
       }
       const newX = this.path.getLastPt().x + grain;
-      // this.path.setIsVolatile()
       this.path.lineTo(newX, data);
     }
   }
 
   loadDataVector = vector => {
     for (let i = 0; i < vector.length; i++) {
-      // console.log(`vector[${i}] = ${vector[i]}`);
       this.pushData(vector[i])
     }
   }
