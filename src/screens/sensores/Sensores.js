@@ -1,4 +1,4 @@
-import { View, Text, Button, ScrollView, Dimensions } from "react-native";
+import { View, Button, ScrollView, Dimensions } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { Canvas, Path } from "@shopify/react-native-skia";
@@ -44,7 +44,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
     }
     CanvasList.push(
       <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={CanvasStyle} mode='continuous' debug={true} >
-        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={2} />
+        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={1} />
       </Canvas>
     );
   }

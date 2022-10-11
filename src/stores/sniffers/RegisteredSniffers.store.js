@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
-import { Skia } from "@shopify/react-native-skia";
+import { Skia, Path } from "@shopify/react-native-skia";
 
 
 class LineChart {
@@ -14,10 +14,7 @@ class LineChart {
       max: yScale[1],
     }
     this.path = Skia.Path.Make();
-    this.pathStatus = {
-      moved: false,
-    }
-    this.lastXAxisIndex = 0;
+    this.path.setIsVolatile(false);
     this.axisScale = {
       x: 5,
       y: 1,
@@ -25,33 +22,26 @@ class LineChart {
   }
 
   pushData = data => {
-    const limit = 50;
-    let tmpComands = this.path.toCmds();
-    if (tmpComands.length > 0) {
-      if (tmpComands.length < limit) {
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
-      } else {
-        this.lastXAxisIndex -= 1;
-        for (let i = tmpComands.length - 1; i > 0; i--) {
-          tmpComands[i][1] = tmpComands[i - 1][1];
-        }
-        this.path.rewind();
-        this.path.moveTo(tmpComands[1][1], tmpComands[1][2]);
-        for (let i = 2; i < tmpComands.length; i++) {
-          this.path.lineTo(tmpComands[i][1], tmpComands[i][2]);
-        }
-        this.path.lineTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
+    let totalLength = 300;
+    const how_many_times = 200; // min = 1, quanto maior mais ajuda na performance, pq economiza na quantidade de operações na operação de trim e de offset, deve crescer com a quantidade de logs esperado (faixa de tempo), quantos logs existiram nessa faixa de tempo, pra evitar de fazer um trim grande e visualmente parecer que comeu um pedaço do grágico
+    const logsExpected = 10000;
+    const grain = totalLength / logsExpected;
+    if (this.path.countPoints <= 0) { // Path vazio
+      this.path.lineTo(0, data);
+    } else { // Path já tem ao menos um dado
+      if (this.path.getLastPt().x >= totalLength) { // Path ta cheio
+        // corta o inicício
+        this.path.trim(grain / totalLength * how_many_times, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
+        // move pra o ponto x = 0
+        this.path.offset(0 - this.path.getPoint(0).x, 0);
       }
+      const newX = this.path.getLastPt().x + grain;
+      this.path.lineTo(newX, data);
     }
-    else {
-      this.path.moveTo(this.lastXAxisIndex * this.axisScale.x, data * this.axisScale.y);
-    }
-    this.lastXAxisIndex += 1;
   }
 
   loadDataVector = vector => {
     for (let i = 0; i < vector.length; i++) {
-      // console.log(`vector[${i}] = ${vector[i]}`);
       this.pushData(vector[i])
     }
   }
@@ -117,7 +107,7 @@ class RegisteredSniffersStore {
     let logs; 
     let ports;
     for (let i = 0; i < this.wsClients.length; i++) {
-      logs = this.wsClients[i].getLogs(100);
+      logs = this.wsClients[i].getLogs(120);
       ports = Object.keys(logs);
       for (let j = 0; j < ports.length; j++) {
         this.pushDataPortChart(this.wsClients[i].getUrl(), ports[j], logs[ports[j]]);
