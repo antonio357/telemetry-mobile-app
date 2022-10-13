@@ -3,6 +3,7 @@ import { Text, View, Button } from "react-native";
 import { styles } from "./RegisteredSniffer.styles";
 import { Ionicons } from '@expo/vector-icons';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { DataBaseOperations } from '../../databases/DataBaseOperations';
 
 
 function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
@@ -31,6 +32,8 @@ function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
   );
 }
 
+const database = new DataBaseOperations();
+database.saveTest('this is an value for test', 'this is a time for test');
 
 function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, setSensorType }) {
   const statusColor = {
@@ -39,6 +42,11 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
   }[status];
 
   let counter = sensors.length + 1;
+
+  setTimeout(async () => {
+    const here = await database.getTest();
+    console.log(here[here.length - 1]._raw);
+  }, 1000)
 
   return (
     <View style={[styles.card, styles.shadowProp]}>
@@ -56,7 +64,7 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
           {sensors.length == 0 && (<Text>sniffer has no ports connected</Text>)}
           {sensors.length > 0 && sensors.map(port => {
             counter -= 1;
-            const definition = {url, ...port, zIndex: counter, setSensorType: setSensorType};
+            const definition = { url, ...port, zIndex: counter, setSensorType: setSensorType };
             return <DefineSensor key={port.portName} {...definition} />
           })}
         </View>

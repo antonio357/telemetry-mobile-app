@@ -21,11 +21,6 @@ export class DataBaseOperations {
 
   getTest = async () => {
     const TestCollection = await this.connection.get('TestSchema').query().fetch();
-    TestCollection.map(data => {
-      const thing = data[0];
-      console.log(`thing = ${thing}`);
-      console.log(`thing = ${Object.keys(thing)}`);
-      console.log(`thing = ${Object.values(thing)}`);
-    })
+    return TestCollection;
   }
 }
