@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "emulator-server": "npx react-native start --reset-cache",
+    "emulator": "npx react-native run-android",
     "dev": "expo start",
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -10,6 +12,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@nozbe/watermelondb": "^0.24.0",
     "@react-navigation/drawer": "^6.5.0",
     "@react-navigation/native": "^6.0.13",
     "@shopify/react-native-skia": "0.1.141",
@@ -29,7 +32,8 @@
     "react-native-web": "~0.18.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-decorators": "^7.19.3"
   },
   "private": true
 }
