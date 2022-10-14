@@ -204,12 +204,10 @@ export class DataBaseOperations {
     }
   };
 
-  getExecutionSniffer = async (execution_id) => {
+  getExecutionSniffer = async (id) => {
     const resgisters = await this.connection.get('ExecutionSniffers').query(
-      Q.where('execution_id', '8qm6bzyqel9fvyjt')
+      Q.where('id', id)
     ).fetch();
-    console.log(`execution_id to filter = ${execution_id}`);
-    console.log(`resgisters = ${resgisters}`);
     return resgisters.map(resgister => this.executionSnifferToObj(resgister._raw));
   }
 }
