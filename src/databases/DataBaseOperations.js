@@ -149,10 +149,10 @@ export class DataBaseOperations {
 
     const executionId = await this.createExecution('execução de testes', '2022-10-01', '14:30:15:500');
     console.log(`executionId = ${executionId}`);
-    const snifferId = await this.appendExecutionSniffer(executionId, 'sniffer de testes', 'ws://123.123.123:81');
-    console.log(`snifferId = ${snifferId}`);
-    const sniffer = await this.getExecutionSniffer(snifferId);
-    console.log(`sniffer = ${JSON.stringify(sniffer)}`);
+    await this.appendExecutionSniffer(executionId, 'sniffer de testes', 'ws://123.123.123:81');
+    await this.appendExecutionSniffer(executionId, 'sniffer de testes', 'ws://123.123.123:81');
+    const sniffers = await this.getExecutionSniffersByExecution(executionId);
+    console.log(`sniffer = ${JSON.stringify(sniffers)}`);
   }
 
   createExecution = async (name, initDate, initTime) => {
@@ -207,6 +207,13 @@ export class DataBaseOperations {
   getExecutionSniffer = async (id) => {
     const resgisters = await this.connection.get('ExecutionSniffers').query(
       Q.where('id', id)
+    ).fetch();
+    return resgisters.map(resgister => this.executionSnifferToObj(resgister._raw));
+  }
+
+  getExecutionSniffersByExecution = async (execution_id) => {
+    const resgisters = await this.connection.get('ExecutionSniffers').query(
+      Q.where('execution_id', execution_id)
     ).fetch();
     return resgisters.map(resgister => this.executionSnifferToObj(resgister._raw));
   }
