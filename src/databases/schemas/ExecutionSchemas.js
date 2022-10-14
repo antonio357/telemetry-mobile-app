@@ -13,27 +13,27 @@ export const Executions = tableSchema({
 export const ExecutionSniffers = tableSchema({
   name: 'ExecutionSniffers',
   columns: [
-    {name: 'execution_id', type: 'string'},
-    {name: 'name', type: 'string'},
-    {name: 'wsServerUrl', type: 'string'},
+    { name: 'execution_id', type: 'string' },
+    { name: 'name', type: 'string' },
+    { name: 'wsServerUrl', type: 'string' },
   ]
 });
 
 export const ExecutionSensorPorts = tableSchema({
   name: 'ExecutionSensorPorts',
   columns: [
-    {name: 'execution_sniffer_id', type: 'string'},
-    {name: 'brickPortName', type: 'string'},
-    {name: 'sensorType', type: 'string'},
-    {name: 'sensorName', type: 'string'},
+    { name: 'execution_sniffer_id', type: 'string' },
+    { name: 'brickPortName', type: 'string' },
+    { name: 'sensorType', type: 'string' },
+    { name: 'sensorName', type: 'string' },
   ]
 });
 
 export const ExecutionLogs = tableSchema({
   name: 'ExecutionLogs',
   columns: [
-    {name: 'execution_sensor_port_id', type: 'string'},
-    {name: 'value', type: 'string'},
-    {name: 'time', type: 'number'}
+    { name: 'execution_sensor_port_id', type: 'string' },
+    { name: 'value', type: 'string' },
+    { name: 'time', type: 'number' }
   ]
 });

@@ -1,6 +1,5 @@
 import { Model } from '@nozbe/watermelondb';
-import { text, field, lazy, children, writer} from '@nozbe/watermelondb/decorators';
-import { Q } from '@nozbe/watermelondb';
+import { text, field } from '@nozbe/watermelondb/decorators';
 
 
 export class ExecutionModal extends Model {
