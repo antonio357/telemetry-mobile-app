@@ -32,9 +32,6 @@ function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
   );
 }
 
-const database = new DataBaseOperations();
-database.saveTest('this is an value for test', 'this is a time for test');
-
 function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, setSensorType }) {
   const statusColor = {
     "desconectado": "#666666",
@@ -44,11 +41,10 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
   let counter = sensors.length + 1;
 
   setTimeout(async () => {
-    // const here = await database.getTest();
-    // console.log(here[here.length - 1]);
-    // console.log(here[here.length - 1]._raw);
-
-    database.testAll();
+    const database = new DataBaseOperations();
+    await database.createExecution('execução para testes', '2022-02-02', '14:30:15:500');
+    const executions = await database.getAllExecutions();
+    console.log(`executions = ${JSON.stringify(executions)}`);
   }, 1000)
 
   return (
