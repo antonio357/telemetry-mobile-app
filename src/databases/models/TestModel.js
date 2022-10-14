@@ -1,10 +1,10 @@
 import { Model } from '@nozbe/watermelondb';
-import { field } from '@nozbe/watermelondb/decorators';
+import { field, text } from '@nozbe/watermelondb/decorators';
 
 export class TestModel extends Model {
   static table = 'TestSchema';
 
-  @field('value') value;
+  @text('value') value;
 
-  @field('time') time;
+  @text('time') time;
 }

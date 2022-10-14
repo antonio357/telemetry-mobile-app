@@ -44,8 +44,11 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
   let counter = sensors.length + 1;
 
   setTimeout(async () => {
-    const here = await database.getTest();
-    console.log(here[here.length - 1]._raw);
+    // const here = await database.getTest();
+    // console.log(here[here.length - 1]);
+    // console.log(here[here.length - 1]._raw);
+
+    database.testAll();
   }, 1000)
 
   return (
