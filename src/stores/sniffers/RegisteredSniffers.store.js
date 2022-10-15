@@ -1,7 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
-import { Skia, Path } from "@shopify/react-native-skia";
-
+import { Skia } from "@shopify/react-native-skia";
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -104,7 +103,7 @@ class RegisteredSniffersStore {
   }
 
   getWsClientsBufferedLogs = () => {
-    let logs; 
+    let logs;
     let ports;
     for (let i = 0; i < this.wsClients.length; i++) {
       logs = this.wsClients[i].getLogs(120);
