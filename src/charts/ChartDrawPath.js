@@ -20,9 +20,11 @@ export class ChartDrawPath {
     this.dimensionsUnits = { x: this.axisLength.x / this.xBounds.max, y: this.axisLength.y / this.yBounds.max };
     this.lastPointTime = 0;
     console.log(`${this.axisLength.x} == ${this.dimensionsUnits.x} * ${this.xBounds.max} == ${this.dimensionsUnits.x * this.xBounds.max}`);
+    this.firstPoint = true;
   }
 
   pushData = data => {
+    // console.log(`na tela de recording tem = ${this.path.countPoints()}`);
     // const data = {
     //   value: '', // string com o valor do sensor 
     //   time: 15000 // inteiro com o valor de tempo em ms que se passou após o início da execução
@@ -30,23 +32,23 @@ export class ChartDrawPath {
     const y = parseInt(data.value) * this.dimensionsUnits.y;
     const timeDiff = (data.time - this.lastPointTime) * this.dimensionsUnits.x;
     const x = (this.path.getLastPt().x + timeDiff);
-
-    if (x > this.lineDrawPoints.rightBottom.x) {
-      const offSet = x - this.lineDrawPoints.rightBottom.x;
+    this.path.lineTo(x, y);
+    if (this.path.getLastPt().x > this.lineDrawPoints.rightBottom.x) {
+      const offSet = this.path.getLastPt().x - this.lineDrawPoints.rightBottom.x;
       this.path.offset(- offSet, 0);
-      // no emulador usando a operação de trim o canvas ficava lento
-      // const trim = this.axisLength.x / this.path.getPoint(0).x - this.path.getLastPt().x;
-      // this.path.trim(trim, 1, false);
-      this.path.lineTo(this.path.getLastPt().x + offSet, y);
-    }
-    else {
-      this.path.lineTo(x, y);
+      const pathLen = Math.abs(this.path.getPoint(0).x - this.path.getLastPt().x);
+      const trim = (pathLen - this.axisLength.x) / pathLen;
+      this.path.trim(trim, 1, false);
     }
 
     this.lastPointTime = data.time;
   }
 
   loadDataVector = vector => {
+    if (this.firstPoint && vector.length > 0) {
+      this.firstPoint = false;
+      this.path.moveTo(this.lineDrawPoints.leftBottom.x, parseInt(vector[0].value) * this.dimensionsUnits.y);
+    }
     for (let i = 0; i < vector.length; i++) {
       this.pushData(vector[i])
     }
