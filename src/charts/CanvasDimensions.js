@@ -5,7 +5,7 @@ export class CanvasDimensions {
   // card para o canvas
   screen = { height: Dimensions.get('window').height, width: Dimensions.get('window').width };
   cardHorizontalMargin = 48;
-  card = { height: 400, width: this.screen.width - this.cardHorizontalMargin };
+  card = { height: 250, width: this.screen.width - this.cardHorizontalMargin };
   cardText = { height: 24, width: this.card.width - 20, fontSize: 12 };
   canvasHorizontalMargin = 20;
 
