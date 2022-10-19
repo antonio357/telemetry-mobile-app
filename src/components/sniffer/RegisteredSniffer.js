@@ -40,13 +40,6 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
 
   let counter = sensors.length + 1;
 
-  setTimeout(async () => {
-    const database = new DataBaseOperations();
-    // await database.createExecution('execução para testes', '2022-02-02', '14:30:15:500');
-    const executions = await database.getAllExecutions();
-    console.log(`executions = ${JSON.stringify(executions)}`);
-  }, 1000)
-
   return (
     <View style={[styles.card, styles.shadowProp]}>
       <Text style={[styles.heading, styles.font]}>Sniffer {name || url}</Text>

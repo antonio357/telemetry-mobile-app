@@ -1,5 +1,5 @@
 import { Model } from '@nozbe/watermelondb';
-import { text, field } from '@nozbe/watermelondb/decorators';
+import { text, field, relation } from '@nozbe/watermelondb/decorators';
 
 
 export class ExecutionModal extends Model {
@@ -11,14 +11,14 @@ export class ExecutionModal extends Model {
 
 export class ExecutionSnifferModal extends Model {
   static table = 'ExecutionSniffers';
-  @text('execution_id') execution_id
+  @relation('Executions', 'id') execution_id
   @text('name') name
   @text('wsServerUrl') wsServerUrl
 }
 
 export class ExecutionSensorPortModal extends Model {
   static table = 'ExecutionSensorPorts';
-  @text('execution_sniffer_id') execution_sniffer_id
+  @relation('ExecutionSniffers', 'id') execution_sniffer_id
   @text('brickPortName') brickPortName
   @text('sensorType') sensorType
   @text('sensorName') sensorName
@@ -26,7 +26,7 @@ export class ExecutionSensorPortModal extends Model {
 
 export class ExecutionLogModal extends Model {
   static table = 'ExecutionLogs';
-  @text('execution_sensor_port_id') execution_sensor_port_id
+  @relation('ExecutionSensorPorts', 'id') execution_sensor_port_id
   @text('value') value
   @field('time') time
 }

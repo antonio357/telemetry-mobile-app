@@ -10,10 +10,21 @@ export class DataBaseOperations {
   }
 
   // criar o registro da gravação da execução
-  createLogsRegister = async () => {}
+  createLogsRecord = async () => { }
 
   // salvar os logs de um registro de gravação de uma execução
-  appendLogs = async () => {}
+  appendLog = async (execution_sensor_port_id, value, time) => {
+    let record;
+    await this.connection.write(async () => {
+      record = await this.connection.get('ExecutionLogs')
+        .create(logModal => {
+          // logModal.execution_sensor_port_id = execution_sensor_port_id,
+          logModal.value = value,
+            logModal.time = time
+        });
+    });
+    return record._raw.id;
+  }
 
   // pegar os logs de um registro de de uma execução delimitando ou não uma faixa de tempo 
   getExecutionLogs = async (executionId, requestedTime = null, timeFrame = 10000) => {
@@ -80,108 +91,162 @@ export class DataBaseOperations {
       wsServerUrl: executionSniffer.wsServerUrl
     }
   };
-  executionSensorPortToObj = executionSensorPortRegister => {
+  executionSensorPortToObj = executionSensorPortRecord => {
     return {
-      id: executionSensorPortRegister.id,
-      execution_sniffer_id: executionSensorPortRegister.execution_sniffer_id,
-      brickPortName: executionSensorPortRegister.brickPortName,
-      sensorType: executionSensorPortRegister.sensorType,
-      sensorName: executionSensorPortRegister.sensorName,
+      id: executionSensorPortRecord.id,
+      execution_sniffer_id: executionSensorPortRecord.execution_sniffer_id,
+      brickPortName: executionSensorPortRecord.brickPortName,
+      sensorType: executionSensorPortRecord.sensorType,
+      sensorName: executionSensorPortRecord.sensorName,
     }
   };
-  executionLogToObj = executionLogRegister => {
+  executionLogToObj = executionLogRecord => {
     return {
-      id: executionLogRegister.id,
-      execution_sensor_port_id: executionLogRegister.execution_sensor_port_id,
-      value: executionLogRegister.value,
-      time: executionLogRegister.time
+      id: executionLogRecord.id,
+      execution_sensor_port_id: executionLogRecord.execution_sensor_port_id,
+      value: executionLogRecord.value,
+      time: executionLogRecord.time
     }
   };
 
   createExecution = async (name, initDate, initTime) => {
-    let resgister;
+    let record;
     await this.connection.write(async () => {
-      resgister = await this.connection.get('Executions')
+      record = await this.connection.get('Executions')
         .create(executionModal => {
           executionModal.name = name,
             executionModal.initDate = initDate,
             executionModal.initTime = initTime
         });
     });
-    return resgister._raw.id;
+    return record._raw.id;
   }
 
-  executionToObj = executionRegister => {
+  executionToObj = executionRecord => {
     return {
-      id: executionRegister.id,
-      name: executionRegister.name,
-      initDate: executionRegister.initDate,
-      initTime: executionRegister.initTime
+      id: executionRecord.id,
+      name: executionRecord.name,
+      initDate: executionRecord.initDate,
+      initTime: executionRecord.initTime
     }
   };
 
-  getAllExecutions = async () => {
-    const resgisters = await this.connection.get('Executions').query().fetch();
-    return resgisters.map(resgister => this.executionToObj(resgister._raw));
+  getExecution = async (id, convertToJsObj = true) => {
+    const record = await this.connection.get('Executions').query(
+      Q.where('id', id)
+    ).fetch();
+    if (convertToJsObj) return this.executionToObj(record[0]._raw);
+    else return record[0];
+  }
+
+  getAllExecutions = async (convertToJsObj = true) => {
+    const records = await this.connection.get('Executions').query().fetch();
+    if (convertToJsObj) return records.map(record => this.executionToObj(record._raw));
+    else return records;
   }
 
   appendExecutionSniffer = async (execution_id, name, wsServerUrl) => {
-    let resgister;
+    let record;
     await this.connection.write(async () => {
-      resgister = await this.connection.get('ExecutionSniffers')
+      record = await this.connection.get('ExecutionSniffers')
         .create(executionModal => {
-          executionModal.execution_id = execution_id,
-            executionModal.name = name,
+          // executionModal.execution_id = execution_id,
+          executionModal.name = name,
             executionModal.wsServerUrl = wsServerUrl
         });
     });
-    return resgister._raw.id;
+    return record._raw.id;
   }
 
-  executionSnifferToObj = executionSnifferRegister => {
+  executionSnifferToObj = executionSnifferRecord => {
     return {
-      id: executionSnifferRegister.id,
-      execution_id: executionSnifferRegister.execution_id,
-      name: executionSnifferRegister.name,
-      wsServerUrl: executionSnifferRegister.wsServerUrl
+      id: executionSnifferRecord.id,
+      execution_id: executionSnifferRecord.execution_id,
+      name: executionSnifferRecord.name,
+      wsServerUrl: executionSnifferRecord.wsServerUrl
     }
   };
 
-  getExecutionSniffer = async (id) => {
-    const resgisters = await this.connection.get('ExecutionSniffers').query(
+  getExecutionSniffer = async (id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSniffers').query(
       Q.where('id', id)
     ).fetch();
-    return resgisters.map(resgister => this.executionSnifferToObj(resgister._raw));
+    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
+    else return records;
   }
 
-  getSniffersFromExecution = async (execution_id) => {
-    const resgisters = await this.connection.get('ExecutionSniffers').query(
+  getSniffersFromExecution = async (execution_id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSniffers').query(
       Q.where('execution_id', execution_id)
     ).fetch();
-    return resgisters.map(resgister => this.executionSnifferToObj(resgister._raw));
+    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
+    else return records;
   }
 
-  getPortsFromExecutionSniffer = async (execution_sniffer_id) => {
-    const resgisters = await this.connection.get('ExecutionSensorPorts').query(
+  getPortsFromExecutionSniffer = async (execution_sniffer_id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSensorPorts').query(
       Q.where('execution_sniffer_id', execution_sniffer_id)
     ).fetch();
-    return resgisters.map(resgister => this.executionSensorPortToObj(resgister._raw));
+    if (convertToJsObj) return records.map(record => this.executionSensorPortToObj(record._raw));
+    else return records;
   }
 
-  getLogsFromExecutionSnifferPort = async (execution_sensor_port_id, timeFrame = null) => {
-    let resgisters;
+  appendExecutionSensorPort = async (execution_sniffer_id, brickPortName, sensorType, sensorName) => {
+    let record;
+    await this.connection.write(async () => {
+      record = await this.connection.get('ExecutionSensorPorts')
+        .create(executionModal => {
+          // executionModal.execution_sniffer_id = execution_sniffer_id,
+          executionModal.brickPortName = brickPortName,
+            executionModal.sensorType = sensorType,
+            executionModal.sensorName = sensorName
+        });
+    });
+    return record._raw.id;
+  }
+
+  getLogsFromExecutionSnifferPort = async (execution_sensor_port_id, timeFrame = null, convertToJsObj = true) => {
+    let records;
     if (timeFrame) {
-      const {begin, end} = timeFrame;
-      resgisters = await this.connection.get('ExecutionSensorPorts').query(
+      const { begin, end } = timeFrame;
+      records = await this.connection.get('ExecutionSensorPorts').query(
         Q.where('execution_sensor_port_id', execution_sensor_port_id),
         Q.where('value', Q.between(begin, end))
       ).fetch();
     } else {
-      resgisters = await this.connection.get('ExecutionSensorPorts').query(
+      records = await this.connection.get('ExecutionSensorPorts').query(
         Q.where('execution_sensor_port_id', execution_sensor_port_id)
       ).fetch();
     }
-    return resgisters.map(resgister => this.executionLogToObj(resgister._raw));
+    if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
+    else return records;
+  }
+
+  deleteExecution = async (id) => {
+    const execution = await this.getExecution(id, false);
+    console.log(`got execution =${Object.keys(execution)}`);
+    await this.connection.write(async () => {
+      await execution.destroyPermanently();
+    })
+  }
+
+  deleteAllExecutions = async () => {
+    const executions = await this.getAllExecutions();
+    await executions.map(execution => this.deleteExecution(execution.id));
+  }
+
+  countRecords = async () => {
+    let tablesCount = {
+      Executions: 0,
+      ExecutionSniffers: 0,
+      ExecutionSensorPorts: 0,
+      ExecutionLogs: 0
+    }
+    const keys = Object.keys(tablesCount);
+    for (let i = 0; i < keys.length; i++) {
+      tablesCount[keys[i]] = await this.connection.get(`${keys[i]}`).query().fetchCount();
+    }
+    return tablesCount;
   }
 }
 
