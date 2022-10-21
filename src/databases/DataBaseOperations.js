@@ -218,44 +218,7 @@ export class DataBaseOperations {
 
   // DELETE
   deleteExecution = async (id) => {
-    let execution;
-    let sniffers;
-    let sensorPorts = [];
-
-    // await this.connection.read(async () => {
-    //   await this.connection.batch(
-    //     execution = await this.getExecution(id, false),
-    //     sniffers = await this.getSniffersFromExecution(execution._raw.id, false),
-    //     await sniffers.map(async sniffer => {
-    //       sensorPorts = [...sensorPorts, ...(await this.getPortsFromExecutionSniffer(sniffer._raw.id, false))]
-    //     })
-    //   );
-    // });
-
     await this.connection.write(async () => {
-      // await this.connection.batch(
-      // execution = await this.getExecution(id, false),
-      //   sniffers = await this.getSniffersFromExecution(execution._raw.id, false),
-      //   await sniffers.map(async sniffer => {
-      //     const ports = await this.getPortsFromExecutionSniffer(sniffer._raw.id, false);
-      //     console.log(`ports = ${Object.values(ports[0]._raw)}`);
-      //     await ports.map(port => sensorPorts.push(port));
-      //   }),
-      //   // console.log(`sensorPorts = ${sensorPorts}`),
-      //   await sensorPorts.map(async sensorPort => {
-      //     await this.connection.get('ExecutionLogs').query(
-      //       Q.where('execution_sensor_port_id', sensorPort._raw.id)
-      //     ).fetch().map(async log => {
-      //       await log.destroyPermanently();
-      //     });
-      //     console.log(`sensorPort = ${Object.keys(sensorPort)}`);
-      //     await sensorPort.destroyPermanently();
-      //   }),
-      //   await sniffers.map(async sniffer => {
-      //     await sniffer.destroyPermanently();
-      //   }),
-      //   await execution.destroyPermanently()
-      // );
       let execution;
       let sniffers;
       let snifferIds;
