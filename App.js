@@ -7,15 +7,15 @@ import { DataBaseOperations } from './src/databases/DataBaseOperations';
 
 setTimeout(async () => {
   const database = new DataBaseOperations();
-    const executionId = await database.createExecution('test', 'test', 'test');
-    const snifferId = await database.appendExecutionSniffer(executionId, 'test', 'test');
-    const portId = await database.appendExecutionSensorPort(snifferId, 'test', 'test');
-    await database.appendLog(portId, 'test', 500);
-    console.log('created logs');
-    const records = await database.countRecords();
-    console.log(`records = ${JSON.stringify(records)}`);
-    await database.deleteAllExecutions();
-    console.log('deleted logs');
+  const executionId = await database.createExecution('test', 'test', 'test');
+  const snifferId = await database.appendExecutionSniffer(executionId, 'test', 'test');
+  const portId = await database.appendExecutionSensorPort(snifferId, 'test', 'test');
+  await database.appendLog(portId, 'test', 500);
+  console.log('created logs');
+  const records = await database.countRecords();
+  console.log(`records = ${JSON.stringify(records)}`);
+  await database.deleteAllExecutions();
+  console.log('deleted logs');
   setTimeout(async () => {
     const records = await database.countRecords();
     console.log(`records = ${JSON.stringify(records)}`);

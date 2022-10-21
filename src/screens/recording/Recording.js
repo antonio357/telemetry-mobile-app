@@ -2,8 +2,8 @@ import { View } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { styles } from '../../../App.styles';
 import { observer, inject } from 'mobx-react';
-import { ChartCardsList } from '../../charts/ChartCardsList';
-import { ChartDrawPath } from '../../charts/ChartDrawPath';
+// import { ChartCardsList } from '../../charts/ChartCardsList';
+// import { ChartDrawPath } from '../../charts/ChartDrawPath';
 
 // const path1 =  new ChartDrawPath('ultrassonic');
 // const path2 =  new ChartDrawPath('touch');
