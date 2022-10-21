@@ -256,16 +256,24 @@ export class DataBaseOperations {
       //   }),
       //   await execution.destroyPermanently()
       // );
-      const execution = await this.getExecution(id, false);
-      const sniffers = await this.getSniffersFromExecution(execution._raw.id, false);
-      const snifferIds = sniffers.map(sniffer => sniffer._raw.id);
-      const ports = await this.getPortsFromExecutionSniffers(snifferIds, false);
-      const portIds = ports.map(port => port._raw.id);
-      const logs = await this.getLogsFromExecutionSnifferPorts(portIds, null, false);
-      await logs.map(async log => await log.destroyPermanently());
-      await ports.map(async port => await port.destroyPermanently());
-      await sniffers.map(async sniffer => await sniffer.destroyPermanently());
-      await execution.destroyPermanently();
+      let execution;
+      let sniffers;
+      let snifferIds;
+      let ports;
+      let portIds;
+      let logs;
+      this.connection.batch(
+        execution = await this.getExecution(id, false),
+        sniffers = await this.getSniffersFromExecution(execution._raw.id, false),
+        snifferIds = sniffers.map(sniffer => sniffer._raw.id),
+        ports = await this.getPortsFromExecutionSniffers(snifferIds, false),
+        portIds = ports.map(port => port._raw.id),
+        logs = await this.getLogsFromExecutionSnifferPorts(portIds, null, false),
+        await logs.map(async log => await log.destroyPermanently()),
+        await ports.map(async port => await port.destroyPermanently()),
+        await sniffers.map(async sniffer => await sniffer.destroyPermanently()),
+        await execution.destroyPermanently()
+      );
     });
   }
 
