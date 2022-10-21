@@ -9,23 +9,113 @@ export class DataBaseOperations {
     this.connection = database
   }
 
-  // criar o registro da gravação da execução
-  createLogsRecord = async () => { }
-
-  // salvar os logs de um registro de gravação de uma execução
-  appendLog = async (execution_sensor_port_id, value, time) => {
-    let record;
-    await this.connection.write(async () => {
-      record = await this.connection.get('ExecutionLogs')
-        .create(logModal => {
-          // logModal.execution_sensor_port_id = execution_sensor_port_id,
-          logModal.value = value,
-            logModal.time = time
-        });
-    });
-    return record._raw.id;
+  // CONVERT 
+  executionToObj = execution => {
+    return {
+      id: execution.id,
+      name: execution.name,
+      initDate: execution.initDate,
+      initTime: execution.initTime
+    }
+  };
+  executionSnifferToObj = executionSniffer => {
+    return {
+      id: executionSniffer.id,
+      execution_id: executionSniffer.execution_id,
+      name: executionSniffer.name,
+      wsServerUrl: executionSniffer.wsServerUrl
+    }
+  };
+  executionSensorPortToObj = executionSensorPortRecord => {
+    return {
+      id: executionSensorPortRecord.id,
+      execution_sniffer_id: executionSensorPortRecord.execution_sniffer_id,
+      brickPortName: executionSensorPortRecord.brickPortName,
+      sensorType: executionSensorPortRecord.sensorType,
+      sensorName: executionSensorPortRecord.sensorName,
+    }
+  };
+  executionLogToObj = executionLogRecord => {
+    return {
+      id: executionLogRecord.id,
+      execution_sensor_port_id: executionLogRecord.execution_sensor_port_id,
+      value: executionLogRecord.value,
+      time: executionLogRecord.time
+    }
+  };
+  // GET
+  getExecution = async (id, convertToJsObj = true) => {
+    const record = await this.connection.get('Executions').query(
+      Q.where('id', id)
+    ).fetch();
+    if (convertToJsObj) return this.executionToObj(record[0]._raw);
+    else return record[0];
   }
-
+  getAllExecutions = async (convertToJsObj = true) => {
+    const records = await this.connection.get('Executions').query().fetch();
+    if (convertToJsObj) return records.map(record => this.executionToObj(record._raw));
+    else return records;
+  }
+  getExecutionSniffer = async (id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSniffers').query(
+      Q.where('id', id)
+    ).fetch();
+    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
+    else return records;
+  }
+  getSniffersFromExecution = async (execution_id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSniffers').query(
+      Q.where('execution_id', execution_id)
+    ).fetch();
+    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
+    else return records;
+  }
+  getPortsFromExecutionSniffer = async (execution_sniffer_id, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSensorPorts').query(
+      Q.where('execution_sniffer_id', execution_sniffer_id)
+    ).fetch();
+    if (convertToJsObj) return records.map(record => this.executionSensorPortToObj(record._raw));
+    else return records;
+  }
+  getPortsFromExecutionSniffers = async (execution_sniffer_ids, convertToJsObj = true) => {
+    const records = await this.connection.get('ExecutionSensorPorts').query(
+      Q.where('execution_sniffer_id', Q.oneOf(execution_sniffer_ids))
+    ).fetch();
+    if (convertToJsObj) return records.map(record => this.executionSensorPortToObj(record._raw));
+    else return records;
+  }
+  getLogsFromExecutionSnifferPort = async (execution_sensor_port_id, timeFrame = null, convertToJsObj = true) => {
+    let records;
+    if (timeFrame) {
+      const { begin, end } = timeFrame;
+      records = await this.connection.get('ExecutionLogs').query(
+        Q.where('execution_sensor_port_id', execution_sensor_port_id),
+        Q.where('value', Q.between(begin, end))
+      ).fetch();
+    } else {
+      records = await this.connection.get('ExecutionLogs').query(
+        Q.where('execution_sensor_port_id', execution_sensor_port_id)
+      ).fetch();
+    }
+    if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
+    else return records;
+  }
+  getLogsFromExecutionSnifferPorts = async (execution_sensor_port_ids, timeFrame = null, convertToJsObj = true) => {
+    let records;
+    if (timeFrame) {
+      const { begin, end } = timeFrame;
+      records = await this.connection.get('ExecutionLogs').query(
+        Q.where('execution_sensor_port_id', Q.oneOf(execution_sensor_port_ids)),
+        Q.where('value', Q.between(begin, end))
+      ).fetch();
+    } else {
+      records = await this.connection.get('ExecutionLogs').query(
+        Q.where('execution_sensor_port_id', Q.oneOf(execution_sensor_port_ids))
+      ).fetch();
+    }
+    if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
+    else return records;
+  }
   // pegar os logs de um registro de de uma execução delimitando ou não uma faixa de tempo 
   getExecutionLogs = async (executionId, requestedTime = null, timeFrame = 10000) => {
     // const executionId = "65kp0bxxrdp30hb3"; // id da gravação de uma execução, do tipo string é gerado automaticamente pelo próprio watermelonDB
@@ -74,41 +164,7 @@ export class DataBaseOperations {
 
     return executionSniffers;
   }
-
-  executionToObj = execution => {
-    return {
-      id: execution.id,
-      name: execution.name,
-      initDate: execution.initDate,
-      initTime: execution.initTime
-    }
-  };
-  executionSnifferToObj = executionSniffer => {
-    return {
-      id: executionSniffer.id,
-      execution_id: executionSniffer.execution_id,
-      name: executionSniffer.name,
-      wsServerUrl: executionSniffer.wsServerUrl
-    }
-  };
-  executionSensorPortToObj = executionSensorPortRecord => {
-    return {
-      id: executionSensorPortRecord.id,
-      execution_sniffer_id: executionSensorPortRecord.execution_sniffer_id,
-      brickPortName: executionSensorPortRecord.brickPortName,
-      sensorType: executionSensorPortRecord.sensorType,
-      sensorName: executionSensorPortRecord.sensorName,
-    }
-  };
-  executionLogToObj = executionLogRecord => {
-    return {
-      id: executionLogRecord.id,
-      execution_sensor_port_id: executionLogRecord.execution_sensor_port_id,
-      value: executionLogRecord.value,
-      time: executionLogRecord.time
-    }
-  };
-
+  // CREATE
   createExecution = async (name, initDate, initTime) => {
     let record;
     await this.connection.write(async () => {
@@ -121,113 +177,96 @@ export class DataBaseOperations {
     });
     return record._raw.id;
   }
-
-  executionToObj = executionRecord => {
-    return {
-      id: executionRecord.id,
-      name: executionRecord.name,
-      initDate: executionRecord.initDate,
-      initTime: executionRecord.initTime
-    }
-  };
-
-  getExecution = async (id, convertToJsObj = true) => {
-    const record = await this.connection.get('Executions').query(
-      Q.where('id', id)
-    ).fetch();
-    if (convertToJsObj) return this.executionToObj(record[0]._raw);
-    else return record[0];
-  }
-
-  getAllExecutions = async (convertToJsObj = true) => {
-    const records = await this.connection.get('Executions').query().fetch();
-    if (convertToJsObj) return records.map(record => this.executionToObj(record._raw));
-    else return records;
-  }
-
   appendExecutionSniffer = async (execution_id, name, wsServerUrl) => {
     let record;
     await this.connection.write(async () => {
       record = await this.connection.get('ExecutionSniffers')
         .create(executionModal => {
-          // executionModal.execution_id = execution_id,
-          executionModal.name = name,
+          executionModal.execution_id = execution_id,
+            executionModal.name = name,
             executionModal.wsServerUrl = wsServerUrl
         });
     });
     return record._raw.id;
   }
-
-  executionSnifferToObj = executionSnifferRecord => {
-    return {
-      id: executionSnifferRecord.id,
-      execution_id: executionSnifferRecord.execution_id,
-      name: executionSnifferRecord.name,
-      wsServerUrl: executionSnifferRecord.wsServerUrl
-    }
-  };
-
-  getExecutionSniffer = async (id, convertToJsObj = true) => {
-    const records = await this.connection.get('ExecutionSniffers').query(
-      Q.where('id', id)
-    ).fetch();
-    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
-    else return records;
-  }
-
-  getSniffersFromExecution = async (execution_id, convertToJsObj = true) => {
-    const records = await this.connection.get('ExecutionSniffers').query(
-      Q.where('execution_id', execution_id)
-    ).fetch();
-    if (convertToJsObj) return records.map(record => this.executionSnifferToObj(record._raw));
-    else return records;
-  }
-
-  getPortsFromExecutionSniffer = async (execution_sniffer_id, convertToJsObj = true) => {
-    const records = await this.connection.get('ExecutionSensorPorts').query(
-      Q.where('execution_sniffer_id', execution_sniffer_id)
-    ).fetch();
-    if (convertToJsObj) return records.map(record => this.executionSensorPortToObj(record._raw));
-    else return records;
-  }
-
   appendExecutionSensorPort = async (execution_sniffer_id, brickPortName, sensorType, sensorName) => {
     let record;
     await this.connection.write(async () => {
       record = await this.connection.get('ExecutionSensorPorts')
         .create(executionModal => {
-          // executionModal.execution_sniffer_id = execution_sniffer_id,
-          executionModal.brickPortName = brickPortName,
+          executionModal.execution_sniffer_id = execution_sniffer_id,
+            executionModal.brickPortName = brickPortName,
             executionModal.sensorType = sensorType,
             executionModal.sensorName = sensorName
         });
     });
     return record._raw.id;
   }
-
-  getLogsFromExecutionSnifferPort = async (execution_sensor_port_id, timeFrame = null, convertToJsObj = true) => {
-    let records;
-    if (timeFrame) {
-      const { begin, end } = timeFrame;
-      records = await this.connection.get('ExecutionSensorPorts').query(
-        Q.where('execution_sensor_port_id', execution_sensor_port_id),
-        Q.where('value', Q.between(begin, end))
-      ).fetch();
-    } else {
-      records = await this.connection.get('ExecutionSensorPorts').query(
-        Q.where('execution_sensor_port_id', execution_sensor_port_id)
-      ).fetch();
-    }
-    if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
-    else return records;
+  // salvar os logs de um registro de gravação de uma execução
+  appendLog = async (execution_sensor_port_id, value, time) => {
+    let record;
+    await this.connection.write(async () => {
+      record = await this.connection.get('ExecutionLogs')
+        .create(logModal => {
+          logModal.execution_sensor_port_id = execution_sensor_port_id,
+            logModal.value = value,
+            logModal.time = time
+        });
+    });
+    return record._raw.id;
   }
 
+  // DELETE
   deleteExecution = async (id) => {
-    const execution = await this.getExecution(id, false);
-    console.log(`got execution =${Object.keys(execution)}`);
+    let execution;
+    let sniffers;
+    let sensorPorts = [];
+
+    // await this.connection.read(async () => {
+    //   await this.connection.batch(
+    //     execution = await this.getExecution(id, false),
+    //     sniffers = await this.getSniffersFromExecution(execution._raw.id, false),
+    //     await sniffers.map(async sniffer => {
+    //       sensorPorts = [...sensorPorts, ...(await this.getPortsFromExecutionSniffer(sniffer._raw.id, false))]
+    //     })
+    //   );
+    // });
+
     await this.connection.write(async () => {
+      // await this.connection.batch(
+      // execution = await this.getExecution(id, false),
+      //   sniffers = await this.getSniffersFromExecution(execution._raw.id, false),
+      //   await sniffers.map(async sniffer => {
+      //     const ports = await this.getPortsFromExecutionSniffer(sniffer._raw.id, false);
+      //     console.log(`ports = ${Object.values(ports[0]._raw)}`);
+      //     await ports.map(port => sensorPorts.push(port));
+      //   }),
+      //   // console.log(`sensorPorts = ${sensorPorts}`),
+      //   await sensorPorts.map(async sensorPort => {
+      //     await this.connection.get('ExecutionLogs').query(
+      //       Q.where('execution_sensor_port_id', sensorPort._raw.id)
+      //     ).fetch().map(async log => {
+      //       await log.destroyPermanently();
+      //     });
+      //     console.log(`sensorPort = ${Object.keys(sensorPort)}`);
+      //     await sensorPort.destroyPermanently();
+      //   }),
+      //   await sniffers.map(async sniffer => {
+      //     await sniffer.destroyPermanently();
+      //   }),
+      //   await execution.destroyPermanently()
+      // );
+      const execution = await this.getExecution(id, false);
+      const sniffers = await this.getSniffersFromExecution(execution._raw.id, false);
+      const snifferIds = sniffers.map(sniffer => sniffer._raw.id);
+      const ports = await this.getPortsFromExecutionSniffers(snifferIds, false);
+      const portIds = ports.map(port => port._raw.id);
+      const logs = await this.getLogsFromExecutionSnifferPorts(portIds, null, false);
+      await logs.map(async log => await log.destroyPermanently());
+      await ports.map(async port => await port.destroyPermanently());
+      await sniffers.map(async sniffer => await sniffer.destroyPermanently());
       await execution.destroyPermanently();
-    })
+    });
   }
 
   deleteAllExecutions = async () => {
@@ -235,6 +274,7 @@ export class DataBaseOperations {
     await executions.map(execution => this.deleteExecution(execution.id));
   }
 
+  // UTILS
   countRecords = async () => {
     let tablesCount = {
       Executions: 0,

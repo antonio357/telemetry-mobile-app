@@ -7,17 +7,25 @@ import { DataBaseOperations } from './src/databases/DataBaseOperations';
 
 setTimeout(async () => {
   const database = new DataBaseOperations();
-  const executionId = await database.createExecution('this is a test', '2022-02-02', '14:30:15:500');
-  const snifferId = await database.appendExecutionSniffer(executionId, 'sniffer de teste', 'ws://123.123.123.123:81');
-  const portId = await database.appendExecutionSensorPort(snifferId, 'port1', 'ultrassonic', 'sensor de distância');
-  // await database.appendLog(portId, '125', '500');
-  console.log(`records before clean ${JSON.stringify(await database.countRecords())}`);
   setTimeout(async () => {
-    await database.deleteAllExecutions(); // ta com um possível problema
-    setTimeout(async () => {
-      console.log(`records after clean ${JSON.stringify(await database.countRecords())}`);
-    }, 1000);
+    const executionId = await database.createExecution('test', 'test', 'test');
+    const snifferId = await database.appendExecutionSniffer(executionId, 'test', 'test');
+    const portId = await database.appendExecutionSensorPort(snifferId, 'test', 'test');
+    await database.appendLog(portId, 'test', 500);
+    console.log('created logs');
   }, 1000);
+  setTimeout(async () => {
+    const records = await database.countRecords();
+    console.log(`records = ${JSON.stringify(records)}`);
+  }, 2000);
+  setTimeout(async () => {
+    await database.deleteAllExecutions();
+    console.log('deleted logs');
+  }, 3000);
+  setTimeout(async () => {
+    const records = await database.countRecords();
+    console.log(`records = ${JSON.stringify(records)}`);
+  }, 4000);
 }, 1000);
 
 function App() {

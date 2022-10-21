@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "expo-deploy": "expo build:android",
     "emulator-server": "npx react-native start --reset-cache",
     "emulator": "npx react-native run-android",
     "dev": "expo start",
