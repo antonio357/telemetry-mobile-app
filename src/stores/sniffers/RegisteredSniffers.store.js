@@ -1,6 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
 import { Skia } from "@shopify/react-native-skia";
+import { DataBaseOperations } from '../../databases/DataBaseOperations';
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -73,6 +74,25 @@ class RegisteredSniffersStore {
   // ]
   portChart = []
 
+  // executionInfo = {
+  //   executionId: 'id',
+  //   sniffers: [
+  //     {
+  //       wsClientUrl: 'url do sniffer',
+  //       id: 'identificador do sniffer no banco',
+  //       portIds: [
+  //         {
+  //           id: 'id1',
+  //           portName: 'portName'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // }
+  executionInfo = {};
+  executionInfoReady = false;
+  database = new DataBaseOperations();
+
   constructor() {
     makeObservable(this, {
       // observables for sniffers screens
@@ -106,10 +126,19 @@ class RegisteredSniffersStore {
     let logs;
     let ports;
     for (let i = 0; i < this.wsClients.length; i++) {
+      const url = this.wsClients[i].getUrl();
       logs = this.wsClients[i].getLogs(120);
       ports = Object.keys(logs);
       for (let j = 0; j < ports.length; j++) {
-        this.pushDataPortChart(this.wsClients[i].getUrl(), ports[j], logs[ports[j]]);
+        const portName = ports[j];
+        this.pushDataPortChart(this.wsClients[i].getUrl(), portName, logs[ports[j]]);
+        
+        if (this.executionInfoReady) {
+          console.log(`in thread, this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
+          const portIds = this.executionInfo.sniffers?.find(sniffer => sniffer.wsClientUrl == url).portIds;
+          const portId = portIds?.find(portId => portId.portName == portName).id;
+          this.database.appendLogs(logs, portId);
+        }
       }
     }
   }
@@ -118,6 +147,17 @@ class RegisteredSniffersStore {
   getAllPortChart = () => {
     return this.portChart;
   }
+  getSnifferSensorsDescription = (wsClientUrl) => {
+    const filtered = this.portChart.filter(port => port.url == wsClientUrl);
+    return filtered.map(sensorDescription => {
+      return {
+        sensorType: 'ultrassonic',
+        portName: sensorDescription.port,
+        sensorName: sensorDescription.port,
+      };
+    })
+  }
+  getexecutionInfo
   getPortChart = (wsClientUrl, portName) => {
     return this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
   }
@@ -225,14 +265,51 @@ class RegisteredSniffersStore {
     if (sniffer) sniffer.status = status;
   }
 
-  startLogs = () => {
-    this.lastCmdToAllWsClients = "start logs";
-    this.wsClients.forEach(socket => socket.send('start logs'));
+  startLogs = async () => {
+    if (!this.executionInfoReady) { // as informações da execução enterior já foram salvas
+      this.lastCmdToAllWsClients = "start logs";
+
+      // prepara armazenamento dos logs no banco
+      const date = new Date();
+      this.executionInfo['executionId'] = await this.database.createExecution('temp-name', `${date.getUTCFullYear()}-${date.getUTCMonth + 1}-${date.getUTCDate()}`, `${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`);
+
+      this.executionInfo['sniffers'] = [];
+      this.wsClients.map(async sniffer => {
+        const url = sniffer.getUrl();
+        const ports = this.getSnifferSensorsDescription(url);
+        let snifferInfo = {
+          wsClientUrl: url,
+          id: '',
+          portIds: []
+        };
+
+        snifferInfo.id = await this.database.appendExecutionSniffer(this.executionInfo['executionId'], url, url);
+        ports.map(async port => {
+          const obj = {
+            id: await this.database.appendExecutionSensorPort(snifferInfo.id, port.portName, port.sensorType),
+            portName: port.portName
+          };
+          snifferInfo.portIds.push(obj);
+        });
+
+        this.executionInfo['sniffers'].push(snifferInfo);
+      });
+
+      this.wsClients.forEach(socket => socket.send('start logs'));
+      this.executionInfoReady = true;
+    }
   }
 
   stopLogs = () => {
     this.lastCmdToAllWsClients = "stop logs";
     this.wsClients.forEach(socket => socket.send('stop logs'));
+
+    setTimeout(async () => {
+      this.executionInfoReady = false;
+      executionInfo = {};
+      const count = await this.database.countRecords();
+      console.log(`records after execution = ${JSON.stringify(count)}`);
+    }, 1000);
   }
 }
 

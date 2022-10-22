@@ -215,6 +215,20 @@ export class DataBaseOperations {
     });
     return record._raw.id;
   }
+  appendLogs = async (logs, portId) => {
+    await this.connection.write(async () => {
+      this.connection.batch(
+        logs.map(async log => {
+          await this.connection.get('ExecutionLogs')
+            .create(logModal => {
+              logModal.execution_sensor_port_id = portId,
+                logModal.value = log.value,
+                logModal.time = log.time
+            })
+        })
+      );
+    });
+  }
 
   // DELETE
   deleteExecution = async (id) => {
