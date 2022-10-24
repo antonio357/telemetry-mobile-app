@@ -1,10 +1,30 @@
 import RegisteredSniffersStore from '../../stores/sniffers/RegisteredSniffers.store';
+import { DataBaseOperations } from '../../databases/DataBaseOperations';
+
 
 class WsClient {
   name = '';
   url = '';
   ws = null;
   logsBuffer = {};
+
+  detDbInfoThread = null;
+  database = new DataBaseOperations();
+  dbExecutionId; // id da execução atual
+  // dbLogsBuffer = {
+  //   port1: {
+  //     id: 'id do banco',
+  //     logs: [
+  //       {
+  //         value: '123',
+  //         time: 500
+  //       }
+  //     ]
+  //   }
+  // };
+  dbLogsBuffer = {};
+  dbLogsBufferTimer = 10000;
+  dbLastSaveTime; // tempo em ms da ultima vez em que salvou os logs no banco
 
   constructor(name, url) {
     this.name = name;
@@ -30,7 +50,51 @@ class WsClient {
   }
 
   send = cmd => {
+    if (cmd == "start logs") {
+      this.setToSaveLogs();
+    } else if (cmd == "stop logs") {
+      this.saveLogs(true);
+      this.resetToSaveLogs();
+    }
     this.ws.send(cmd);
+  }
+
+  resetToSaveLogs = () => {
+    this.dbExecutionId = null;
+    this.dbLogsBuffer = {};
+  }
+
+  setToSaveLogs = () => {
+    const { getDbExecutionId, getDbPortsIds } = RegisteredSniffersStore;
+    this.dbExecutionId = getDbExecutionId();
+    this.dbLogsBuffer = getDbPortsIds();
+    this.dbLastSaveTime = new Date().getTime();
+  }
+
+  checkDbInfo = () => {
+    const keys = Object.keys(this.dbExecutionId);
+    if (keys.length > 0) return;
+    else this.setToSaveLogs();
+  }
+
+  bufferDbLogs = logs => {
+    const ports = Object.keys(logs);
+    for (let i = 0; i < ports.length; i++) {
+      const logsBuffer = this.dbLogsBuffer[ports[i]].logs;
+      logsBuffer = [...logsBuffer, ...logs];
+    }
+  }
+
+  saveLogs = (onStopLogs = false) => {
+    const actualTime = new Date().getTime();
+    if (onStopLogs || actualTime - this.dbLastSaveTime > this.dbLogsBufferTimer) {
+      const ports = Object.keys(this.dbLogsBuffer);
+      for (let i = 0; i < ports.length; i++) {
+        const portBrickName = ports[i];
+        this.database.appendLogs(this.dbLogsBuffer[portBrickName].logs.splice(0), this.dbLogsBuffer[portBrickName].id);
+      }
+      this.dbLastSaveTime = new Date().getTime();
+    }
   }
 
   connect = () => {
@@ -59,6 +123,10 @@ class WsClient {
         for (let i = 0; i < ports.length; i++) {
           this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
         }
+
+        this.checkDbInfo();
+        this.bufferDbLogs(logs);
+        this.saveLogs();
       }
       else if (connectedPorts) {
         // { connectedPorts: ["port1", "port2"] };
