@@ -95,8 +95,9 @@ class WsClient {
       console.log(`port = ${JSON.stringify(port)}`);
       console.log(`this.dbLogsBuffer[port] = ${JSON.stringify(this.dbLogsBuffer[port])}`);
       const logsBuffer = this.dbLogsBuffer[port].logs;
-      logsBuffer = [...logsBuffer, ...logs[port]];
+      this.dbLogsBuffer[port].logs = [...this.dbLogsBuffer[port].logs, ...logs[port]];
       console.log(`logsBuffer = ${JSON.stringify(logsBuffer)}`);
+      console.log(`this.dbLogsBuffer[port].logs = ${JSON.stringify(this.dbLogsBuffer[port].logs)}`);
     }
   }
 
@@ -108,7 +109,12 @@ class WsClient {
       for (let i = 0; i < ports.length; i++) {
         const portBrickName = ports[i];
         console.log(`on sniffer saveLogs, saved the logs`);
-        this.database.appendLogs(this.dbLogsBuffer[portBrickName].logs.splice(0), this.dbLogsBuffer[portBrickName].id);
+        console.log(`portBrickName = ${JSON.stringify(portBrickName)}`);
+        console.log(`this.dbLogsBuffer = ${JSON.stringify(this.dbLogsBuffer)}`);
+        console.log(`this.dbLogsBuffer[portBrickName].logs = ${JSON.stringify(this.dbLogsBuffer[portBrickName].logs)}`);
+        const sv = this.dbLogsBuffer[portBrickName].logs.splice(0);
+        console.log(`sv = ${JSON.stringify(sv)}`);
+        this.database.appendLogs(sv, this.dbLogsBuffer[portBrickName].id);
       }
       this.dbLastSaveTime = new Date().getTime();
     }
