@@ -29,7 +29,7 @@ export class ChartDrawPath {
     //   value: '', // string com o valor do sensor 
     //   time: 15000 // inteiro com o valor de tempo em ms que se passou após o início da execução
     // };
-    const y = (parseInt(data.value) * this.dimensionsUnits.y) - this.axisLength.y;
+    const y = (parseInt(data.value) * this.dimensionsUnits.y);
     const timeDiff = (data.time - this.lastPointTime) * this.dimensionsUnits.x;
     const x = (this.path.getLastPt().x + timeDiff);
     this.path.lineTo(x, y);
