@@ -65,6 +65,8 @@ class WsClient {
   }
 
   setToSaveLogs = () => {
+    const { printDbExecutionInfo } = RegisteredSniffersStore;
+    printDbExecutionInfo();
     const { getDbExecutionId, getDbPortsIds } = RegisteredSniffersStore;
     this.dbExecutionId = getDbExecutionId();
     this.dbLogsBuffer = getDbPortsIds();

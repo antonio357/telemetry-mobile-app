@@ -330,6 +330,10 @@ class RegisteredSniffersStore {
     this.executionInfoReady = true;
   }
 
+  printDbExecutionInfo = () => {
+    console.log(`this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
+  }
+
   getDbExecutionId = () => {
     console.log(`getDbExecutionId()`);
     if (this.executionInfoReady) {
