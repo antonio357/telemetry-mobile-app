@@ -2,6 +2,7 @@ import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
 import { Skia } from "@shopify/react-native-skia";
 import { DataBaseOperations } from '../../databases/DataBaseOperations';
+import { ChartDrawPath } from '../../charts/ChartDrawPath';
 
 class LineChart {
   constructor(xScale, yScale) {
@@ -140,6 +141,21 @@ class RegisteredSniffersStore {
   getAllPortChart = () => {
     return this.portChart;
   }
+  getAllportChartForChartCardsList = () => {
+    const array = [];
+    for (let i = 0; i < this.portChart.length; i++) {
+      const port = this.portChart[i];
+      const obj = {
+        sensorName: port.port1,
+        sensorType: 'ultrassonic',
+        timeFrame: 10,
+        logsRate: 1000,
+        drawPath: port.chart.getPath()
+      };
+      array.push(obj);
+    }
+    return array;
+  }
   getSnifferSensorsDescription = (wsClientUrl) => {
     const filtered = this.portChart.filter(port => port.url == wsClientUrl);
     return filtered.map(sensorDescription => {
@@ -155,7 +171,8 @@ class RegisteredSniffersStore {
     return this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
   }
   createChart = () => {
-    return new LineChart([0, 100], [0, 255]);
+    // return new LineChart([0, 100], [0, 255]);
+    return new ChartDrawPath('ultrassonic');
   }
   setPortChart = (wsClientUrl, portName) => {
     const portChartRef = this.getPortChart(wsClientUrl, portName);
@@ -184,7 +201,7 @@ class RegisteredSniffersStore {
   pushDataPortChart = (wsClientUrl, portName, dataVector) => {
     const portChartRef = this.getPortChart(wsClientUrl, portName);
     if (portChartRef) {
-      portChartRef.chart.loadDataVector(dataVector.map(log => log.value));
+      portChartRef.chart.loadDataVector(dataVector);
     }
   }
 

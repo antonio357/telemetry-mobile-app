@@ -1,12 +1,12 @@
 import { View, Button, ScrollView, Dimensions } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
-import { Canvas, Path } from "@shopify/react-native-skia";
 import { StyleSheet } from "react-native";
+import { ChartCardsList } from '../../charts/ChartCardsList';
 
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
-  const { getAllPortChart, lastCmdToAllWsClients, startLogs, stopLogs } = RegisteredSniffersStore;
+  const { getAllportChartForChartCardsList, lastCmdToAllWsClients, startLogs, stopLogs } = RegisteredSniffersStore;
 
   const viewMarging = 24;
   const strokeWidth = 16;
@@ -24,31 +24,17 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   const canvasHeight = yAxisDimensions.height; // valor máximo do sensor de ultrassônico
 
   const styles = StyleSheet.create({
-    returnView: { flex: 1 },
+    returnView: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     ButtonAndScrollView: { marginHorizontal: horizontalScrollViewMargin, marginTop: 24 },
     Button: {},
     ScrollView: { marginHorizontal: horizontalScrollViewMargin, marginTop: 8 },
     Canvas: { height: yAxisDimensions.height, width: canvasWidth },
     LastCanvas: { height: yAxisDimensions.height, width: canvasWidth, marginBottom: 110 }
   });
-
-  let CanvasList = [];
-  const portCharts = getAllPortChart();
-  let CanvasStyle;
-  for (let i = 0; i < portCharts.length; i++) {
-    CanvasStyle = styles.Canvas;
-    if (i == portCharts.length - 1) {
-      CanvasStyle = styles.LastCanvas;
-    } else {
-      CanvasStyle = styles.Canvas;
-    }
-    CanvasList.push(
-      <Canvas key={`${portCharts[i].url}${portCharts[i].port}`} style={CanvasStyle} mode='continuous' debug={true} >
-        <Path path={portCharts[i].chart.getPath()} style="stroke" color="tomato" strokeWidth={1} />
-      </Canvas>
-    );
-  }
-
   return (
     <View style={styles.returnView}>
       <View style={styles.ButtonAndScrollView}>
@@ -59,9 +45,8 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
             stopLogs();
           }
         }} />
-        <ScrollView style={styles.ScrollView}>
-          {CanvasList}
-        </ScrollView>
+
+        <ChartCardsList sensorConfigsArray={getAllportChartForChartCardsList()} />
       </View>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
