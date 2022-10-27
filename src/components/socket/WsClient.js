@@ -69,7 +69,7 @@ class WsClient {
     printDbExecutionInfo();
     const { getDbExecutionId, getDbPortsIds } = RegisteredSniffersStore;
     this.dbExecutionId = getDbExecutionId();
-    this.dbLogsBuffer = getDbPortsIds();
+    this.dbLogsBuffer = getDbPortsIds(this.getUrl());
     this.dbLastSaveTime = new Date().getTime();
   }
 
