@@ -51,6 +51,7 @@ class WsClient {
 
   send = cmd => {
     if (cmd == "start logs") {
+      console.log(`on sniffer sending start logs`);
       this.setToSaveLogs();
     } else if (cmd == "stop logs") {
       this.saveLogs(true);
@@ -71,28 +72,42 @@ class WsClient {
     this.dbExecutionId = getDbExecutionId();
     this.dbLogsBuffer = getDbPortsIds(this.getUrl());
     this.dbLastSaveTime = new Date().getTime();
+    console.log(`on sniffer setToSaveLogs`);
+    console.log(`this.dbExecutionId = ${this.dbExecutionId}`);
   }
 
   checkDbInfo = () => {
-    const keys = Object.keys(this.dbExecutionId);
+    console.log(`on sinffer checkDbInfo()`);
+    const keys = Object.keys(this.dbLogsBuffer);
     if (keys.length > 0) return;
-    else this.setToSaveLogs();
+    else {
+      this.setToSaveLogs();
+      console.log(`on sinffer this.setToSaveLogs();`);
+    }
   }
 
   bufferDbLogs = logs => {
+    console.log(`on sinffer bufferDbLogs()`);
     const ports = Object.keys(logs);
     for (let i = 0; i < ports.length; i++) {
-      const logsBuffer = this.dbLogsBuffer[ports[i]].logs;
-      logsBuffer = [...logsBuffer, ...logs];
+      const port = ports[i];
+      console.log(`this.dbLogsBuffer = ${JSON.stringify(this.dbLogsBuffer)}`);
+      console.log(`port = ${JSON.stringify(port)}`);
+      console.log(`this.dbLogsBuffer[port] = ${JSON.stringify(this.dbLogsBuffer[port])}`);
+      const logsBuffer = this.dbLogsBuffer[port].logs;
+      logsBuffer = [...logsBuffer, ...logs[port]];
+      console.log(`logsBuffer = ${JSON.stringify(logsBuffer)}`);
     }
   }
 
   saveLogs = (onStopLogs = false) => {
+    console.log(`on sniffer saveLogs`);
     const actualTime = new Date().getTime();
     if (onStopLogs || actualTime - this.dbLastSaveTime > this.dbLogsBufferTimer) {
       const ports = Object.keys(this.dbLogsBuffer);
       for (let i = 0; i < ports.length; i++) {
         const portBrickName = ports[i];
+        console.log(`on sniffer saveLogs, saved the logs`);
         this.database.appendLogs(this.dbLogsBuffer[portBrickName].logs.splice(0), this.dbLogsBuffer[portBrickName].id);
       }
       this.dbLastSaveTime = new Date().getTime();

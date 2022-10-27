@@ -275,9 +275,10 @@ class RegisteredSniffersStore {
     if (sniffer) sniffer.status = status;
   }
 
-  startLogs = () => {
+  startLogs = async () => {
     this.lastCmdToAllWsClients = "start logs";
-    this.setUpExecutionInfo();
+    console.log(`on store sending start logs`);
+    await this.setUpExecutionInfo();
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
 
@@ -345,6 +346,7 @@ class RegisteredSniffersStore {
     //   this.executionInfo['sniffers'].push(snifferInfo);
     // });
     this.executionInfoReady = true;
+    console.log(`on store execution info setted on store`);
   }
 
   printDbExecutionInfo = () => {
@@ -352,22 +354,34 @@ class RegisteredSniffersStore {
   }
 
   getDbExecutionId = () => {
-    console.log(`getDbExecutionId()`);
+    console.log(`on store getDbExecutionId()`);
+    console.log(`on store this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
     if (this.executionInfoReady) {
+      console.log(`on store getDbExecutionId() return ${JSON.stringify(this.executionInfo.executionId)}`);
       return this.executionInfo.executionId;
-    } else return null;
+    } else {
+      console.log(`on store getDbExecutionId() return null`);
+      return null;
+    }
   }
 
   getDbPortsIds = wsServerUrl => {
+    console.log(`on store getDbPortsIds(wsServerUrl = ${wsServerUrl})`);
+    const executionInfo = this.executionInfo;
+    console.log(`on store this.executionInfo = ${JSON.stringify(executionInfo)}`);
     if (this.executionInfoReady) {
       const portsInfo = {};
-      const portsIds = this.executionInfo.sniffers.find(sniffer => sniffer.wsClientUrl == wsServerUrl).portIds;
+      const portsIds = executionInfo.sniffers.find(sniffer => sniffer.wsClientUrl == wsServerUrl).portIds;
       for (let i = 0; i < portsIds.length; i++) {
         const port = portsIds[i];
         portsInfo[port.portName] = { id: port.id, logs: [] }
       }
+      console.log(`on store getDbPortsIds return portsInfo = ${JSON.stringify(portsInfo)}`);
       return portsInfo;
-    } else return null;
+    } else {
+      console.log(`on store getDbPortsIds return null`);
+      return null;
+    }
   }
 }
 
