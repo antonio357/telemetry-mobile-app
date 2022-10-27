@@ -146,7 +146,7 @@ class RegisteredSniffersStore {
     for (let i = 0; i < this.portChart.length; i++) {
       const port = this.portChart[i];
       const obj = {
-        sensorName: port.port1,
+        sensorName: port.port,
         sensorType: 'ultrassonic',
         timeFrame: 10,
         logsRate: 1000,
