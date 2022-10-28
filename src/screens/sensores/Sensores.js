@@ -1,4 +1,4 @@
-import { View, Button, ScrollView, Dimensions } from "react-native";
+import { View, Button, Dimensions } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { StyleSheet } from "react-native";

@@ -325,26 +325,6 @@ class RegisteredSniffersStore {
 
       this.executionInfo['sniffers'].push(snifferInfo);
     }
-    // this.wsClients.map(async sniffer => {
-    //   const url = sniffer.getUrl();
-    //   const snifferInfo = {
-    //     wsClientUrl: url,
-    //     id: '',
-    //     portIds: []
-    //   };
-
-    //   snifferInfo.id = await this.database.appendExecutionSniffer(this.executionInfo.executionId, url, url);
-    //   const ports = this.getSnifferSensorsDescription(url);
-    //   ports.map(async port => {
-    //     const obj = {
-    //       id: await this.database.appendExecutionSensorPort(snifferInfo.id, port.portName, port.sensorType),
-    //       portName: port.portName
-    //     };
-    //     snifferInfo.portIds.push(obj);
-    //   });
-
-    //   this.executionInfo['sniffers'].push(snifferInfo);
-    // });
     this.executionInfoReady = true;
     console.log(`on store execution info setted on store`);
   }
