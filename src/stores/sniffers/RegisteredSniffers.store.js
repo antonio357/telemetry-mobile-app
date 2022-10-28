@@ -288,7 +288,7 @@ class RegisteredSniffersStore {
 
     setTimeout(async () => {
       this.executionInfoReady = false;
-      executionInfo = {};
+      this.executionInfo = {};
       const count = await this.database.countRecords();
       console.log(`records after execution = ${JSON.stringify(count)}`);
     }, 1000);
