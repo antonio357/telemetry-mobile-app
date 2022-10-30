@@ -225,7 +225,7 @@ class RegisteredSniffersStore {
     if (sniffer) sniffer.status = status;
   }
 
-  startLogs = async () => {
+  startLogs = () => {
     this.lastCmdToAllWsClients = "start logs";
     // console.log(`on store sending start logs`);
     // await this.setUpExecutionInfo();

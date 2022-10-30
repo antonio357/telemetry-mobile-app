@@ -20,8 +20,6 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
   const axisLabelThickness = 15;
   const yAxisDimensions = { width: axisLabelThickness, height: 256 + 10 } // height: valor máximo do sensor de ultrassônico + tamanho do texto dos números do eixo y
   const canvasWidth = screenDimensions.width - horizontalScrollViewMargin;
-  const xAxisDimensions = { width: canvasWidth - yAxisDimensions.width, height: axisLabelThickness }
-  const canvasHeight = yAxisDimensions.height; // valor máximo do sensor de ultrassônico
 
   const styles = StyleSheet.create({
     returnView: {
