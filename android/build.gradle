@@ -33,7 +33,7 @@ buildscript {
         // in the individual module build.gradle files
     }
 
-    ext.kotlinVersion = '1.5.20'
+    // ext.kotlinVersion = '1.5.20'
 }
 
 allprojects {
