@@ -1,56 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
-import { Skia } from "@shopify/react-native-skia";
-import { DataBaseOperations } from '../../databases/DataBaseOperations';
 import { ChartDrawPath } from '../../charts/ChartDrawPath';
 
-class LineChart {
-  constructor(xScale, yScale) {
-    this.xScale = {
-      min: xScale[0],
-      max: xScale[1],
-    }
-    this.yScale = {
-      min: yScale[0],
-      max: yScale[1],
-    }
-    this.path = Skia.Path.Make();
-    this.path.setIsVolatile(false);
-    this.axisScale = {
-      x: 5,
-      y: 1,
-    };
-  }
-
-  pushData = data => {
-    let totalLength = 300;
-    const how_many_times = 200; // min = 1, quanto maior mais ajuda na performance, pq economiza na quantidade de operações na operação de trim e de offset, deve crescer com a quantidade de logs esperado (faixa de tempo), quantos logs existiram nessa faixa de tempo, pra evitar de fazer um trim grande e visualmente parecer que comeu um pedaço do grágico
-    const logsExpected = 10000;
-    const grain = totalLength / logsExpected;
-    if (this.path.countPoints <= 0) { // Path vazio
-      this.path.lineTo(0, data);
-    } else { // Path já tem ao menos um dado
-      if (this.path.getLastPt().x >= totalLength) { // Path ta cheio
-        // corta o inicício
-        this.path.trim(grain / totalLength * how_many_times, 1, false); // isComplement = false evita que o gráfico seja apagado caso a operação de trim retorne null
-        // move pra o ponto x = 0
-        this.path.offset(0 - this.path.getPoint(0).x, 0);
-      }
-      const newX = this.path.getLastPt().x + grain;
-      this.path.lineTo(newX, data);
-    }
-  }
-
-  loadDataVector = vector => {
-    for (let i = 0; i < vector.length; i++) {
-      this.pushData(vector[i])
-    }
-  }
-
-  getPath = () => {
-    return this.path;
-  }
-}
 
 class RegisteredSniffersStore {
   // register last command sent to all wsClients
@@ -92,7 +43,7 @@ class RegisteredSniffersStore {
   // }
   executionInfo = {};
   executionInfoReady = false;
-  database = new DataBaseOperations();
+  database = null;
 
   constructor() {
     makeObservable(this, {
@@ -166,7 +117,6 @@ class RegisteredSniffersStore {
       };
     })
   }
-  getexecutionInfo
   getPortChart = (wsClientUrl, portName) => {
     return this.portChart.find(port => port.url == wsClientUrl && port.port == portName)
   }
@@ -278,7 +228,7 @@ class RegisteredSniffersStore {
   startLogs = async () => {
     this.lastCmdToAllWsClients = "start logs";
     // console.log(`on store sending start logs`);
-    await this.setUpExecutionInfo();
+    // await this.setUpExecutionInfo();
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
 
@@ -286,14 +236,14 @@ class RegisteredSniffersStore {
     this.lastCmdToAllWsClients = "stop logs";
     this.wsClients.forEach(socket => socket.send('stop logs'));
 
-    setTimeout(async () => {
-      this.executionInfoReady = false;
-      const logs = await this.database.getAllLogs();
-      this.executionInfo = {};
-      const count = await this.database.countRecords();
-      console.log(`records after execution = ${JSON.stringify(count)}`);
-      console.log(`records after execution logs = ${JSON.stringify(logs)}`);
-    }, 1000);
+    // setTimeout(async () => {
+    //   this.executionInfoReady = false;
+    //   const logs = await this.database.getAllLogs();
+    //   this.executionInfo = {};
+    //   const count = await this.database.countRecords();
+    //   console.log(`records after execution = ${JSON.stringify(count)}`);
+    //   console.log(`records after execution logs = ${JSON.stringify(logs)}`);
+    // }, 1000);
   }
 
   setUpExecutionInfo = async () => {

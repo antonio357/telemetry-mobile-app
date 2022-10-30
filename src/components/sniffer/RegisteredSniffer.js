@@ -3,7 +3,6 @@ import { Text, View, Button } from "react-native";
 import { styles } from "./RegisteredSniffer.styles";
 import { Ionicons } from '@expo/vector-icons';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { DataBaseOperations } from '../../databases/DataBaseOperations';
 
 
 function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
