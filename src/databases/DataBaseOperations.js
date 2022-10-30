@@ -100,6 +100,14 @@ export class DataBaseOperations {
     if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
     else return records;
   }
+  getAllLogs = async (convertToJsObj = true) => {
+    let records;
+    records = await this.connection.get('ExecutionLogs').query(
+      Q.take(10)
+    ).fetch();
+    if (convertToJsObj) return records.map(record => this.executionLogToObj(record._raw));
+    else return records;
+  }
   getLogsFromExecutionSnifferPorts = async (execution_sensor_port_ids, timeFrame = null, convertToJsObj = true) => {
     let records;
     if (timeFrame) {
