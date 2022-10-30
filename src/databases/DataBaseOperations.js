@@ -1,5 +1,6 @@
-import { database } from './index';
+import { database, adapterTag } from './index';
 import { Q } from '@nozbe/watermelondb';
+import { NativeModules } from 'react-native';
 
 
 export class DataBaseOperations {
@@ -44,6 +45,9 @@ export class DataBaseOperations {
     }
   };
   // GET
+  getAllTableRecords = async (tableName) => {
+    return await this.connection.get(tableName).query().fetch();
+  }
   getExecution = async (id, convertToJsObj = true) => {
     const record = await this.connection.get('Executions').query(
       Q.where('id', id)
@@ -224,30 +228,41 @@ export class DataBaseOperations {
     return record._raw.id;
   }
   appendLogs = async (logs, portId) => {
-    const tableRef = await this.connection.get('ExecutionLogs');
-    await this.connection.write(async () => {
-      await this.connection.batch(
-        // logs.map(async log => {
-        //   await tableRef.create(logModal => {
-        //     logModal.execution_sensor_port_id = portId,
-        //       logModal.value = log.value,
-        //       logModal.time = log.time
-        //   })
-        // })
-        () => {
-          for (let i = 0; i < logs.length; i++) {
-            tableRef.prepareCreate(logModal => {
-              logModal.execution_sensor_port_id = portId,
-                logModal.value = logs[i].value,
-                logModal.time = logs[i].time
-            })
-          }
-        }
-      );
-    });
+    // const tableRef = await this.connection.get('ExecutionLogs');
+    // await this.connection.write(async () => {
+    //   await this.connection.batch(
+    //     logs.map(log => {
+    //       this.connection.get('ExecutionLogs').create(logModal => {
+    //         logModal.execution_sensor_port_id = portId,
+    //           logModal.value = log.value,
+    //           logModal.time = log.time
+    //       })
+    //     })
+    //     // () => {
+    //     //   for (let i = 0; i < logs.length; i++) {
+    //     //     tableRef.prepareCreate(logModal => {
+    //     //       logModal.execution_sensor_port_id = portId,
+    //     //         logModal.value = logs[i].value,
+    //     //         logModal.time = logs[i].time
+    //     //     })
+    //     //   }
+    //     // }
+    //   );
+    // });
+    await this.appendThounsandLogs(logs, portId);
   }
 
   // DELETE
+  // deleteAllDataBase = async () => {
+  //   await this.connection.write(async () => {
+  //     await this.connection.batch(
+  //       await this.getAllTableRecords('Executions')._raw.map(record => record.destroyPermanently()),
+  //       await this.getAllTableRecords('ExecutionSniffers')._raw.map(record => record.destroyPermanently()),
+  //       await this.getAllTableRecords('ExecutionSensorPorts')._raw.map(record => record.destroyPermanently()),
+  //       await this.getAllTableRecords('ExecutionLogs')._raw.map(record => record.destroyPermanently()),
+  //     );
+  //   });
+  // }
   deleteExecution = async (id) => {
     await this.connection.write(async () => {
       let execution;
@@ -289,6 +304,35 @@ export class DataBaseOperations {
       tablesCount[keys[i]] = await this.connection.get(`${keys[i]}`).query().fetchCount();
     }
     return tablesCount;
+  }
+
+  // DIRECT SQL
+  appendThounsandLogs = async (logs, portId) => {
+    let sqlInsert = `insert into 'ExecutionLogs' ('id', 'execution_sensor_port_id', 'value', 'time') values `;
+    for (let i = 0; i < 1; i++) {
+      const log = logs[i];
+      sqlInsert += `('${Math.random}', '${portId}', '${log.value}', ${log.time}), `
+    }
+    sqlInsert = sqlInsert.slice(0, -2);
+    const tag = await this.connection.adapter._tag;
+    const bridge = await NativeModules.DatabaseBridge;
+    console.log(`adapterTag = ${JSON.stringify(adapterTag)}`);
+    console.log(`bridge = ${JSON.stringify(bridge)}`);
+    try {
+      // await bridge.query(adapterTag, 'ExecutionLogs', sqlInsert);
+      // await bridge.query(adapterTag, 'ExecutionLogs', sqlInsert,
+      //   () => {
+      //     return null;
+      //   },
+      //   () => {
+      //     console.log('resolved');
+      //   },
+      //   () => {
+      //     console.log('rejectd');
+      //   });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

@@ -8,6 +8,8 @@ const adapter = new SQLiteAdapter({
   schema: schemas
 });
 
+export const adapterTag = adapter._tag;
+
 export const database = new Database({
   adapter,
   modelClasses: [
