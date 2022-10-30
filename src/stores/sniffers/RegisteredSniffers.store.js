@@ -277,7 +277,7 @@ class RegisteredSniffersStore {
 
   startLogs = async () => {
     this.lastCmdToAllWsClients = "start logs";
-    console.log(`on store sending start logs`);
+    // console.log(`on store sending start logs`);
     await this.setUpExecutionInfo();
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
@@ -326,7 +326,7 @@ class RegisteredSniffersStore {
       this.executionInfo['sniffers'].push(snifferInfo);
     }
     this.executionInfoReady = true;
-    console.log(`on store execution info setted on store`);
+    // console.log(`on store execution info setted on store`);
   }
 
   printDbExecutionInfo = () => {
@@ -334,21 +334,21 @@ class RegisteredSniffersStore {
   }
 
   getDbExecutionId = () => {
-    console.log(`on store getDbExecutionId()`);
-    console.log(`on store this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
+    // console.log(`on store getDbExecutionId()`);
+    // console.log(`on store this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
     if (this.executionInfoReady) {
-      console.log(`on store getDbExecutionId() return ${JSON.stringify(this.executionInfo.executionId)}`);
+      // console.log(`on store getDbExecutionId() return ${JSON.stringify(this.executionInfo.executionId)}`);
       return this.executionInfo.executionId;
     } else {
-      console.log(`on store getDbExecutionId() return null`);
+      // console.log(`on store getDbExecutionId() return null`);
       return null;
     }
   }
 
   getDbPortsIds = wsServerUrl => {
-    console.log(`on store getDbPortsIds(wsServerUrl = ${wsServerUrl})`);
+    // console.log(`on store getDbPortsIds(wsServerUrl = ${wsServerUrl})`);
     const executionInfo = this.executionInfo;
-    console.log(`on store this.executionInfo = ${JSON.stringify(executionInfo)}`);
+    // console.log(`on store this.executionInfo = ${JSON.stringify(executionInfo)}`);
     if (this.executionInfoReady) {
       const portsInfo = {};
       const portsIds = executionInfo.sniffers.find(sniffer => sniffer.wsClientUrl == wsServerUrl).portIds;
@@ -356,10 +356,10 @@ class RegisteredSniffersStore {
         const port = portsIds[i];
         portsInfo[port.portName] = { id: port.id, logs: [] }
       }
-      console.log(`on store getDbPortsIds return portsInfo = ${JSON.stringify(portsInfo)}`);
+      // console.log(`on store getDbPortsIds return portsInfo = ${JSON.stringify(portsInfo)}`);
       return portsInfo;
     } else {
-      console.log(`on store getDbPortsIds return null`);
+      // console.log(`on store getDbPortsIds return null`);
       return null;
     }
   }
