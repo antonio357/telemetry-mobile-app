@@ -216,16 +216,25 @@ export class DataBaseOperations {
     return record._raw.id;
   }
   appendLogs = async (logs, portId) => {
+    const tableRef = await this.connection.get('ExecutionLogs');
     await this.connection.write(async () => {
-      this.connection.batch(
-        logs.map(async log => {
-          await this.connection.get('ExecutionLogs')
-            .create(logModal => {
+      await this.connection.batch(
+        // logs.map(async log => {
+        //   await tableRef.create(logModal => {
+        //     logModal.execution_sensor_port_id = portId,
+        //       logModal.value = log.value,
+        //       logModal.time = log.time
+        //   })
+        // })
+        () => {
+          for (let i = 0; i < logs.length; i++) {
+            tableRef.prepareCreate(logModal => {
               logModal.execution_sensor_port_id = portId,
-                logModal.value = log.value,
-                logModal.time = log.time
+                logModal.value = logs[i].value,
+                logModal.time = logs[i].time
             })
-        })
+          }
+        }
       );
     });
   }
