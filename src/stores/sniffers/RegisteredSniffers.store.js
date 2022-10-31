@@ -154,7 +154,11 @@ class RegisteredSniffersStore {
       portChartRef.chart.loadDataVector(dataVector);
     }
   }
-
+  cleanAllCharts = () => {
+    for (let i = 0; i < this.portChart.length; i++) {
+      this.portChart[i].chart.resetDraw();
+    }
+  }
   registerConnectedPorts = (url, ports) => {
     const sniffer = this.getRegisteredSniffer(url);
     sniffer.sensors = ports.map(port => { return { sensorType: undefined, portName: port } });
@@ -229,6 +233,7 @@ class RegisteredSniffersStore {
     this.lastCmdToAllWsClients = "start logs";
     // console.log(`on store sending start logs`);
     // await this.setUpExecutionInfo();
+    this.cleanAllCharts();
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
 

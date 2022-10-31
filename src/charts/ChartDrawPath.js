@@ -24,6 +24,7 @@ export class ChartDrawPath {
   }
 
   pushData = data => {
+    // console.log(`pushData data = ${JSON.stringify(data)}`);
     // console.log(`na tela de recording tem = ${this.path.countPoints()}`);
     // const data = {
     //   value: '', // string com o valor do sensor 
@@ -56,5 +57,11 @@ export class ChartDrawPath {
 
   getPath = () => {
     return this.path;
+  }
+
+  resetDraw = () => {
+    this.firstPoint = true;
+    this.path.rewind();
+    this.lastPointTime = 0;
   }
 }
