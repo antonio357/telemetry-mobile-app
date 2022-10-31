@@ -31,7 +31,6 @@ function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
   );
 }
 
-
 function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, setSensorType }) {
   const statusColor = {
     "desconectado": "#666666",
@@ -56,7 +55,7 @@ function RegisteredSniffer({ name, url, status, connect, disconnect, sensors, se
           {sensors.length == 0 && (<Text>sniffer has no ports connected</Text>)}
           {sensors.length > 0 && sensors.map(port => {
             counter -= 1;
-            const definition = {url, ...port, zIndex: counter, setSensorType: setSensorType};
+            const definition = { url, ...port, zIndex: counter, setSensorType: setSensorType };
             return <DefineSensor key={port.portName} {...definition} />
           })}
         </View>
