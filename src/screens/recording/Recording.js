@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { styles } from '../../../App.styles';
-import { observer, inject } from 'mobx-react';
 // import { ChartCardsList } from '../../charts/ChartCardsList';
 // import { ChartDrawPath } from '../../charts/ChartDrawPath';
 
@@ -48,4 +47,4 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   )
 }
 
-export default inject('RegisteredSniffersStore')(observer(Recording));
+export default Recording;
