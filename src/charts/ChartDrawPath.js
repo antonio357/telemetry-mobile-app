@@ -38,14 +38,11 @@ export class ChartDrawPath {
       const pathLen = Math.abs(this.path.getPoint(0).x - this.path.getLastPt().x);
       const trim = (pathLen - this.axisLength.x) / pathLen;
       if (trim >= 0.25) {
-        console.log(`trimed`);
         this.path.trim(trim, 1, false);
       }
       const offSet = this.path.getLastPt().x - this.lineDrawPoints.rightBottom.x;
       this.path.offset(- offSet, 0);
     }
-
-    console.log(`this.path.countPoints() = ${this.path.countPoints()}`);
 
     this.lastPointTime = data.time;
   }
