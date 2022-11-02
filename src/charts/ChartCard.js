@@ -6,9 +6,9 @@ import { CanvasDimensions } from './CanvasDimensions';
 const dimensions = new CanvasDimensions();
 
 const styles = StyleSheet.create({
-  view: {flex: 1},
+  view: { flex: 1 },
   text: {},
-  canvas: {height: dimensions.canvasDimensions.height, width: dimensions.canvasDimensions.width},
+  canvas: { height: dimensions.canvasDimensions.height, width: dimensions.canvasDimensions.width },
   yAxisDrawPath: {},
   drawPath: {},
   xAxisDrawPath: {},
