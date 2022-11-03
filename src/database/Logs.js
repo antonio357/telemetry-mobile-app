@@ -34,7 +34,7 @@ const appendLogs = (logs) => {
         [],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`);
+          if (rowsAffected > 0) resolve(console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`));
           else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
