@@ -1,6 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
 import { ChartDrawPath } from '../../charts/ChartDrawPath';
+import Logs from '../../database/Logs';
 
 
 class RegisteredSniffersStore {
@@ -45,6 +46,8 @@ class RegisteredSniffersStore {
   executionInfoReady = false;
   database = null;
 
+  countLogsRecordsSaved = null;
+
   constructor() {
     makeObservable(this, {
       // observables for sniffers screens
@@ -66,6 +69,10 @@ class RegisteredSniffersStore {
       lastCmdToAllWsClients: observable,
       startLogs: action,
       stopLogs: action,
+
+      // database status
+      countLogsRecordsSaved: observable,
+      setCountLogsRecordsSaved: action
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
@@ -240,7 +247,7 @@ class RegisteredSniffersStore {
   stopLogs = () => {
     this.lastCmdToAllWsClients = "stop logs";
     this.wsClients.forEach(socket => socket.send('stop logs'));
-
+    this.setCountLogsRecordsSaved();
     // setTimeout(async () => {
     //   this.executionInfoReady = false;
     //   const logs = await this.database.getAllLogs();
@@ -249,6 +256,10 @@ class RegisteredSniffersStore {
     //   console.log(`records after execution = ${JSON.stringify(count)}`);
     //   console.log(`records after execution logs = ${JSON.stringify(logs)}`);
     // }, 1000);
+  }
+
+  setCountLogsRecordsSaved = async () => {
+    this.countLogsRecordsSaved = await Logs.countRecords();
   }
 
   setUpExecutionInfo = async () => {
