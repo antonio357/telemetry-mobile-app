@@ -17,12 +17,6 @@ setTimeout(async () => {
   await Logs.appendLogs(logs);
 
   console.log(`after ${(new Date().getTime()) - initialTime} ms inserting ${quantLogs} logs, logs table has ${await Logs.countRecords()} records`);
-
-  // let allLogs = await Logs.getAllRecords();
-  // console.log(`allLogs = ${JSON.stringify(allLogs)}`);
-
-  // allLogs = await Logs.getAllRecords();
-  // console.log(`after delete allLogs = ${JSON.stringify(allLogs)}`)
 });
 
 function App() {
