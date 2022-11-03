@@ -1,6 +1,7 @@
 import db from "./DataBase";
 
-const tableName = "logs"; 
+
+const tableName = "logs";
 
 /**
  * INICIALIZAÇÃO DA TABELA
@@ -12,13 +13,12 @@ db.transaction((tx) => {
   //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
 
   tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS ${tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, value TEXT, time INT);`
+    `CREATE TABLE IF NOT EXISTS ${tableName} (value TEXT, time INT);`
   );
 });
 
 
 const appendLogs = (logs) => {
-  const initialTime = new Date().getTime();
   let batchInsertSqlStatement = `INSERT INTO ${tableName} (value, time) values `;
   for (let i = 0; i < logs.length; i++) {
     batchInsertSqlStatement += `(${logs[i].value}, ${logs[i].time}), `;
@@ -26,7 +26,6 @@ const appendLogs = (logs) => {
   batchInsertSqlStatement = batchInsertSqlStatement.slice(0, -2);
   batchInsertSqlStatement += ';';
 
-  console.log(`called appendLogs`);
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
@@ -34,34 +33,9 @@ const appendLogs = (logs) => {
         batchInsertSqlStatement,
         [],
         //-----------------------
-        () => {
-          console.log(`saved ${logs.length} in ${(new Date().getTime()) - initialTime} ms`);
-          // reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
-        },
-        (_, error) => reject(error) // erro interno em tx.executeSql
-      );
-    });
-  });
-};
-
-/**
- * CRIAÇÃO DE UM NOVO REGISTRO
- * - Recebe um objeto;
- * - Retorna uma Promise:
- *  - O resultado da Promise é o ID do registro (criado por AUTOINCREMENT)
- *  - Pode retornar erro (reject) caso exista erro no SQL ou nos parâmetros.
- */
-const create = (log) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      //comando SQL modificável
-      tx.executeSql(
-        `INSERT INTO ${tableName} (value, time) values (?, ?);`,
-        [log.value, log.time],
-        //-----------------------
         (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) resolve(insertId);
-          else reject("Error inserting log: " + JSON.stringify(log)); // insert falhou
+          if (rowsAffected > 0) console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`);
+          else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -125,7 +99,6 @@ const countRecords = () => {
 };
 
 export default {
-  create,
   deleteAllRecords,
   appendLogs,
   countRecords,
