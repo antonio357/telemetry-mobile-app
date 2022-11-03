@@ -18,6 +18,7 @@ db.transaction((tx) => {
 
 
 const appendLogs = (logs) => {
+  const initialTime = new Date().getTime();
   let batchInsertSqlStatement = `INSERT INTO ${tableName} (value, time) values `;
   for (let i = 0; i < logs.length; i++) {
     batchInsertSqlStatement += `(${logs[i].value}, ${logs[i].time}), `;
@@ -33,7 +34,7 @@ const appendLogs = (logs) => {
         [],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) resolve(insertId);
+          if (rowsAffected > 0) console.log(`saved ${logs.length} in ${(new Date().getTime()) - initialTime} ms`);
           else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
@@ -124,7 +125,6 @@ const countRecords = () => {
 
 export default {
   create,
-  getAllRecords,
   deleteAllRecords,
   appendLogs,
   countRecords,

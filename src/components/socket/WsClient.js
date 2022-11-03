@@ -112,9 +112,11 @@ class WsClient {
         // console.log(`portBrickName = ${JSON.stringify(portBrickName)}`);
         // console.log(`this.dbLogsBuffer = ${JSON.stringify(this.dbLogsBuffer)}`);
         // console.log(`this.dbLogsBuffer[portBrickName].logs = ${JSON.stringify(this.dbLogsBuffer[portBrickName].logs)}`);
+        console.log(`before splice = ${this.dbLogsBuffer[portBrickName].logs.length}`);
         const sv = this.dbLogsBuffer[portBrickName].logs.splice(0);
+        console.log(`after splice = ${this.dbLogsBuffer[portBrickName].logs.length}`);
         // console.log(`sv = ${JSON.stringify(sv)}`);
-        Logs.appendLogs(sv, this.dbLogsBuffer[portBrickName].id);
+        Logs.appendLogs(sv);
       }
       this.dbLastSaveTime = new Date().getTime();
     }
@@ -144,7 +146,7 @@ class WsClient {
       if (logs) {
         const ports = Object.keys(logs);
         for (let i = 0; i < ports.length; i++) {
-          this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
+          // this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
         }
 
         // this.checkDbInfo();

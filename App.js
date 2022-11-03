@@ -7,7 +7,7 @@ import Logs from './src/database/Logs';
 
 setTimeout(async () => {
   console.log(`logs table had ${await Logs.countRecords()} records on inicialization`);
-  await Logs.deleteAllRecords();
+  // await Logs.deleteAllRecords();
   console.log(`logs table has ${await Logs.countRecords()} records after inicialization`);
 
   // const logs = [];
