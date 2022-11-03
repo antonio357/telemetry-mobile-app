@@ -26,6 +26,7 @@ const appendLogs = (logs) => {
   batchInsertSqlStatement = batchInsertSqlStatement.slice(0, -2);
   batchInsertSqlStatement += ';';
 
+  console.log(`called appendLogs`);
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
@@ -33,9 +34,9 @@ const appendLogs = (logs) => {
         batchInsertSqlStatement,
         [],
         //-----------------------
-        (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) console.log(`saved ${logs.length} in ${(new Date().getTime()) - initialTime} ms`);
-          else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
+        () => {
+          console.log(`saved ${logs.length} in ${(new Date().getTime()) - initialTime} ms`);
+          // reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );

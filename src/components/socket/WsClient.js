@@ -23,7 +23,7 @@ class WsClient {
   };
   // dbLogsBuffer = {};
   dbLogsBufferTimer = 10000;
-  dbLastSaveTime; // tempo em ms da ultima vez em que salvou os logs no banco
+  dbLastSaveTime = new Date().getTime(); // tempo em ms da ultima vez em que salvou os logs no banco
 
   constructor(name, url) {
     this.name = name;
@@ -146,7 +146,7 @@ class WsClient {
       if (logs) {
         const ports = Object.keys(logs);
         for (let i = 0; i < ports.length; i++) {
-          // this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
+          this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
         }
 
         // this.checkDbInfo();
