@@ -9,6 +9,7 @@ setTimeout(async () => {
   console.log(`logs table had ${await Logs.countRecords()} records on inicialization`);
   // await Logs.deleteAllRecords();
   console.log(`logs table has ${await Logs.countRecords()} records after inicialization`);
+  console.log(`logs = ${(await Logs.getAllRecords()).length}`);
   // const logs = [];
   // const quantLogs = 10000;
   // for (let i = 0; i < quantLogs; i++) {

@@ -1,7 +1,7 @@
 import db from "./DataBase";
 
 
-const tableName = "logs";
+const tableName = "executions";
 
 /**
  * INICIALIZAÇÃO DA TABELA
@@ -13,25 +13,18 @@ db.transaction((tx) => {
   //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
 
   tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS ${tableName} (value TEXT, time INT);`
+    `CREATE TABLE IF NOT EXISTS ${tableName} (name TEXT, initDate TEXT, initTime TEXT);`
   );
 });
 
 
-const appendLogs = (logs) => {
-  let batchInsertSqlStatement = `INSERT INTO ${tableName} (value, time) values `;
-  for (let i = 0; i < logs.length; i++) {
-    batchInsertSqlStatement += `(${logs[i].value}, ${logs[i].time}), `;
-  }
-  batchInsertSqlStatement = batchInsertSqlStatement.slice(0, -2);
-  batchInsertSqlStatement += ';';
-
+const create = (execution) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        batchInsertSqlStatement,
-        [],
+        `INSERT INTO ${tableName} values (?, ?, ?)`,
+        [execution.name, execution.initDate, execution.initTime],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
           if (rowsAffected > 0) resolve(console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`));
@@ -52,18 +45,14 @@ const appendLogs = (logs) => {
  *  - Pode retornar um array vazio caso não existam registros.
  */
 const getAllRecords = () => {
-  const initTime = new Date().getTime();
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `SELECT * FROM ${tableName} limit 10000;`,
+        `SELECT * FROM ${tableName};`,
         [],
         //-----------------------
-        (_, { rows }) => {
-          console.log(`took ms ${(new Date().getTime()) - initTime} to get 10000 logs`);
-          resolve(rows._array);
-        },
+        (_, { rows }) => resolve(rows._array),
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
     });
@@ -104,7 +93,6 @@ const countRecords = () => {
 
 export default {
   deleteAllRecords,
-  appendLogs,
+  create,
   countRecords,
-  getAllRecords,
 };
