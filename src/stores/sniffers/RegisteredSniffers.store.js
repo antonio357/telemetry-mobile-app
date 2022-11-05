@@ -1,7 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
 import { ChartDrawPath } from '../../charts/ChartDrawPath';
-import Logs from '../../database/Logs';
+// import Logs from '../../database/Logs';
 
 
 class RegisteredSniffersStore {
@@ -46,7 +46,7 @@ class RegisteredSniffersStore {
   executionInfoReady = false;
   database = null;
 
-  countLogsRecordsSaved = null;
+  // countLogsRecordsSaved = null;
 
   constructor() {
     makeObservable(this, {
@@ -71,8 +71,8 @@ class RegisteredSniffersStore {
       stopLogs: action,
 
       // database status
-      countLogsRecordsSaved: observable,
-      setCountLogsRecordsSaved: action
+      // countLogsRecordsSaved: observable,
+      // setCountLogsRecordsSaved: action
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
@@ -258,9 +258,9 @@ class RegisteredSniffersStore {
     // }, 1000);
   }
 
-  setCountLogsRecordsSaved = async () => {
-    this.countLogsRecordsSaved = await Logs.countRecords();
-  }
+  // setCountLogsRecordsSaved = async () => {
+  //   this.countLogsRecordsSaved = await Logs.countRecords();
+  // }
 
   setUpExecutionInfo = async () => {
     this.executionInfoReady = false;

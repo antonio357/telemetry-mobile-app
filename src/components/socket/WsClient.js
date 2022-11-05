@@ -1,5 +1,5 @@
 import RegisteredSniffersStore from '../../stores/sniffers/RegisteredSniffers.store';
-import Logs from '../../database/Logs';
+// import Logs from '../../database/Logs';
 
 
 class WsClient {
@@ -53,7 +53,7 @@ class WsClient {
       // console.log(`on sniffer sending start logs`);
       // this.setToSaveLogs();
     } else if (cmd == "stop logs") {
-      this.saveLogs(true);
+      // this.saveLogs(true);
       // this.resetToSaveLogs();
     }
     this.ws.send(cmd);
@@ -150,8 +150,8 @@ class WsClient {
         }
 
         // this.checkDbInfo();
-        this.bufferDbLogs(logs);
-        this.saveLogs();
+        // this.bufferDbLogs(logs);
+        // this.saveLogs();
       }
       else if (connectedPorts) {
         // { connectedPorts: ["port1", "port2"] };

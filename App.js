@@ -2,14 +2,16 @@ import { Routes } from './src/routes/Context';
 import { Provider } from 'mobx-react';
 import Stores from './src/stores';
 import 'react-native-gesture-handler';
-import Logs from './src/database/Logs';
+// import Logs from './src/database/Logs';
+import DbOperations from './src/database/DbOperations';
 
 
 setTimeout(async () => {
-  console.log(`logs table had ${await Logs.countRecords()} records on inicialization`);
+  await DbOperations.initTables(true);
+  // console.log(`logs table had ${await Logs.countRecords()} records on inicialization`);
   // await Logs.deleteAllRecords();
-  console.log(`logs table has ${await Logs.countRecords()} records after inicialization`);
-  console.log(`logs = ${(await Logs.getAllRecords()).length}`);
+  // console.log(`logs table has ${await Logs.countRecords()} records after inicialization`);
+  // console.log(`logs = ${(await Logs.getAllRecords()).length}`);
   // const logs = [];
   // const quantLogs = 10000;
   // for (let i = 0; i < quantLogs; i++) {

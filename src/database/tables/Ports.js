@@ -1,34 +1,50 @@
-import db from "./DataBase";
+import db from "../DataBase";
 
 
-const tableName = "executions";
+const tableName = "ports";
 
 /**
  * INICIALIZAÇÃO DA TABELA
  * - Executa sempre, mas só cria a tabela caso não exista (primeira execução)
  */
-db.transaction((tx) => {
-  //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-  //tx.executeSql("DROP TABLE cars;");
-  //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
+const init = async () => {
+  await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          name TEXT, 
+          sensorName TEXT,
+          sensorType TEXT, 
+          snifferId INTEGER, 
+          CONSTRAINT snifferId FOREIGN KEY (snifferId) 
+            REFERENCES sniffers(id) 
+            ON DELETE CASCADE);`,
+        [],
+        (_, { rowsAffected, insertId }) => resolve(console.log(`created ${tableName} table, rowsAffected = ${rowsAffected}, insertId = ${insertId}`)),
+        (_, error) => {
+          console.log(`could not create ${tableName} table`);
+          reject(error) // erro interno em tx.executeSql
+        }
+      );
+    });
+  });
+}
 
-  tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS ${tableName} (name TEXT, initDate TEXT, initTime TEXT);`
-  );
-});
-
-
-const create = (execution) => {
+const appendPortOnSniffer = (port, snifferId) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `INSERT INTO ${tableName} values (?, ?, ?)`,
-        [execution.name, execution.initDate, execution.initTime],
+        `INSERT INTO ${tableName} values (?, ?, ?, ?)`,
+        [port.name, port.sensorName, port.sensorType, snifferId],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) resolve(console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`));
-          else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
+          if (rowsAffected > 0) {
+            console.log(`created port with id = ${insertId}`);
+            resolve(insertId);
+          }
+          else reject(`Error inserting execution: ${(JSON.stringify(execution))}`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -44,15 +60,18 @@ const create = (execution) => {
  *  - Pode retornar erro (reject) caso o ID não exista ou então caso ocorra erro no SQL;
  *  - Pode retornar um array vazio caso não existam registros.
  */
-const getAllRecords = () => {
+const getPortsFromSniffer = snifferId => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `SELECT * FROM ${tableName};`,
+        `SELECT * FROM ${tableName} WHERE snifferId = ${snifferId};`,
         [],
         //-----------------------
-        (_, { rows }) => resolve(rows._array),
+        (_, { rows }) => {
+          console.log(`got ports from snifferId = ${snifferId}`);
+          resolve(rows._array);
+        },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
     });
@@ -76,8 +95,8 @@ const deleteAllRecords = () => {
   });
 };
 
-const countRecords = () => {
-  return new Promise((resolve, reject) => {
+const countRecords = async () => {
+  return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
@@ -92,7 +111,10 @@ const countRecords = () => {
 };
 
 export default {
+  tableName,
+  init,
   deleteAllRecords,
-  create,
+  appendPortOnSniffer,
   countRecords,
+  getPortsFromSniffer
 };

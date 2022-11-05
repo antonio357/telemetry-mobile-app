@@ -1,41 +1,49 @@
-import db from "./DataBase";
+import db from "../DataBase";
 
 
-const tableName = "logs";
+const tableName = "sniffers";
 
 /**
  * INICIALIZAÇÃO DA TABELA
  * - Executa sempre, mas só cria a tabela caso não exista (primeira execução)
  */
-db.transaction((tx) => {
-  //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-  //tx.executeSql("DROP TABLE cars;");
-  //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
+const init = async () => {
+  await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS ${tableName} ( 
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          name TEXT, 
+          wsUrl TEXT, 
+          executionId INTEGER, 
+          CONSTRAINT executionId FOREIGN KEY (executionId) 
+            REFERENCES executions(id) 
+            ON DELETE CASCADE);`,
+        [],
+        (_, { rowsAffected, insertId }) => resolve(console.log(`created ${tableName} table, rowsAffected = ${rowsAffected}, insertId = ${insertId}`)),
+        (_, error) => {
+          console.log(`could not create ${tableName} table`);
+          reject(error) // erro interno em tx.executeSql
+        }
+      );
+    });
+  });
+}
 
-  tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS ${tableName} (value TEXT, time INT);`
-  );
-});
-
-
-const appendLogs = (logs) => {
-  let batchInsertSqlStatement = `INSERT INTO ${tableName} (value, time) values `;
-  for (let i = 0; i < logs.length; i++) {
-    batchInsertSqlStatement += `(${logs[i].value}, ${logs[i].time}), `;
-  }
-  batchInsertSqlStatement = batchInsertSqlStatement.slice(0, -2);
-  batchInsertSqlStatement += ';';
-
+const appendSnifferOnExecution = (sniffer, executionId) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        batchInsertSqlStatement,
-        [],
+        `INSERT INTO ${tableName} values (?, ?, ?)`,
+        [sniffer.name, sniffer.wsUrl, executionId],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
-          if (rowsAffected > 0) resolve(console.log(`appendLogs(${logs.length}) sucess with insertId = ${insertId}`));
-          else reject(`Error inserting logs: [${(JSON.stringify(logs[0]))} ... ${(JSON.stringify(logs[logs.length - 1]))}]"`); // insert falhou
+          if (rowsAffected > 0) {
+            console.log(`created execution with id = ${insertId}`);
+            resolve(insertId);
+          }
+          else reject(`Error inserting execution: ${(JSON.stringify(execution))}`); // insert falhou
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -51,17 +59,16 @@ const appendLogs = (logs) => {
  *  - Pode retornar erro (reject) caso o ID não exista ou então caso ocorra erro no SQL;
  *  - Pode retornar um array vazio caso não existam registros.
  */
-const getAllRecords = () => {
-  const initTime = new Date().getTime();
+const getSniffersFromExecution = executionId => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `SELECT * FROM ${tableName} limit 10000;`,
+        `SELECT * FROM ${tableName} WHERE executionId = ${executionId};`,
         [],
         //-----------------------
         (_, { rows }) => {
-          console.log(`took ms ${(new Date().getTime()) - initTime} to get 10000 logs`);
+          console.log(`got sniffers from executionId = ${executionId}`);
           resolve(rows._array);
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
@@ -87,8 +94,8 @@ const deleteAllRecords = () => {
   });
 };
 
-const countRecords = () => {
-  return new Promise((resolve, reject) => {
+const countRecords = async () => {
+  return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
@@ -103,8 +110,10 @@ const countRecords = () => {
 };
 
 export default {
+  tableName,
+  init,
   deleteAllRecords,
-  appendLogs,
+  appendSnifferOnExecution,
   countRecords,
-  getAllRecords,
+  getSniffersFromExecution
 };
