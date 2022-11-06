@@ -7,7 +7,7 @@ import DbOperations from './src/database/DbOperations';
 
 
 setTimeout(async () => {
-  await DbOperations.initTables();
+  await DbOperations.initTables(true);
 });
 
 function App() {

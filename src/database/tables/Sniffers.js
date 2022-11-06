@@ -14,7 +14,7 @@ const init = async () => {
         `CREATE TABLE IF NOT EXISTS ${tableName} ( 
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           name TEXT, 
-          wsUrl TEXT, 
+          wsClientUrl TEXT, 
           executionId INTEGER, 
           CONSTRAINT executionId FOREIGN KEY (executionId) 
             REFERENCES executions(id) 
@@ -35,8 +35,8 @@ const appendSnifferOnExecution = (sniffer, executionId) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `INSERT INTO ${tableName} values (?, ?, ?)`,
-        [sniffer.name, sniffer.wsUrl, executionId],
+        `INSERT INTO ${tableName} (name, wsClientUrl, executionId) values (?, ?, ?)`,
+        [sniffer.name, sniffer.wsClientUrl, executionId],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
           if (rowsAffected > 0) {

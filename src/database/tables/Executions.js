@@ -15,7 +15,8 @@ const init = async () => {
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           name TEXT, 
           initDate TEXT, 
-          initTime TEXT);`,
+          initTime TEXT,
+          endTime TEXT);`,
         [],
         (_, { rowsAffected, insertId }) => resolve(console.log(`created ${tableName} table, rowsAffected = ${rowsAffected}, insertId = ${insertId}`)),
         (_, error) => {
@@ -27,13 +28,13 @@ const init = async () => {
   });
 }
 
-const create = (execution) => {
+const create = async (execution) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `INSERT INTO ${tableName} values (?, ?, ?)`,
-        [execution.name, execution.initDate, execution.initTime],
+        `INSERT INTO ${tableName} (name, initDate, initTime, endTime) values (?, ?, ?, ?)`,
+        [execution.name, execution.initDate, execution.initTime, ''],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
           if (rowsAffected > 0) {

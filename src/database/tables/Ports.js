@@ -36,7 +36,7 @@ const appendPortOnSniffer = (port, snifferId) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `INSERT INTO ${tableName} values (?, ?, ?, ?)`,
+        `INSERT INTO ${tableName} (name, sensorName, sensorType, snifferId) values (?, ?, ?, ?)`,
         [port.name, port.sensorName, port.sensorType, snifferId],
         //-----------------------
         (_, { rowsAffected, insertId }) => {

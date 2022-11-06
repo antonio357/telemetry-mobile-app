@@ -36,8 +36,6 @@ const initTables = async (reseting = false) => {
   console.log(`all data base tables inicialized`);
 }
 
-const createExecution = () => { }
-
 const countRecords = async () => {
   const recordsCounting = {};
   for (let i = 0; i < tables.length; i++) {
@@ -48,6 +46,37 @@ const countRecords = async () => {
   return recordsCounting;
 }
 
+const createExecution = async (execution, sniffers, ports) => {
+  const executionInfo = {};
+  const executionId = await Executions.create(execution);
+  executionInfo['executionId'] = executionId;
+  executionInfo['sniffers'] = [];
+  for (let i = 0; i < sniffers.length; i++) {
+    const sniffer = {
+      wsClientUrl: sniffers[i].getUrl(),
+      name: sniffers[i].getUrl(),
+    };
+    const snifferId = await Sniffers.appendSnifferOnExecution(sniffer, executionId);
+    executionInfo['sniffers'].push({
+      wsClientUrl: sniffer.wsClientUrl,
+      id: snifferId,
+      portIds: []
+    });
+    for (let j = 0; j < ports.length; j++) {
+      const port = {
+        name: ports[j].port,
+        sensorName: 'sensor de distância',
+        sensorType: 'ultrassonic',
+      };
+      const portId = await Ports.appendPortOnSniffer(port, snifferId);
+      executionInfo['sniffers'][i]['portIds'].push({
+        id: portId,
+        portName: port.name
+      });
+    }
+  }
+  return executionInfo;
+}
 
 export default {
   createExecution,

@@ -1,7 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import WsClient from '../../components/socket/WsClient';
 import { ChartDrawPath } from '../../charts/ChartDrawPath';
-// import Logs from '../../database/Logs';
+import DbOperations from '../../database/DbOperations';
 
 
 class RegisteredSniffersStore {
@@ -236,18 +236,20 @@ class RegisteredSniffersStore {
     if (sniffer) sniffer.status = status;
   }
 
-  startLogs = () => {
+  startLogs = async () => {
     this.lastCmdToAllWsClients = "start logs";
     // console.log(`on store sending start logs`);
-    // await this.setUpExecutionInfo();
+    await this.setUpExecutionInfo();
     this.cleanAllCharts();
     this.wsClients.forEach(socket => socket.send('start logs'));
   }
 
-  stopLogs = () => {
+  stopLogs = async () => {
     this.lastCmdToAllWsClients = "stop logs";
     this.wsClients.forEach(socket => socket.send('stop logs'));
-    this.setCountLogsRecordsSaved();
+    const count = await DbOperations.countRecords();
+    console.log(`count = ${JSON.stringify(count)}`);
+    // this.setCountLogsRecordsSaved();
     // setTimeout(async () => {
     //   this.executionInfoReady = false;
     //   const logs = await this.database.getAllLogs();
@@ -265,36 +267,15 @@ class RegisteredSniffersStore {
   setUpExecutionInfo = async () => {
     this.executionInfoReady = false;
     this.executionInfo = {};
-
     const date = new Date();
-    this.executionInfo['executionId'] = await this.database.createExecution('temp-name', `${date.getUTCFullYear()}-${date.getUTCMonth + 1}-${date.getUTCDate()}`, `${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`);
-
-    this.executionInfo['sniffers'] = [];
-    for (let i = 0; i < this.wsClients.length; i++) {
-      const sniffer = this.wsClients[i];
-
-      const url = sniffer.getUrl();
-      const snifferInfo = {
-        wsClientUrl: url,
-        id: '',
-        portIds: []
-      };
-
-      snifferInfo.id = await this.database.appendExecutionSniffer(this.executionInfo.executionId, url, url);
-      const ports = this.getSnifferSensorsDescription(url);
-      for (let j = 0; j < ports.length; j++) {
-        const port = ports[j];
-        const portId = await this.database.appendExecutionSensorPort(snifferInfo.id, port.portName, port.sensorType);
-        snifferInfo.portIds.push({
-          id: portId,
-          portName: port.portName
-        });
-      }
-
-      this.executionInfo['sniffers'].push(snifferInfo);
-    }
+    const execution = {
+      name: 'temporary name',
+      initDate: `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`,
+      initTime: `${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`,
+    };
+    this.executionInfo = await DbOperations.createExecution(execution, this.wsClients, this.portChart);
+    console.log(`this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
     this.executionInfoReady = true;
-    // console.log(`on store execution info setted on store`);
   }
 
   printDbExecutionInfo = () => {
