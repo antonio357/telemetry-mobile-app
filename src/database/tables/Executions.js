@@ -123,7 +123,7 @@ const findExecution = async (executionId) => {
 }
 
 const update = async (id, execution) => {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
