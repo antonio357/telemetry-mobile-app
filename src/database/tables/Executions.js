@@ -122,6 +122,24 @@ const findExecution = async (executionId) => {
   });
 }
 
+const update = async (id, execution) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `UPDATE ${tableName} SET name=?, initDate=?, initTime=?, endTime=? WHERE id=?;`,
+        [execution.name, execution.initDate, execution.initTime, execution.endTime, id],
+        //-----------------------
+        (_, { rowsAffected }) => {
+          if (rowsAffected > 0) resolve(rowsAffected);
+          else reject(`Error updating execution: id=${id}`); // nenhum registro alterado
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+};
+
 export default {
   tableName,
   init,
@@ -130,4 +148,5 @@ export default {
   countRecords,
   getAllRecords,
   findExecution,
+  update,
 };

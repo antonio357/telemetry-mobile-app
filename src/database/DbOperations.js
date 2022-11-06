@@ -78,7 +78,15 @@ const createExecution = async (execution, sniffers, ports) => {
   return executionInfo;
 }
 
-const findExecution = async (executionId, logsTime = null) => {
+const updateExecution = async (id, execution) => {
+  await Executions.update(id, execution);
+}
+
+const findExecution = async (id) => {
+  return await Executions.findExecution(id);
+}
+
+const findExecutionInfo = async (executionId, logsTime = null) => {
   const executionInfo = {};
   const execution = await Executions.findExecution(executionId);
   executionInfo['id'] = execution.id;
@@ -123,5 +131,7 @@ export default {
   createExecution,
   countRecords,
   initTables,
-  findExecution,
+  findExecutionInfo,
+  updateExecution,
+  findExecution
 };

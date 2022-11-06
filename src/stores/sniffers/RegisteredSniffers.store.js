@@ -249,7 +249,12 @@ class RegisteredSniffersStore {
     this.wsClients.forEach(socket => socket.send('stop logs'));
     const count = await DbOperations.countRecords();
     console.log(`count = ${JSON.stringify(count)}`);
-    const executionInfo = await DbOperations.findExecution(this.executionInfo.executionId, 5000);
+    const execution = await DbOperations.findExecution(this.executionInfo.executionId);
+    execution['name'] = 'new name inserted by user';
+    const date = new Date();
+    execution['endTime'] = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
+    await DbOperations.updateExecution(this.executionInfo.executionId, execution);
+    const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId, 5000);
     console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
   }
 
