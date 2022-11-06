@@ -271,7 +271,7 @@ class RegisteredSniffersStore {
     const execution = {
       name: 'temporary name',
       initDate: `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`,
-      initTime: `${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`,
+      initTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
     };
     this.executionInfo = await DbOperations.createExecution(execution, this.wsClients, this.portChart);
     console.log(`this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
