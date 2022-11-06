@@ -78,8 +78,46 @@ const createExecution = async (execution, sniffers, ports) => {
   return executionInfo;
 }
 
+const findExecution = async (executionId, logsTime = null) => {
+  const executionInfo = {};
+  const execution = await Executions.findExecution(executionId);
+  executionInfo['id'] = execution.id;
+  executionInfo['name'] = execution.name;
+  executionInfo['initDate'] = execution.initDate;
+  executionInfo['initTime'] = execution.initTime;
+  executionInfo['endTime'] = execution.endTime;
+  executionInfo['sniffers'] = [];
+  const sniffers = await Sniffers.findSniffers(executionId);
+  for (let i = 0; i < sniffers.length; i++) {
+    const sniffer = sniffers[i];
+    executionInfo['sniffers'].push({
+      id: sniffer.id,
+      name: sniffer.name,
+      wsClientUrl: sniffer.wsClientUrl,
+      ports: []
+    });
+    const ports = await Ports.findPorts(sniffer.id);
+    for (let j = 0; j < ports.length; j++) {
+      const port = ports[j];
+      executionInfo['sniffers'][i]['ports'].push({
+        id: port.id,
+        name: port.name,
+        sensorName: port.sensorName,
+        sensorType: port.sensorType,
+      });
+      if (logsTime) {
+        const begin = logsTime - 5000;
+        const end = logsTime + 5000;
+        executionInfo['sniffers'][i]['ports'][j]['logs'] = await Logs.findLogs(port.id, { begin, end });
+      }
+    }
+  }
+  return executionInfo;
+}
+
 export default {
   createExecution,
   countRecords,
   initTables,
+  findExecution,
 };

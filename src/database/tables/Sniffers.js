@@ -109,11 +109,30 @@ const countRecords = async () => {
   });
 };
 
+const findSniffers = async (executionId) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE executionId = ${executionId};`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array)
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
 export default {
   tableName,
   init,
   deleteAllRecords,
   appendSnifferOnExecution,
   countRecords,
-  getSniffersFromExecution
+  getSniffersFromExecution,
+  findSniffers
 };

@@ -65,7 +65,7 @@ const appendLogsOnPort = (logs, portId) => {
  *  - Pode retornar erro (reject) caso o ID não exista ou então caso ocorra erro no SQL;
  *  - Pode retornar um array vazio caso não existam registros.
  */
-const getLogsFromPortInTimeFrame = ({begin, end}, portId) => {
+const getLogsFromPortInTimeFrame = ({ begin, end }, portId) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
@@ -119,6 +119,24 @@ const countRecords = async () => {
   });
 };
 
+const findLogs = async (portId, { begin, end }) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE portId = ${portId} AND time BETWEEN ${begin} AND ${end} ORDER BY time ASC LIMIT 10000;`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array)
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
 export default {
   tableName,
   init,
@@ -126,4 +144,5 @@ export default {
   appendLogsOnPort,
   countRecords,
   getLogsFromPortInTimeFrame,
+  findLogs
 };

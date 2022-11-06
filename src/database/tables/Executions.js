@@ -104,11 +104,30 @@ const countRecords = async () => {
   });
 };
 
+const findExecution = async (executionId) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE id = ${executionId};`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array[0]);
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
 export default {
   tableName,
   init,
   deleteAllRecords,
   create,
   countRecords,
-  getAllRecords
+  getAllRecords,
+  findExecution,
 };

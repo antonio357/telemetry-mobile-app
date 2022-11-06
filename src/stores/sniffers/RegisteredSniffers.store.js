@@ -249,6 +249,8 @@ class RegisteredSniffersStore {
     this.wsClients.forEach(socket => socket.send('stop logs'));
     const count = await DbOperations.countRecords();
     console.log(`count = ${JSON.stringify(count)}`);
+    const executionInfo = await DbOperations.findExecution(this.executionInfo.executionId, 5000);
+    console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
     // this.setCountLogsRecordsSaved();
     // setTimeout(async () => {
     //   this.executionInfoReady = false;
