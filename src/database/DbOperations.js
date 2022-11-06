@@ -86,6 +86,10 @@ const findExecution = async (id) => {
   return await Executions.findExecution(id);
 }
 
+const removeExecution = async (id) => {
+  await Executions.remove(id);
+}
+
 const findExecutionInfo = async (executionId, logsTime = null) => {
   const executionInfo = {};
   const execution = await Executions.findExecution(executionId);
@@ -133,5 +137,6 @@ export default {
   initTables,
   findExecutionInfo,
   updateExecution,
-  findExecution
+  findExecution,
+  removeExecution
 };

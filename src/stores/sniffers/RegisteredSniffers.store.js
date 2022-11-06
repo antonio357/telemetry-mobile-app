@@ -256,6 +256,9 @@ class RegisteredSniffersStore {
     await DbOperations.updateExecution(this.executionInfo.executionId, execution);
     const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId, 5000);
     console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
+    await DbOperations.removeExecution(this.executionInfo.executionId);
+    const count_after_remove = await DbOperations.countRecords();
+    console.log(`count_after_remove = ${JSON.stringify(count_after_remove)}`);
   }
 
   // setCountLogsRecordsSaved = async () => {
