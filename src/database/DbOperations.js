@@ -106,8 +106,12 @@ const findExecution = async (executionId, logsTime = null) => {
         sensorType: port.sensorType,
       });
       if (logsTime) {
-        const begin = logsTime - 5000;
-        const end = logsTime + 5000;
+        let begin = logsTime - 5000;
+        let end = logsTime + 5000;
+        if (begin < 0 ) {
+          end += -1 * begin;
+          begin = 0;
+        }
         executionInfo['sniffers'][i]['ports'][j]['logs'] = await Logs.findLogs(port.id, { begin, end });
       }
     }
