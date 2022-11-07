@@ -69,10 +69,6 @@ class RegisteredSniffersStore {
       lastCmdToAllWsClients: observable,
       startLogs: action,
       stopLogs: action,
-
-      // database status
-      // countLogsRecordsSaved: observable,
-      // setCountLogsRecordsSaved: action
     })
 
     this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
@@ -253,16 +249,12 @@ class RegisteredSniffersStore {
     const date = new Date();
     execution['endTime'] = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
     await DbOperations.updateExecution(this.executionInfo.executionId, execution);
-    const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId, 5000);
-    console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
-    await DbOperations.removeExecution(this.executionInfo.executionId);
-    const count_after_remove = await DbOperations.countRecords();
-    console.log(`count_after_remove = ${JSON.stringify(count_after_remove)}`);
+    // const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId);
+    // console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
+    // await DbOperations.removeExecution(this.executionInfo.executionId);
+    // const count_after_remove = await DbOperations.countRecords();
+    // console.log(`count_after_remove = ${JSON.stringify(count_after_remove)}`);
   }
-
-  // setCountLogsRecordsSaved = async () => {
-  //   this.countLogsRecordsSaved = await Logs.countRecords();
-  // }
 
   setUpExecutionInfo = async () => {
     this.executionInfoReady = false;
@@ -279,18 +271,6 @@ class RegisteredSniffersStore {
 
   printDbExecutionInfo = () => {
     console.log(`this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
-  }
-
-  getDbExecutionId = () => {
-    // console.log(`on store getDbExecutionId()`);
-    // console.log(`on store this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
-    if (this.executionInfoReady) {
-      // console.log(`on store getDbExecutionId() return ${JSON.stringify(this.executionInfo.executionId)}`);
-      return this.executionInfo.executionId;
-    } else {
-      // console.log(`on store getDbExecutionId() return null`);
-      return null;
-    }
   }
 
   getDbPortsIds = wsServerUrl => {
