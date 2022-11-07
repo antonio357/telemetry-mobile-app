@@ -1,4 +1,5 @@
 import RegisteredSniffersStore from '../../stores/sniffers/RegisteredSniffers.store';
+import DbOperations from '../../database/DbOperations';
 
 
 class WsClient {
@@ -9,21 +10,19 @@ class WsClient {
 
   detDbInfoThread = null;
   database = null;
-  dbExecutionId; // id da execução atual
   // dbLogsBuffer = {
   //   port1: {
   //     id: 'id do banco',
-  //     logs: [
-  //       {
-  //         value: '123',
-  //         time: 500
-  //       }
-  //     ]
+  //     logs: []
+  //   },
+  //   port2: {
+  //     id: 'id do banco',
+  //     logs: []
   //   }
   // };
   dbLogsBuffer = {};
   dbLogsBufferTimer = 10000;
-  dbLastSaveTime; // tempo em ms da ultima vez em que salvou os logs no banco
+  dbLastSaveTime = new Date().getTime(); // tempo em ms da ultima vez em que salvou os logs no banco
 
   constructor(name, url) {
     this.name = name;
@@ -50,71 +49,43 @@ class WsClient {
 
   send = cmd => {
     if (cmd == "start logs") {
-      // console.log(`on sniffer sending start logs`);
-      // this.setToSaveLogs();
+      this.setToSaveLogs();
     } else if (cmd == "stop logs") {
-      // this.saveLogs(true);
-      // this.resetToSaveLogs();
+      this.saveLogs(true);
+      this.resetToSaveLogs();
     }
     this.ws.send(cmd);
   }
 
   resetToSaveLogs = () => {
-    this.dbExecutionId = null;
     this.dbLogsBuffer = {};
   }
 
   setToSaveLogs = () => {
     const { printDbExecutionInfo } = RegisteredSniffersStore;
     printDbExecutionInfo();
-    const { getDbExecutionId, getDbPortsIds } = RegisteredSniffersStore;
-    this.dbExecutionId = getDbExecutionId();
+    const { getDbPortsIds } = RegisteredSniffersStore;
     this.dbLogsBuffer = getDbPortsIds(this.getUrl());
     this.dbLastSaveTime = new Date().getTime();
-    // console.log(`on sniffer setToSaveLogs`);
-    // console.log(`this.dbExecutionId = ${this.dbExecutionId}`);
   }
 
-  checkDbInfo = () => {
-    // console.log(`on sinffer checkDbInfo()`);
-    const keys = Object.keys(this.dbLogsBuffer);
-    if (keys.length > 0) return;
-    else {
-      this.setToSaveLogs();
-      // console.log(`on sinffer this.setToSaveLogs();`);
-    }
-  }
 
   bufferDbLogs = logs => {
-    // console.log(`on sinffer bufferDbLogs()`);
     const ports = Object.keys(logs);
     for (let i = 0; i < ports.length; i++) {
       const port = ports[i];
-      // console.log(`this.dbLogsBuffer = ${JSON.stringify(this.dbLogsBuffer)}`);
-      // console.log(`port = ${JSON.stringify(port)}`);
-      // console.log(`this.dbLogsBuffer[port] = ${JSON.stringify(this.dbLogsBuffer[port])}`);
-      const logsBuffer = this.dbLogsBuffer[port].logs;
       this.dbLogsBuffer[port].logs = [...this.dbLogsBuffer[port].logs, ...logs[port]];
-      // console.log(`bufferLen = ${this.dbLogsBuffer[port].logs.length}`);
-      // console.log(`logsBuffer = ${JSON.stringify(logsBuffer)}`);
-      // console.log(`this.dbLogsBuffer[port].logs = ${JSON.stringify(this.dbLogsBuffer[port].logs)}`);
     }
   }
 
   saveLogs = (onStopLogs = false) => {
-    // console.log(`on sniffer saveLogs`);
     const actualTime = new Date().getTime();
     if (onStopLogs || actualTime - this.dbLastSaveTime > this.dbLogsBufferTimer) {
       const ports = Object.keys(this.dbLogsBuffer);
       for (let i = 0; i < ports.length; i++) {
-        const portBrickName = ports[i];
-        // console.log(`on sniffer saveLogs, saved the logs`);
-        // console.log(`portBrickName = ${JSON.stringify(portBrickName)}`);
-        // console.log(`this.dbLogsBuffer = ${JSON.stringify(this.dbLogsBuffer)}`);
-        // console.log(`this.dbLogsBuffer[portBrickName].logs = ${JSON.stringify(this.dbLogsBuffer[portBrickName].logs)}`);
-        const sv = this.dbLogsBuffer[portBrickName].logs.splice(0);
-        // console.log(`sv = ${JSON.stringify(sv)}`);
-        this.database.appendLogs(sv, this.dbLogsBuffer[portBrickName].id);
+        const key = ports[i];
+        const port = this.dbLogsBuffer[key];
+        DbOperations.appendLogsOnPort(this.dbLogsBuffer[key].logs.splice(0), port.id);
       }
       this.dbLastSaveTime = new Date().getTime();
     }
@@ -147,9 +118,8 @@ class WsClient {
           this.logsBuffer[ports[i]] = this.logsBuffer[ports[i]] ? [...this.logsBuffer[ports[i]], ...logs[ports[i]]] : [...logs[ports[i]]];
         }
 
-        // this.checkDbInfo();
-        // this.bufferDbLogs(logs);
-        // this.saveLogs();
+        this.bufferDbLogs(logs);
+        this.saveLogs();
       }
       else if (connectedPorts) {
         // { connectedPorts: ["port1", "port2"] };

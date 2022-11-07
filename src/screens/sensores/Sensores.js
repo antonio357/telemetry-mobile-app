@@ -1,4 +1,4 @@
-import { View, Button, Dimensions } from "react-native";
+import { View, Button, Dimensions, Text } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { StyleSheet } from "react-native";
@@ -6,7 +6,7 @@ import { ChartCardsList } from '../../charts/ChartCardsList';
 
 
 function Sensores({ navigation, RegisteredSniffersStore }) {
-  const { getAllportChartForChartCardsList, lastCmdToAllWsClients, startLogs, stopLogs } = RegisteredSniffersStore;
+  const { getAllportChartForChartCardsList, lastCmdToAllWsClients, startLogs, stopLogs, countLogsRecordsSaved } = RegisteredSniffersStore;
 
   const viewMarging = 24;
   const strokeWidth = 16;
@@ -43,7 +43,7 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
             stopLogs();
           }
         }} />
-
+        <Text>DataBase has {countLogsRecordsSaved} logs</Text>
         <ChartCardsList sensorConfigsArray={getAllportChartForChartCardsList()} />
       </View>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
