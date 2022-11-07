@@ -237,11 +237,10 @@ class RegisteredSniffersStore {
   }
 
   startLogs = async () => {
-    this.lastCmdToAllWsClients = "start logs";
-    // console.log(`on store sending start logs`);
     await this.setUpExecutionInfo();
     this.cleanAllCharts();
     this.wsClients.forEach(socket => socket.send('start logs'));
+    this.lastCmdToAllWsClients = "start logs";
   }
 
   stopLogs = async () => {
@@ -275,7 +274,6 @@ class RegisteredSniffersStore {
       initTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
     };
     this.executionInfo = await DbOperations.createExecution(execution, this.wsClients, this.portChart);
-    console.log(`this.executionInfo = ${JSON.stringify(this.executionInfo)}`);
     this.executionInfoReady = true;
   }
 
@@ -309,7 +307,6 @@ class RegisteredSniffersStore {
       // console.log(`on store getDbPortsIds return portsInfo = ${JSON.stringify(portsInfo)}`);
       return portsInfo;
     } else {
-      // console.log(`on store getDbPortsIds return null`);
       return null;
     }
   }

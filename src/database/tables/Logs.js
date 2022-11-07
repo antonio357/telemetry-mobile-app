@@ -128,7 +128,7 @@ const findLogs = async (portId, { begin, end }) => {
         [],
         //-----------------------
         (_, { rows }) => {
-          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          // console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
           resolve(rows._array)
         },
         (_, error) => reject(error) // erro interno em tx.executeSql

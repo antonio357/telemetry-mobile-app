@@ -160,6 +160,10 @@ const findExecutionInfo = async (executionId, logsTime = null) => {
   return executionInfo;
 }
 
+const appendLogsOnPort = (logs, portId) => {
+  Logs.appendLogsOnPort(logs, portId);
+}
+
 export default {
   createExecution,
   countRecords,
@@ -167,5 +171,6 @@ export default {
   findExecutionInfo,
   updateExecution,
   findExecution,
-  removeExecution
+  removeExecution,
+  appendLogsOnPort
 };
