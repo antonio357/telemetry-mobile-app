@@ -86,8 +86,37 @@ const findExecution = async (id) => {
   return await Executions.findExecution(id);
 }
 
+const removeFromTable = async (tableName, id) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `DELETE FROM ${tableName} WHERE id=?;`,
+        [id],
+        //-----------------------
+        (_, { rowsAffected }) => {
+          resolve(rowsAffected);
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+};
+
 const removeExecution = async (id) => {
-  await Executions.remove(id);
+  const execution = await Executions.findExecution(id);
+  const sniffers = await Sniffers.findSniffers(execution.id);
+  for (let i = 0; i < sniffers.length; i++) {
+    const sniffer = sniffers[i];
+    const ports = await Ports.findPorts(sniffer.id);
+    for (let j = 0; j < ports.length; j++) {
+      const port = ports[j];
+      await Logs.remove(port.id);
+      await removeFromTable(Ports.tableName, port.id);
+    }
+    await removeFromTable(Sniffers.tableName, sniffer.id);
+  }
+  await removeFromTable(Executions.tableName, execution.id);
 }
 
 const findExecutionInfo = async (executionId, logsTime = null) => {

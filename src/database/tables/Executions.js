@@ -140,23 +140,6 @@ const update = async (id, execution) => {
   });
 };
 
-const remove = async (id) => {
-  return await new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      //comando SQL modificável
-      tx.executeSql(
-        `DELETE FROM ${tableName} WHERE id=?;`,
-        [id],
-        //-----------------------
-        (_, { rowsAffected }) => {
-          resolve(rowsAffected);
-        },
-        (_, error) => reject(error) // erro interno em tx.executeSql
-      );
-    });
-  });
-};
-
 export default {
   tableName,
   init,
@@ -166,5 +149,4 @@ export default {
   getAllRecords,
   findExecution,
   update,
-  remove
 };

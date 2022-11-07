@@ -137,6 +137,23 @@ const findLogs = async (portId, { begin, end }) => {
   });
 }
 
+const remove = async (portId) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `DELETE FROM ${tableName} WHERE portId=?;`,
+        [portId],
+        //-----------------------
+        (_, { rowsAffected }) => {
+          resolve(rowsAffected);
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+};
+
 export default {
   tableName,
   init,
@@ -144,5 +161,6 @@ export default {
   appendLogsOnPort,
   countRecords,
   getLogsFromPortInTimeFrame,
-  findLogs
+  findLogs,
+  remove
 };
