@@ -21,7 +21,7 @@
       ```
     - install platformIO
       - inside vscode install platformIO extension 
-      - if you get `can't find usbport` or `permission denide usbport` `erros` when flashing code into the esp try installing **99-platformio-udev.rules** [link](https://docs.platformio.org/en/stable/core/installation/udev-rules.html)
+      - if you get `can't find usbport` or `permission denied usbport` `erro` when flashing code into the esp try installing **99-platformio-udev.rules** [link](https://docs.platformio.org/en/stable/core/installation/udev-rules.html)
   - **expo app**
     - install nodejs
       - it should come with npm and npx if not install both, use npm to install yarn and use npx to run expo commands
@@ -30,7 +30,7 @@
     - install expoGO on your phone to run the app
   - **android studio app**
     - to install and config android studio follow the instructions (steps 1 to 3) at https://reactnative.dev/docs/environment-setup
-    - in the beggining of the page make sure to mark the following options
+    - in the beginning of the page make sure to mark the following options
         ![](./documentation/assets/android-studio-page-options.png)
 
     - step 1 to install android studio just run following command
