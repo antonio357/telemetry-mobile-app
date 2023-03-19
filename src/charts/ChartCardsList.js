@@ -14,7 +14,8 @@ export function ChartCardsList({ sensorConfigsArray }) {
   //     sensorType: "ultrassonic",
   //     timeFrame: 10, // faixa de tempo do eixo x em segundos
   //     logsRate: 1000, // quantidade dos logs por segundo
-  //     drawPath: Skia.Path.Make()
+  //     drawPath: Skia.Path.Make(),
+  //     xAxisPath: Skia.Path.Make()
   //   },
   //   ...
   // ];

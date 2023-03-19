@@ -7,6 +7,9 @@ export class ChartDrawPath {
     this.path = Skia.Path.Make();
     this.path.setIsVolatile(false);
 
+    this.xAxisPath = Skia.Path.Make();
+    this.xAxisPath.setIsVolatile(false);
+
     this.xBounds = { min: 0, max: timeFrame * logsRate };
     this.yBounds = { min: 0 };
     if (sensorType == 'touch') {
@@ -57,8 +60,12 @@ export class ChartDrawPath {
     }
   }
 
-  getPath = () => {
+  getDrawPath = () => {
     return this.path;
+  }
+
+  getXAxisPath = () => {
+    return this.xAxisPath;
   }
 
   resetDraw = () => {

@@ -21,7 +21,7 @@ class RegisteredSniffersStore {
   //   {
   //     url: 'ws://192.168.1.199:81',
   //     port: 'port1',
-  //     chart: new LineChart([0, 100], [0, 255]),
+  //     chart: new ChartDrawPath([0, 100], [0, 255]),
   //   },
   //   ...
   // ]
@@ -95,7 +95,7 @@ class RegisteredSniffersStore {
   getAllPortChart = () => {
     return this.portChart;
   }
-  getAllportChartForChartCardsList = () => {
+  getAllportChartForChartCardsList = () => { // here
     const array = [];
     for (let i = 0; i < this.portChart.length; i++) {
       const port = this.portChart[i];
@@ -104,7 +104,8 @@ class RegisteredSniffersStore {
         sensorType: 'ultrassonic',
         timeFrame: 10,
         logsRate: 1000,
-        drawPath: port.chart.getPath()
+        drawPath: port.chart.getDrawPath(),
+        xAxisPath: port.chart.getXAxisPath()
       };
       array.push(obj);
     }
