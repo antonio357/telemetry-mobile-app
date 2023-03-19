@@ -66,7 +66,7 @@ function digit(num, beginPositionCordinate, unit = 5) {
   return digitsPaths[num];
 }
 
-function timePath(beginPositionCordinate, ) {
+function timePath(beginPositionCordinate, timeString = '00:00') {
 
 }
 
@@ -97,16 +97,16 @@ export function ChartCard({ sensorConfig }) {
           {/* path pro eixo y */}
           <Path path={sensorConfig.drawPath} style="stroke" color="tomato" strokeWidth={1} />
           {/* path pro eixo x */}
-          <Path path={digit(0, { x: 0, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(1, { x: 15, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(2, { x: 30, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(3, { x: 45, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(4, { x: 60, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(5, { x: 75, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(6, { x: 90, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(7, { x: 105, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(8, { x: 120, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
-          <Path path={digit(9, { x: 135, y: (styles.canvas.height / 2)})} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(0, { x: 0, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(1, { x: 15, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(2, { x: 30, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(3, { x: 45, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(4, { x: 60, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(5, { x: 75, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(6, { x: 90, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(7, { x: 105, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(8, { x: 120, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
+          <Path path={digit(9, { x: 135, y: (styles.canvas.height / 2) })} style="stroke" color="black" strokeWidth={1.5} />
         </Canvas>
         {/* <XAxisLabel /> */}
       </View>
