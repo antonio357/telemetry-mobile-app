@@ -4,7 +4,7 @@ import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
 
 
-// tentativa 1 https://www.youtube.com/watch?v=cAluIvU2seE não funcionou
+// tentativa 1 https://www.youtube.com/watch?v=4VFYqw5h_qs não funcionou
 
 const styles = StyleSheet.create({
   cameraContainer: {
