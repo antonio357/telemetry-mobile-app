@@ -1,50 +1,108 @@
-import { View } from "react-native";
-import { ScreenBase } from "../common/ScreenBase";
-import { styles } from '../../../App.styles';
-// import { ChartCardsList } from '../../charts/ChartCardsList';
-// import { ChartDrawPath } from '../../charts/ChartDrawPath';
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { Camera } from 'expo-camera';
+import { Video } from 'expo-av';
 
-// const path1 =  new ChartDrawPath('ultrassonic');
-// const path2 =  new ChartDrawPath('touch');
-// const array = [
-//   {
-//     sensorName: "sensor de distância",
-//     sensorType: "ultrassonic",
-//     timeFrame: 10, // faixa de tempo do eixo x em segundos
-//     logsRate: 1000, // quantidade dos logs por segundo
-//     drawPath: path1.getPath()
-//   },
-//   {
-//     sensorName: "sensor de batida",
-//     sensorType: "touch",
-//     timeFrame: 10, // faixa de tempo do eixo x em segundos
-//     logsRate: 1000, // quantidade dos logs por segundo
-//     drawPath: path2.getPath()
-//   },
-// ];
-// let timeCounter = 0;
-// const thread = setInterval(() => {
-//   let array1 = [];
-//   let array2 = [];
-//   for (let i = 0; i < 20; i++) {
-//     array1.push({value: Math.random() * 256, time: timeCounter});
-//     array2.push({value: Math.random() * 2, time: timeCounter});
-//     timeCounter += 1;
-//   }
-//   path1.loadDataVector(array1);
-//   path2.loadDataVector(array2);
-// }, 20);
+
+// tentativa 1 https://www.youtube.com/watch?v=cAluIvU2seE não funcionou
+
+const styles = StyleSheet.create({
+  cameraContainer: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  fixedRatio: {
+    flex: 1,
+    aspectRatio: 1
+  },
+  video: {
+    alignSelf: 'center',
+    width: 350,
+    height: 220
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+});
 
 function Recording({ navigation, RegisteredSniffersStore }) {
-  // const { getAllPortChart } = RegisteredSniffersStore;
-  // console.log(`getAllPortChart() = ${JSON.stringify(getAllPortChart())}`);
+  const [hasAudioPermission, setHasAudioPermission] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [record, setRecord] = useState(null);
+  const [type, setType] = useState(null);
+  const video = React.useRef(null);
+  const [status, setStatus] = React.useState({});
+
+
+  useEffect(() => {
+    (async () => {
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === 'granted');
+
+      const audioStatus = await Camera.requestMicrophonePermissionsAsync();
+      setHasAudioPermission(audioStatus.status === 'granted');
+    })();
+  }, [])
+
+  const takeVideo = async () => {
+    console.log(`takeVideo camera = $camera}`);
+    if (camera) {
+      const data = await camera.recordAsync({ maxDuration: 10 });
+      setRecord(data.uri);
+      console.log(`takeVideo data.uri = ${data.uri}`);
+    }
+  }
+
+  const stopVideo = async () => {
+    console.log(`stopVideo camera = $camera}`);
+    camera.stopRecording();
+  }
+
+  if (hasCameraPermission === null || hasAudioPermission === null) return <View></View>;
+  if (hasCameraPermission === false || hasAudioPermission === false) return <Text>No access to camera</Text>
 
   return (
-    <View style={styles.view}>
-      {/* <ChartCardsList sensorConfigsArray={array} /> */}
-      <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+    <View style={{ flex: 1 }}>
+      <View style={styles.cameraContainer}>
+        <Camera
+          ref={ref => setCamera(ref)}
+          styles={styles.fixedRatio}
+          type={'back'}
+          ratio={'4:3'}
+        />
+      </View>
+      <Video
+        ref={video}
+        style={styles.video}
+        source={{
+          uri: record
+        }}
+        useNativeControls
+        resizeMode="contain"
+        isLooping
+        onPlaybackStatusUpdate={status => setStatus(() => status)}
+      />
+      <View>
+        <Button
+          title={status.isPlaying ? 'Pause' : 'Play'}
+          onPress={() => status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()}
+        />
+      </View>
+      <Button
+        title="Flip Video"
+        onPress={() => {
+          setType(
+            type === camera.Constants.Type.back ? Camera.Constants.Type.front : Camera.Constants.Type.back
+          )
+        }}
+      />
+      <Button title="Take Video" onPress={() => takeVideo()} />
+      <Button title="Stop Video" onPress={() => stopVideo()} />
     </View>
-  )
+  );
 }
 
 export default Recording;
