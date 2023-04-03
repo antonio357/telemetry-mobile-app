@@ -4,7 +4,7 @@ import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
 
-export default function Recording({ navigation, RegisteredSniffersStore }) {
+export default function Recording() {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
