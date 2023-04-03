@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, Button, SafeAreaView } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
-// import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 
 export default function Recording({ navigation, RegisteredSniffersStore }) {
@@ -51,12 +50,6 @@ export default function Recording({ navigation, RegisteredSniffersStore }) {
   };
 
   if (video) {
-    // let shareVideo = () => {
-    //   shareAsync(video.uri).then(() => {
-    //     setVideo(undefined);
-    //   });
-    // };
-
     let saveVideo = () => {
       MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
         setVideo(undefined);
@@ -67,12 +60,10 @@ export default function Recording({ navigation, RegisteredSniffersStore }) {
       <SafeAreaView style={styles.container}>
         <Video
           style={styles.video}
-          source={{uri: video.uri}}
+          source={{ uri: video.uri }}
           useNativeControls
           resizeMode='contain'
-          isLooping
         />
-        {/* <Button title="Share" onPress={shareVideo} /> */}
         {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
         <Button title="Discard" onPress={() => setVideo(undefined)} />
       </SafeAreaView>
@@ -80,19 +71,23 @@ export default function Recording({ navigation, RegisteredSniffersStore }) {
   }
 
   return (
-    <Camera style={styles.container} ref={cameraRef}>
-      <View style={styles.buttonContainer}>
+    <View style={styles.viewContainer}>
+      <Camera style={styles.container} ref={cameraRef}>
         <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
-      </View>
-    </Camera>
+      </Camera>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  viewContainer: {
+    height: 300,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 5
   },
   buttonContainer: {
     backgroundColor: "#fff",
