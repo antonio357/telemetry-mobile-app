@@ -1,108 +1,105 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, Text, View, Button, SafeAreaView } from 'react-native';
+import { useEffect, useState, useRef } from 'react';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
+// import { shareAsync } from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
 
-
-// tentativa 1 https://www.youtube.com/watch?v=4VFYqw5h_qs não funcionou
-
-const styles = StyleSheet.create({
-  cameraContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  fixedRatio: {
-    flex: 1,
-    aspectRatio: 1
-  },
-  video: {
-    alignSelf: 'center',
-    width: 350,
-    height: 220
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});
-
-function Recording({ navigation, RegisteredSniffersStore }) {
-  const [hasAudioPermission, setHasAudioPermission] = useState(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [camera, setCamera] = useState(null);
-  const [record, setRecord] = useState(null);
-  const [type, setType] = useState(null);
-  const video = React.useRef(null);
-  const [status, setStatus] = React.useState({});
-
+export default function Recording({ navigation, RegisteredSniffersStore }) {
+  let cameraRef = useRef();
+  const [hasCameraPermission, setHasCameraPermission] = useState();
+  const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
+  const [isRecording, setIsRecording] = useState(false);
+  const [video, setVideo] = useState();
 
   useEffect(() => {
     (async () => {
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === 'granted');
+      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      const microphonePermission = await Camera.requestMicrophonePermissionsAsync();
+      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
 
-      const audioStatus = await Camera.requestMicrophonePermissionsAsync();
-      setHasAudioPermission(audioStatus.status === 'granted');
+      setHasCameraPermission(cameraPermission.status === "granted");
+      setHasMicrophonePermission(microphonePermission.status === "granted");
+      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
     })();
-  }, [])
+  }, []);
 
-  const takeVideo = async () => {
-    console.log(`takeVideo camera = $camera}`);
-    if (camera) {
-      const data = await camera.recordAsync({ maxDuration: 10 });
-      setRecord(data.uri);
-      console.log(`takeVideo data.uri = ${data.uri}`);
-    }
+  if (hasCameraPermission === undefined || hasMicrophonePermission === undefined) {
+    return <Text>Requestion permissions...</Text>
+  } else if (!hasCameraPermission) {
+    return <Text>Permission for camera not granted.</Text>
   }
 
-  const stopVideo = async () => {
-    console.log(`stopVideo camera = $camera}`);
-    camera.stopRecording();
-  }
+  let recordVideo = () => {
+    setIsRecording(true);
+    let options = {
+      quality: "1080p",
+      maxDuration: 60,
+      mute: false
+    };
 
-  if (hasCameraPermission === null || hasAudioPermission === null) return <View></View>;
-  if (hasCameraPermission === false || hasAudioPermission === false) return <Text>No access to camera</Text>
+    cameraRef.current.recordAsync(options).then((recordedVideo) => {
+      setVideo(recordedVideo);
+      setIsRecording(false);
+    });
+  };
+
+  let stopRecording = () => {
+    setIsRecording(false);
+    cameraRef.current.stopRecording();
+  };
+
+  if (video) {
+    // let shareVideo = () => {
+    //   shareAsync(video.uri).then(() => {
+    //     setVideo(undefined);
+    //   });
+    // };
+
+    let saveVideo = () => {
+      MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
+        setVideo(undefined);
+      });
+    };
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <Video
+          style={styles.video}
+          source={{uri: video.uri}}
+          useNativeControls
+          resizeMode='contain'
+          isLooping
+        />
+        {/* <Button title="Share" onPress={shareVideo} /> */}
+        {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
+        <Button title="Discard" onPress={() => setVideo(undefined)} />
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.cameraContainer}>
-        <Camera
-          ref={ref => setCamera(ref)}
-          styles={styles.fixedRatio}
-          type={'back'}
-          ratio={'4:3'}
-        />
+    <Camera style={styles.container} ref={cameraRef}>
+      <View style={styles.buttonContainer}>
+        <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
       </View>
-      <Video
-        ref={video}
-        style={styles.video}
-        source={{
-          uri: record
-        }}
-        useNativeControls
-        resizeMode="contain"
-        isLooping
-        onPlaybackStatusUpdate={status => setStatus(() => status)}
-      />
-      <View>
-        <Button
-          title={status.isPlaying ? 'Pause' : 'Play'}
-          onPress={() => status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()}
-        />
-      </View>
-      <Button
-        title="Flip Video"
-        onPress={() => {
-          setType(
-            type === camera.Constants.Type.back ? Camera.Constants.Type.front : Camera.Constants.Type.back
-          )
-        }}
-      />
-      <Button title="Take Video" onPress={() => takeVideo()} />
-      <Button title="Stop Video" onPress={() => stopVideo()} />
-    </View>
+    </Camera>
   );
 }
 
-export default Recording;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonContainer: {
+    backgroundColor: "#fff",
+    alignSelf: "flex-end"
+  },
+  video: {
+    flex: 1,
+    alignSelf: "stretch"
+  }
+});
