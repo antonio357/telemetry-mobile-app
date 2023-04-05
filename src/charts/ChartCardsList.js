@@ -1,9 +1,9 @@
 import { ChartCard } from './ChartCard';
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
 
 const styles = StyleSheet.create({
-  scrollView: {flex: 1},
+  // scrollView: {flex: 1},
 });
 
 
@@ -20,8 +20,8 @@ export function ChartCardsList({ sensorConfigsArray }) {
   // ];
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <>
       {sensorConfigsArray.map(sensorConfig => <ChartCard key={Math.random()} sensorConfig={sensorConfig} />)}
-    </ScrollView>
+    </>
   );
 }

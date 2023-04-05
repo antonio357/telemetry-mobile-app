@@ -1,4 +1,4 @@
-import { View, Button, Dimensions, Text } from "react-native";
+import { View, Button, Dimensions, Text, ScrollView } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { observer, inject } from 'mobx-react';
 import { StyleSheet } from "react-native";
@@ -44,7 +44,9 @@ function Sensores({ navigation, RegisteredSniffersStore }) {
           }
         }} />
         <Text>DataBase has {countLogsRecordsSaved} logs</Text>
-        <ChartCardsList sensorConfigsArray={getAllportChartForChartCardsList()} />
+        <ScrollView>
+          <ChartCardsList sensorConfigsArray={getAllportChartForChartCardsList()} />
+        </ScrollView>
       </View>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>

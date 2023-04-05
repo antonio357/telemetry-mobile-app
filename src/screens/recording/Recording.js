@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Button, SafeAreaView, ScrollView } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
@@ -6,7 +6,7 @@ import * as MediaLibrary from 'expo-media-library';
 import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from '../../screens/sensores/SensoresList.js'
 
-export default function Recording({ navigation }) {
+export default function Recording({ navigation, RegisteredSniffersStore }) {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
@@ -79,8 +79,10 @@ export default function Recording({ navigation }) {
           <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
         </Camera>
       </View>
+      <ScrollView>
+        <SensoresList />
+      </ScrollView>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-      <SensoresList />
     </View>
   );
 }
