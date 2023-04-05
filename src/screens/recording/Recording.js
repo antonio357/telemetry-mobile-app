@@ -3,8 +3,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
+import { ScreenBase } from "../common/ScreenBase";
+import SensoresList from '../../screens/sensores/SensoresList.js'
 
-export default function Recording() {
+export default function Recording({ navigation }) {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
@@ -71,10 +73,14 @@ export default function Recording() {
   }
 
   return (
-    <View style={styles.viewContainer}>
-      <Camera style={styles.container} ref={cameraRef}>
-        <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
-      </Camera>
+    <View style={styles.returnView}>
+      <View style={styles.viewContainer}>
+        <Camera style={styles.container} ref={cameraRef}>
+          <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
+        </Camera>
+      </View>
+      <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+      <SensoresList />
     </View>
   );
 }
@@ -96,5 +102,8 @@ const styles = StyleSheet.create({
   video: {
     flex: 1,
     alignSelf: "stretch"
+  },
+  returnView: {
+    flex: 1,
   }
 });
