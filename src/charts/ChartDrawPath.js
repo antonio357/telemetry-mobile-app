@@ -12,7 +12,7 @@ export class ChartDrawPath {
     if (sensorType == 'touch') {
       this.yBounds['max'] = 1;
     } else if (sensorType == 'ultrassonic') {
-      this.yBounds['max'] = 255;
+      this.yBounds['max'] = 2550;
     }
     // this.canvasDimensions = new CanvasDimensions();
     this.lineDrawPoints = new CanvasDimensions().lineDrawPoints;
@@ -30,7 +30,7 @@ export class ChartDrawPath {
     //   value: '', // string com o valor do sensor 
     //   time: 15000 // inteiro com o valor de tempo em ms que se passou após o início da execução
     // };
-    const y = (parseInt(data.value) * this.dimensionsUnits.y);
+    const y = ((this.yBounds['max'] - parseInt(data.value)) * this.dimensionsUnits.y);
     const timeDiff = (data.time - this.lastPointTime) * this.dimensionsUnits.x;
     const x = (this.path.getLastPt().x + timeDiff);
     this.path.lineTo(x, y);
