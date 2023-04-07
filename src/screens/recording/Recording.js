@@ -4,9 +4,12 @@ import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
 import { ScreenBase } from "../common/ScreenBase";
-import SensoresList from '../../screens/sensores/SensoresList.js'
+import SensoresList from '../../screens/sensores/SensoresList.js';
+import { observer, inject } from 'mobx-react';
 
-export default function Recording({ navigation, RegisteredSniffersStore }) {
+function Recording({ navigation, RegisteredSniffersStore }) {
+  const { startLogs, stopLogs } = RegisteredSniffersStore;
+
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
@@ -33,6 +36,7 @@ export default function Recording({ navigation, RegisteredSniffersStore }) {
   }
 
   let recordVideo = () => {
+    startLogs();
     setIsRecording(true);
     let options = {
       quality: "1080p",
@@ -49,6 +53,7 @@ export default function Recording({ navigation, RegisteredSniffersStore }) {
   let stopRecording = () => {
     setIsRecording(false);
     cameraRef.current.stopRecording();
+    stopLogs();
   };
 
   if (video) {
@@ -109,3 +114,5 @@ const styles = StyleSheet.create({
     flex: 1,
   }
 });
+
+export default inject('RegisteredSniffersStore')(observer(Recording));

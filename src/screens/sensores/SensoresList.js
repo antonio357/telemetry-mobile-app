@@ -5,7 +5,7 @@ import { ChartCardsList } from '../../charts/ChartCardsList';
 
 
 function SensoresList({ RegisteredSniffersStore }) {
-    const { getAllportChartForChartCardsList, lastCmdToAllWsClients, startLogs, stopLogs } = RegisteredSniffersStore;
+    const { getAllportChartForChartCardsList } = RegisteredSniffersStore;
 
     const viewMarging = 24;
     const strokeWidth = 16;
@@ -29,13 +29,6 @@ function SensoresList({ RegisteredSniffersStore }) {
     });
     return (
         <View style={styles.ButtonAndScrollView}>
-            <Button style={styles.Button} title={lastCmdToAllWsClients == "stop logs" ? "get logs" : "stop logs"} onPress={() => {
-                if (lastCmdToAllWsClients == "stop logs") {
-                    startLogs();
-                } else {
-                    stopLogs();
-                }
-            }} />
             <ChartCardsList sensorConfigsArray={getAllportChartForChartCardsList()} />
         </View>
     );
