@@ -64,23 +64,29 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     };
 
     return (
-      <SafeAreaView style={styles.container}>
-        <Video
-          style={styles.video}
-          source={{ uri: video.uri }}
-          useNativeControls
-          resizeMode='contain'
-        />
-        {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
-        <Button title="Discard" onPress={() => setVideo(undefined)} />
-      </SafeAreaView>
+      <View style={styles.videoContainer}>
+        <View style={styles.viewContainer}>
+          <Video
+            style={styles.video}
+            source={{ uri: video.uri }}
+            useNativeControls
+          // resizeMode='contain'
+          />
+        </View>
+        <View style={styles.videoButtonsView}>
+          <View style={{ flexDirection: 'row' }}>
+            {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
+            <Button title="Discard" onPress={() => setVideo(undefined)} />
+          </View>
+        </View>
+      </View>
     );
   }
 
   return (
     <View style={styles.returnView}>
       <View style={styles.viewContainer}>
-        <Camera style={styles.container} ref={cameraRef}>
+        <Camera style={styles.cameraContainer} ref={cameraRef}>
           <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
         </Camera>
       </View>
@@ -96,19 +102,23 @@ const styles = StyleSheet.create({
   viewContainer: {
     height: 300,
   },
-  container: {
+  cameraContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingBottom: 5
   },
-  buttonContainer: {
-    backgroundColor: "#fff",
-    alignSelf: "flex-end"
+  videoContainer: {
+    flex: 1,
+  },
+  videoButtonsView: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 5,
   },
   video: {
     flex: 1,
-    alignSelf: "stretch"
   },
   returnView: {
     flex: 1,
