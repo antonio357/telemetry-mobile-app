@@ -74,8 +74,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
               const {isPlaying, durationMillis, positionMillis} = obj;
               // console.log(`onPlaybackStatusUpdate obj = ${JSON.stringify(obj)}`);
             }}
-            onReadyForDisplay={obj => console.log(`onReadyForDisplay obj = ${JSON.stringify(obj)}`)}
-          // resizeMode='contain'
           />
         </View>
         <View style={styles.videoButtonsView}>
