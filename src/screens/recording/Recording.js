@@ -70,6 +70,11 @@ function Recording({ navigation, RegisteredSniffersStore }) {
             style={styles.video}
             source={{ uri: video.uri }}
             useNativeControls
+            onPlaybackStatusUpdate={obj => {
+              const {isPlaying, durationMillis, positionMillis} = obj;
+              // console.log(`onPlaybackStatusUpdate obj = ${JSON.stringify(obj)}`);
+            }}
+            onReadyForDisplay={obj => console.log(`onReadyForDisplay obj = ${JSON.stringify(obj)}`)}
           // resizeMode='contain'
           />
         </View>
