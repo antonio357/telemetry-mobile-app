@@ -119,6 +119,30 @@ const removeExecution = async (id) => {
   await removeFromTable(Executions.tableName, execution.id);
 }
 
+const removeAllTempExecutions = async () => {
+  const executions = await Executions.findAllTempExecutions();
+  for (let e = 0; e < executions.length; e++) {
+    const executionId = executions[e].id;
+    const sniffers = await Sniffers.findSniffers(executionId);
+    for (let i = 0; i < sniffers.length; i++) {
+      const sniffer = sniffers[i];
+      const ports = await Ports.findPorts(sniffer.id);
+      for (let j = 0; j < ports.length; j++) {
+        const port = ports[j];
+        await Logs.remove(port.id);
+        await removeFromTable(Ports.tableName, port.id);
+      }
+      await removeFromTable(Sniffers.tableName, sniffer.id);
+    }
+    await removeFromTable(Executions.tableName, executionId);
+  }
+  console.log(`removeu todas as execuções temporárias`);
+}
+
+const findLastExecutionInfo = async () => {
+  return await Executions.findLastExecution();
+}
+
 const findExecutionInfo = async (executionId, logsTime = null) => {
   const executionInfo = {};
   const execution = await Executions.findExecution(executionId);
@@ -127,6 +151,7 @@ const findExecutionInfo = async (executionId, logsTime = null) => {
   executionInfo['initDate'] = execution.initDate;
   executionInfo['initTime'] = execution.initTime;
   executionInfo['endTime'] = execution.endTime;
+  executionInfo['videoUri'] = execution.videoUri;
   executionInfo['sniffers'] = [];
   const sniffers = await Sniffers.findSniffers(executionId);
   for (let i = 0; i < sniffers.length; i++) {
@@ -149,7 +174,7 @@ const findExecutionInfo = async (executionId, logsTime = null) => {
       if (logsTime) {
         let begin = logsTime - 5000;
         let end = logsTime + 5000;
-        if (begin < 0 ) {
+        if (begin < 0) {
           end += -1 * begin;
           begin = 0;
         }
@@ -172,5 +197,7 @@ export default {
   updateExecution,
   findExecution,
   removeExecution,
-  appendLogsOnPort
+  removeAllTempExecutions,
+  appendLogsOnPort,
+  findLastExecutionInfo
 };

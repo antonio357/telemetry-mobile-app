@@ -16,7 +16,8 @@ const init = async () => {
           name TEXT, 
           initDate TEXT, 
           initTime TEXT,
-          endTime TEXT);`,
+          endTime TEXT,
+          videoUri TEXT);`,
         [],
         (_, { rowsAffected, insertId }) => resolve(console.log(`created ${tableName} table, rowsAffected = ${rowsAffected}, insertId = ${insertId}`)),
         (_, error) => {
@@ -122,13 +123,49 @@ const findExecution = async (executionId) => {
   });
 }
 
+const findLastExecution = async (executionId) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} ORDER BY id DESC LIMIT 1;`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array[0]);
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
+const findAllTempExecutions = async () => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE videoUri IS NULL;`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array);
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
 const update = async (id, execution) => {
   return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `UPDATE ${tableName} SET name=?, initDate=?, initTime=?, endTime=? WHERE id=?;`,
-        [execution.name, execution.initDate, execution.initTime, execution.endTime, id],
+        `UPDATE ${tableName} SET name=?, initDate=?, initTime=?, endTime=?, videoUri=? WHERE id=?;`,
+        [execution.name, execution.initDate, execution.initTime, execution.endTime, execution.videoUri, id],
         //-----------------------
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) resolve(rowsAffected);
@@ -148,5 +185,7 @@ export default {
   countRecords,
   getAllRecords,
   findExecution,
+  findLastExecution,
+  findAllTempExecutions,
   update,
 };

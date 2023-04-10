@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, ScrollView } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
@@ -6,9 +6,10 @@ import * as MediaLibrary from 'expo-media-library';
 import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from '../../screens/sensores/SensoresList.js';
 import { observer, inject } from 'mobx-react';
+import DbOperations from '../../database/DbOperations';
 
 function Recording({ navigation, RegisteredSniffersStore }) {
-  const { startLogs, stopLogs } = RegisteredSniffersStore;
+  const { startLogs, stopLogs, setExecutionVideo } = RegisteredSniffersStore;
 
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -26,6 +27,8 @@ function Recording({ navigation, RegisteredSniffersStore }) {
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+
+      await DbOperations.removeAllTempExecutions();
     })();
   }, []);
 
@@ -59,6 +62,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   if (video) {
     let saveVideo = () => {
       MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
+        setExecutionVideo(video.uri);
         setVideo(undefined);
       });
     };
@@ -71,8 +75,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
             source={{ uri: video.uri }}
             useNativeControls
             onPlaybackStatusUpdate={obj => {
-              const {isPlaying, durationMillis, positionMillis} = obj;
-              // console.log(`onPlaybackStatusUpdate obj = ${JSON.stringify(obj)}`);
+              const { isPlaying, durationMillis, positionMillis } = obj;
             }}
           />
         </View>

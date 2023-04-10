@@ -261,6 +261,14 @@ class RegisteredSniffersStore {
     }
   }
 
+  setExecutionVideo = async videoUri => {
+    const execution = await DbOperations.findLastExecutionInfo();
+    execution['videoUri'] = videoUri;
+    await DbOperations.updateExecution(execution.id, execution);
+    const executionInfo = await DbOperations.findExecutionInfo(execution.id);
+    console.log(`setExecutionVideo executionInfo = ${JSON.stringify(executionInfo)}`);
+  }
+
   setUpExecutionInfo = async () => {
     this.executionInfoReady = false;
     this.executionInfo = {};
