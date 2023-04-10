@@ -7,9 +7,10 @@ import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from '../../screens/sensores/SensoresList.js';
 import { observer, inject } from 'mobx-react';
 import DbOperations from '../../database/DbOperations';
+import ExecutionPlayer from '../../player/ExecutionPlayer';
 
 function Recording({ navigation, RegisteredSniffersStore }) {
-  const { startLogs, stopLogs, setExecutionVideo } = RegisteredSniffersStore;
+  const { startLogs, stopLogs, setExecutionVideo, setExecutionInfoVideoUri, getExecutionInfo } = RegisteredSniffersStore;
 
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -60,6 +61,9 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   };
 
   if (video) {
+    const execution = getExecutionInfo();
+    execution['videoUri'] = video.uri;
+
     let saveVideo = () => {
       MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
         setExecutionVideo(video.uri);
@@ -69,16 +73,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
     return (
       <View style={styles.videoContainer}>
-        <View style={styles.viewContainer}>
-          <Video
-            style={styles.video}
-            source={{ uri: video.uri }}
-            useNativeControls
-            onPlaybackStatusUpdate={obj => {
-              const { isPlaying, durationMillis, positionMillis } = obj;
-            }}
-          />
-        </View>
+        <ExecutionPlayer execution={execution} />
         <View style={styles.videoButtonsView}>
           <View style={{ flexDirection: 'row' }}>
             {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
