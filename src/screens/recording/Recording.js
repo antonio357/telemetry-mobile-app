@@ -1,16 +1,29 @@
-import { StyleSheet, Text, View, Button, ScrollView } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
-import { Camera } from 'expo-camera';
-import { Video } from 'expo-av';
-import * as MediaLibrary from 'expo-media-library';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { Camera } from "expo-camera";
+import { Video } from "expo-av";
+import * as MediaLibrary from "expo-media-library";
 import { ScreenBase } from "../common/ScreenBase";
-import SensoresList from '../../screens/sensores/SensoresList.js';
-import { observer, inject } from 'mobx-react';
-import DbOperations from '../../database/DbOperations';
-import ExecutionPlayer from '../../player/ExecutionPlayer';
+import SensoresList from "../../screens/sensores/SensoresList.js";
+import { observer, inject } from "mobx-react";
+import DbOperations from "../../database/DbOperations";
+import ExecutionPlayer from "../../player/ExecutionPlayer";
 
 function Recording({ navigation, RegisteredSniffersStore }) {
-  const { startLogs, stopLogs, setExecutionVideo, setExecutionInfoVideoUri, getExecutionInfo } = RegisteredSniffersStore;
+  const {
+    startLogs,
+    stopLogs,
+    setExecutionVideo,
+    setExecutionInfoVideoUri,
+    getExecutionInfo,
+  } = RegisteredSniffersStore;
 
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -22,8 +35,10 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
-      const microphonePermission = await Camera.requestMicrophonePermissionsAsync();
-      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
+      const microphonePermission =
+        await Camera.requestMicrophonePermissionsAsync();
+      const mediaLibraryPermission =
+        await MediaLibrary.requestPermissionsAsync();
 
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
@@ -33,10 +48,13 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     })();
   }, []);
 
-  if (hasCameraPermission === undefined || hasMicrophonePermission === undefined) {
-    return <Text>Requestion permissions...</Text>
+  if (
+    hasCameraPermission === undefined ||
+    hasMicrophonePermission === undefined
+  ) {
+    return <Text>Requestion permissions...</Text>;
   } else if (!hasCameraPermission) {
-    return <Text>Permission for camera not granted.</Text>
+    return <Text>Permission for camera not granted.</Text>;
   }
 
   let recordVideo = () => {
@@ -45,7 +63,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     let options = {
       quality: "1080p",
       maxDuration: 60,
-      mute: false
+      mute: false,
     };
 
     cameraRef.current.recordAsync(options).then((recordedVideo) => {
@@ -63,6 +81,21 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   if (video) {
     const execution = getExecutionInfo();
     execution['videoUri'] = video.uri;
+    // const execution = {
+    //   executionId: 2,
+    //   sniffers: [
+    //     {
+    //       wsClientUrl: "ws://192.168.1.199:81",
+    //       id: 2,
+    //       portIds: [
+    //         { id: 3, portName: "port1" },
+    //         { id: 4, portName: "port2" },
+    //       ],
+    //     },
+    //   ],
+    //   videoUri:
+    //     "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540antonio357%252Ftelemetry-mobile-app/Camera/c75c2da9-b610-4377-9992-26511ad019f8.mp4",
+    // };
 
     let saveVideo = () => {
       MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
@@ -72,15 +105,54 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     };
 
     return (
-      <View style={styles.videoContainer}>
+      <>
         <ExecutionPlayer execution={execution} />
-        <View style={styles.videoButtonsView}>
-          <View style={{ flexDirection: 'row' }}>
-            {hasMediaLibraryPermission ? <Button title="Save" onPress={saveVideo} /> : undefined}
-            <Button title="Discard" onPress={() => setVideo(undefined)} />
-          </View>
-        </View>
-      </View>
+        {/* <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            paddingBottom: 5,
+          }}
+        > */}
+        {hasMediaLibraryPermission ? (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              width: 45,
+              height: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              left: 100,
+              bottom: 10,
+              backgroundColor: "#1299FA",
+              borderRadius: 2,
+            }}
+            // title="Save"
+            onPress={saveVideo}
+          >
+            <Text style={{ color: "white" }}>SAVE</Text>
+          </TouchableOpacity>
+        ) : undefined}
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            width: 70,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            left: 180,
+            bottom: 10,
+            backgroundColor: "#1299FA",
+            borderRadius: 2,
+          }}
+          // title="Discard"
+          onPress={() => setVideo(undefined)}
+        >
+          <Text style={{ color: "white" }}>DISCARD</Text>
+        </TouchableOpacity>
+        <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+        {/* </View> */}
+      </>
     );
   }
 
@@ -88,7 +160,10 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     <View style={styles.returnView}>
       <View style={styles.viewContainer}>
         <Camera style={styles.cameraContainer} ref={cameraRef}>
-          <Button title={isRecording ? "Stop Recording" : "Record Video"} onPress={isRecording ? stopRecording : recordVideo} />
+          <Button
+            title={isRecording ? "Stop Recording" : "Record Video"}
+            onPress={isRecording ? stopRecording : recordVideo}
+          />
         </Camera>
       </View>
       <ScrollView>
@@ -105,17 +180,17 @@ const styles = StyleSheet.create({
   },
   cameraContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 5
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 5,
   },
   videoContainer: {
     flex: 1,
   },
   videoButtonsView: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    alignItems: "center",
+    justifyContent: "flex-end",
     paddingBottom: 5,
   },
   video: {
@@ -123,7 +198,7 @@ const styles = StyleSheet.create({
   },
   returnView: {
     flex: 1,
-  }
+  },
 });
 
-export default inject('RegisteredSniffersStore')(observer(Recording));
+export default inject("RegisteredSniffersStore")(observer(Recording));
