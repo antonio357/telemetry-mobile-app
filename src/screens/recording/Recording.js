@@ -21,7 +21,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     startLogs,
     stopLogs,
     setExecutionVideo,
-    setExecutionInfoVideoUri,
     getExecutionInfo,
   } = RegisteredSniffersStore;
 
