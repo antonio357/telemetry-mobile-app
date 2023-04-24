@@ -137,6 +137,42 @@ const findLogs = async (portId, { begin, end }) => {
   });
 }
 
+const findLogsBuffer = async (portId, { begin, end }, bufferLimit) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE portId = ${portId} AND time BETWEEN ${begin} AND ${end} ORDER BY time ASC LIMIT ${bufferLimit};`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          // console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array)
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
+const findAllLogs = async (portId) => {
+  return await new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      //comando SQL modificável
+      tx.executeSql(
+        `SELECT * FROM ${tableName} WHERE portId = ${portId} ORDER BY time ASC;`,
+        [],
+        //-----------------------
+        (_, { rows }) => {
+          // console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
+          resolve(rows._array)
+        },
+        (_, error) => reject(error) // erro interno em tx.executeSql
+      );
+    });
+  });
+}
+
 const remove = async (portId) => {
   return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -156,6 +192,8 @@ const remove = async (portId) => {
 
 export default {
   tableName,
+  findAllLogs,
+  findLogsBuffer,
   init,
   deleteAllRecords,
   appendLogsOnPort,

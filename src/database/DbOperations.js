@@ -185,8 +185,25 @@ const findExecutionInfo = async (executionId, logsTime = null) => {
   return executionInfo;
 }
 
+const findLogsByPort = async (portId, logsTime, bufferLimit=30000) => {
+  if (logsTime >= 0) {
+    let begin = logsTime - 15000;
+    let end = logsTime + 15000;
+    if (begin < 0) {
+      end += -1 * begin;
+      begin = 0;
+    }
+    return await Logs.findLogsBuffer(portId, { begin, end }, bufferLimit);
+  }
+}
+
+
 const appendLogsOnPort = (logs, portId) => {
   Logs.appendLogsOnPort(logs, portId);
+}
+
+const findAllLogsByPortId = async portId => {
+  return await Logs.findAllLogs(portId);
 }
 
 export default {
@@ -199,5 +216,7 @@ export default {
   removeExecution,
   removeAllTempExecutions,
   appendLogsOnPort,
-  findLastExecutionInfo
+  findLastExecutionInfo,
+  findAllLogsByPortId,
+  findLogsByPort
 };
