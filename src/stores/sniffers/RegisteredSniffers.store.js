@@ -96,6 +96,7 @@ class RegisteredSniffersStore {
   getAllPortChart = () => {
     return this.portChart;
   }
+  
   getAllportChartForChartCardsList = () => {
     const array = [];
     for (let i = 0; i < this.portChart.length; i++) {
