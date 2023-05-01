@@ -41,9 +41,11 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
+      console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
       await DbOperations.removeAllTempExecutions();
+      console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
     })();
   }, []);
 
