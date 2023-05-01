@@ -41,11 +41,11 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
-      console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
+      // console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
       await DbOperations.removeAllTempExecutions();
-      console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
+      // console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
     })();
   }, []);
 
@@ -108,13 +108,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     return (
       <>
         <ExecutionPlayer execution={execution} />
-        {/* <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            paddingBottom: 5,
-          }}
-        > */}
         {hasMediaLibraryPermission ? (
           <TouchableOpacity
             style={{
@@ -128,7 +121,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
               backgroundColor: "#1299FA",
               borderRadius: 2,
             }}
-            // title="Save"
             onPress={saveVideo}
           >
             <Text style={{ color: "white" }}>SAVE</Text>
@@ -146,13 +138,11 @@ function Recording({ navigation, RegisteredSniffersStore }) {
             backgroundColor: "#1299FA",
             borderRadius: 2,
           }}
-          // title="Discard"
           onPress={() => setVideo(undefined)}
         >
           <Text style={{ color: "white" }}>DISCARD</Text>
         </TouchableOpacity>
         <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-        {/* </View> */}
       </>
     );
   }
