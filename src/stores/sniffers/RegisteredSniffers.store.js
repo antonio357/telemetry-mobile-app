@@ -96,6 +96,7 @@ class RegisteredSniffersStore {
   getAllPortChart = () => {
     return this.portChart;
   }
+  
   getAllportChartForChartCardsList = () => {
     const array = [];
     for (let i = 0; i < this.portChart.length; i++) {
@@ -234,28 +235,40 @@ class RegisteredSniffersStore {
   }
 
   startLogs = async () => {
-    await this.setUpExecutionInfo();
-    this.cleanAllCharts();
-    this.wsClients.forEach(socket => socket.send('start logs'));
-    this.lastCmdToAllWsClients = "start logs";
+    if (this.wsClients.length > 0) {
+      await this.setUpExecutionInfo();
+      this.cleanAllCharts();
+      this.wsClients.forEach(socket => socket.send('start logs'));
+      this.lastCmdToAllWsClients = "start logs";
+    }
   }
 
   stopLogs = async () => {
-    this.lastCmdToAllWsClients = "stop logs";
-    this.wsClients.forEach(socket => socket.send('stop logs'));
-    const count = await DbOperations.countRecords();
-    console.log(`count = ${JSON.stringify(count)}`);
-    const execution = await DbOperations.findExecution(this.executionInfo.executionId);
-    execution['name'] = 'new name inserted by user';
-    const date = new Date();
-    execution['endTime'] = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
-    await DbOperations.updateExecution(this.executionInfo.executionId, execution);
-    // const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId);
-    // console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
-    // await DbOperations.removeExecution(this.executionInfo.executionId);
-    // const count_after_remove = await DbOperations.countRecords();
-    // console.log(`count_after_remove = ${JSON.stringify(count_after_remove)}`);
+    if (this.wsClients.length > 0) {
+      this.lastCmdToAllWsClients = "stop logs";
+      this.wsClients.forEach(socket => socket.send('stop logs'));
+      const count = await DbOperations.countRecords();
+      console.log(`count = ${JSON.stringify(count)}`);
+      const execution = await DbOperations.findExecution(this.executionInfo.executionId);
+      execution['name'] = 'new name inserted by user';
+      const date = new Date();
+      execution['endTime'] = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
+      await DbOperations.updateExecution(this.executionInfo.executionId, execution);
+      // const executionInfo = await DbOperations.findExecutionInfo(this.executionInfo.executionId);
+      // console.log(`executionInfo = ${JSON.stringify(executionInfo)}`);
+      // await DbOperations.removeExecution(this.executionInfo.executionId);
+      // const count_after_remove = await DbOperations.countRecords();
+      // console.log(`count_after_remove = ${JSON.stringify(count_after_remove)}`);
+    }
   }
+
+  setExecutionVideo = async videoUri => {
+    const execution = await DbOperations.findLastExecutionInfo();
+    execution['videoUri'] = videoUri;
+    await DbOperations.updateExecution(execution.id, execution);
+  }
+
+  getExecutionInfo = () => { return this.executionInfo; }
 
   setUpExecutionInfo = async () => {
     this.executionInfoReady = false;

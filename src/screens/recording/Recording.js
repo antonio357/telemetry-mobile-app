@@ -1,50 +1,205 @@
-import { View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { Camera } from "expo-camera";
+import { Video } from "expo-av";
+import * as MediaLibrary from "expo-media-library";
 import { ScreenBase } from "../common/ScreenBase";
-import { styles } from '../../../App.styles';
-// import { ChartCardsList } from '../../charts/ChartCardsList';
-// import { ChartDrawPath } from '../../charts/ChartDrawPath';
-
-// const path1 =  new ChartDrawPath('ultrassonic');
-// const path2 =  new ChartDrawPath('touch');
-// const array = [
-//   {
-//     sensorName: "sensor de distância",
-//     sensorType: "ultrassonic",
-//     timeFrame: 10, // faixa de tempo do eixo x em segundos
-//     logsRate: 1000, // quantidade dos logs por segundo
-//     drawPath: path1.getPath()
-//   },
-//   {
-//     sensorName: "sensor de batida",
-//     sensorType: "touch",
-//     timeFrame: 10, // faixa de tempo do eixo x em segundos
-//     logsRate: 1000, // quantidade dos logs por segundo
-//     drawPath: path2.getPath()
-//   },
-// ];
-// let timeCounter = 0;
-// const thread = setInterval(() => {
-//   let array1 = [];
-//   let array2 = [];
-//   for (let i = 0; i < 20; i++) {
-//     array1.push({value: Math.random() * 256, time: timeCounter});
-//     array2.push({value: Math.random() * 2, time: timeCounter});
-//     timeCounter += 1;
-//   }
-//   path1.loadDataVector(array1);
-//   path2.loadDataVector(array2);
-// }, 20);
+import SensoresList from "../../screens/sensores/SensoresList.js";
+import { observer, inject } from "mobx-react";
+import DbOperations from "../../database/DbOperations";
+import ExecutionPlayer from "../../player/ExecutionPlayer";
 
 function Recording({ navigation, RegisteredSniffersStore }) {
-  // const { getAllPortChart } = RegisteredSniffersStore;
-  // console.log(`getAllPortChart() = ${JSON.stringify(getAllPortChart())}`);
+  const {
+    startLogs,
+    stopLogs,
+    setExecutionVideo,
+    getExecutionInfo,
+  } = RegisteredSniffersStore;
+
+  let cameraRef = useRef();
+  const [hasCameraPermission, setHasCameraPermission] = useState();
+  const [hasMicrophonePermission, setHasMicrophonePermission] = useState();
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
+  const [isRecording, setIsRecording] = useState(false);
+  const [video, setVideo] = useState();
+
+  useEffect(() => {
+    (async () => {
+      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      const microphonePermission =
+        await Camera.requestMicrophonePermissionsAsync();
+      const mediaLibraryPermission =
+        await MediaLibrary.requestPermissionsAsync();
+
+      setHasCameraPermission(cameraPermission.status === "granted");
+      setHasMicrophonePermission(microphonePermission.status === "granted");
+      console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
+      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+
+      await DbOperations.removeAllTempExecutions();
+      console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
+    })();
+  }, []);
+
+  if (
+    hasCameraPermission === undefined ||
+    hasMicrophonePermission === undefined
+  ) {
+    return <Text>Requestion permissions...</Text>;
+  } else if (!hasCameraPermission) {
+    return <Text>Permission for camera not granted.</Text>;
+  }
+
+  let recordVideo = () => {
+    startLogs();
+    setIsRecording(true);
+    let options = {
+      quality: "1080p",
+      maxDuration: 60,
+      mute: false,
+    };
+
+    cameraRef.current.recordAsync(options).then((recordedVideo) => {
+      setVideo(recordedVideo);
+      setIsRecording(false);
+    });
+  };
+
+  let stopRecording = () => {
+    setIsRecording(false);
+    cameraRef.current.stopRecording();
+    stopLogs();
+  };
+
+  if (video) {
+    const execution = getExecutionInfo();
+    execution['videoUri'] = video.uri;
+    // const execution = {
+    //   executionId: 2,
+    //   sniffers: [
+    //     {
+    //       wsClientUrl: "ws://192.168.1.199:81",
+    //       id: 2,
+    //       portIds: [
+    //         { id: 3, portName: "port1" },
+    //         { id: 4, portName: "port2" },
+    //       ],
+    //     },
+    //   ],
+    //   videoUri:
+    //     "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540antonio357%252Ftelemetry-mobile-app/Camera/c75c2da9-b610-4377-9992-26511ad019f8.mp4",
+    // };
+
+    let saveVideo = () => {
+      MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
+        setExecutionVideo(video.uri);
+        setVideo(undefined);
+      });
+    };
+
+    return (
+      <>
+        <ExecutionPlayer execution={execution} />
+        {/* <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            paddingBottom: 5,
+          }}
+        > */}
+        {hasMediaLibraryPermission ? (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              width: 45,
+              height: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              left: 100,
+              bottom: 10,
+              backgroundColor: "#1299FA",
+              borderRadius: 2,
+            }}
+            // title="Save"
+            onPress={saveVideo}
+          >
+            <Text style={{ color: "white" }}>SAVE</Text>
+          </TouchableOpacity>
+        ) : undefined}
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            width: 70,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            left: 180,
+            bottom: 10,
+            backgroundColor: "#1299FA",
+            borderRadius: 2,
+          }}
+          // title="Discard"
+          onPress={() => setVideo(undefined)}
+        >
+          <Text style={{ color: "white" }}>DISCARD</Text>
+        </TouchableOpacity>
+        <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+        {/* </View> */}
+      </>
+    );
+  }
 
   return (
-    <View style={styles.view}>
-      {/* <ChartCardsList sensorConfigsArray={array} /> */}
+    <View style={styles.returnView}>
+      <View style={styles.viewContainer}>
+        <Camera style={styles.cameraContainer} ref={cameraRef}>
+          <Button
+            title={isRecording ? "Stop Recording" : "Record Video"}
+            onPress={isRecording ? stopRecording : recordVideo}
+          />
+        </Camera>
+      </View>
+      <ScrollView>
+        <SensoresList />
+      </ScrollView>
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
-  )
+  );
 }
 
-export default Recording;
+const styles = StyleSheet.create({
+  viewContainer: {
+    height: 300,
+  },
+  cameraContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 5,
+  },
+  videoContainer: {
+    flex: 1,
+  },
+  videoButtonsView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 5,
+  },
+  video: {
+    flex: 1,
+  },
+  returnView: {
+    flex: 1,
+  },
+});
+
+export default inject("RegisteredSniffersStore")(observer(Recording));
