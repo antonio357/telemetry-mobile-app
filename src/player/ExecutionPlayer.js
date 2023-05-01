@@ -1,48 +1,11 @@
-import { StyleSheet, View, ScrollView, Text, FlatList, TouchableOpacity } from "react-native";
-import SensoresList from "../screens/sensores/SensoresList.js";
-import { Video, ResizeMode } from "expo-av";
+import { StyleSheet, View, ScrollView} from "react-native";
+import { Video } from "expo-av";
 import DbOperations from "../database/DbOperations.js";
 import { useEffect, useState } from "react";
 import { ChartCardsList } from "../charts/ChartCardsList.js";
 import { Skia } from "@shopify/react-native-skia";
-import { ChartDrawPath } from "../charts/ChartDrawPath.js";
 import { CanvasDimensions } from "../charts/CanvasDimensions.js";
-// import { TouchableOpacity } from "react-native-gesture-handler";
 
-// class ChartsPathController {
-//   // {
-//   //   // const chart = new ChartDrawPath(port.sensorType);
-//   //   portId: { // portId é único vem do registro do banco que é um autoincrement
-//   //     sensorName: port.sensorName,
-//   //     sensorType: port.sensorType,
-//   //     drawPath: chart.getPath(),
-//   //     chart: chart,
-//   //     logsBuffer: [{value: 255, time: 1500, portId: 1}]
-//   //   }
-//   // }
-//   portsConfig = {};
-
-//   setPortsConfig = portsConfig => {
-//     this.portsConfig = portsConfig;
-//     const portsId = Object.keys(this.portsConfig);
-//     for (let i = 0; i < portsId.length; i++) {
-//       this.portsConfig[`${portsId[i]}`].logsBuffer = [];
-//     }
-//   }
-
-//   playerStopped = timelinePosition => {
-//     const portsId = Object.keys(this.portsConfig);
-//     for (let i = 0; i < portsId.length; i++) {
-//       const indetifierString = `${portsId[i]}`;
-//       DbOperations.findLogsByPort(indetifierString, timelinePosition).then(logs => {
-//         this.portsConfig[indetifierString].logsBuffer = logs;
-//         this.portsConfig[indetifierString].chart
-//       });
-//     }
-//   }
-// };
-
-// const chartsPathController = new ChartsPathController();
 
 class DbLogsChart {
   constructor(portId, timeFrame = 10, logsRate = 1000) {
@@ -86,7 +49,7 @@ class DbLogsChart {
   }
 
   loadWindow = () => {
-    console.log(`loadWindow = ${JSON.stringify(this.queryBufferWindowIndexes)}`);
+    // console.log(`loadWindow = ${JSON.stringify(this.queryBufferWindowIndexes)}`);
     const data = this.queryBuffer[this.queryBufferWindowIndexes.begin];
     const y = ((this.yBounds.max - parseInt(data.value)) * this.dimensionsUnits.y);
     const x = (data.time - this.lastPointTime) * this.dimensionsUnits.x;
@@ -103,9 +66,9 @@ class DbLogsChart {
 
     this.lasPositionCall = timelinePosition;
     this.queryBuffer = await DbOperations.findLogsByPort(this.queryPort, timelinePosition);
-    console.log(`timelinePosition = ${timelinePosition}`);
-    console.log(`this.queryBuffer.length = ${this.queryBuffer.length}`);
-    console.log(`[this.queryBuffer[0], this.queryBuffer[-1]] = ${[JSON.stringify(this.queryBuffer[0]), JSON.stringify(this.queryBuffer[this.queryBuffer.length - 1])]}`);
+    // console.log(`timelinePosition = ${timelinePosition}`);
+    // console.log(`this.queryBuffer.length = ${this.queryBuffer.length}`);
+    // console.log(`[this.queryBuffer[0], this.queryBuffer[-1]] = ${[JSON.stringify(this.queryBuffer[0]), JSON.stringify(this.queryBuffer[this.queryBuffer.length - 1])]}`);
 
     this.path.rewind();
     this.lastPointTime = 0;
@@ -138,16 +101,6 @@ class DbLogsChart {
 
   }
 }
-
-// const positionMillisHistory = [0, 0, 0];
-// function capturePositionMillis(positionMillis) {
-//   positionMillisHistory.shift();
-//   positionMillisHistory.push(positionMillis);
-// }
-// function positionMillisStabilized() {
-//   if (positionMillisHistory[0] == positionMillisHistory[1] == positionMillisHistory[2]) return true;
-//   return false;
-// }
 
 let playerStoppedTimer = null;
 let lastOnPlaybackStatusUpdateEventTime = Date.now();
@@ -192,15 +145,6 @@ export default function ExecutionPlayer({ execution }) {
           const sniffer = sniffers[i];
           for (let j = 0; j < sniffer.ports.length; j++) {
             const port = sniffer.ports[j];
-            // DbOperations.findAllLogsByPortId(port.id).then(logs => {
-            //   logs[`${port.id}`] = []
-            //   for (let a = 0; a < 170; a++) {
-            //     for (let b = 0; b < logs.length; b++) {
-            //       logs[`${port.id}`].push(logs[b])
-            //     }
-            //   }
-            //   console.log(`logs.length = ${logs[`${port.id}`].length}`);
-            // });
             const chart = new DbLogsChart(`${port.id}`);
             ptsConfig[`${port.id}`] = {
               sensorName: port.sensorName,
@@ -211,13 +155,6 @@ export default function ExecutionPlayer({ execution }) {
           }
         }
         setPortsConfig(ptsConfig);
-        // chartsPathController.setPortsConfig(ptsConfig);
-
-        // DbOperations.findAllLogsByPortId(128376).then(logs => {
-        //   logs[`${128376}`] = logs;
-        //   console.log(`logs.length = ${logs[`${128376}`].length}`);
-        //   console.log(`logs.length = ${logs.length}`);
-        // });
       });
     })();
   }, [])
@@ -240,23 +177,12 @@ export default function ExecutionPlayer({ execution }) {
               clearTimeout(playerStoppedTimer);
               playerStoppedTimer = setTimeout(() => {
                 if (Date.now() - lastOnPlaybackStatusUpdateEventTime >= 1000) {
-                  console.log(`PLAYER STOPPED`);
+                  // console.log(`PLAYER STOPPED`);
                   const keys = Object.keys(portsConfig);
                   for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerStopped(actualPositionMillis);
                 }
               }, 1000);
             };
-
-            // console.log(`isPlaying: ${isPlaying}, isBuffering: ${isBuffering}, durationMillis: ${durationMillis}, positionMillis: ${positionMillis}}`);
-            // console.log(`onPlaybackStatusUpdate isPlaying, durationMillis, positionMillis = ${isPlaying, durationMillis, positionMillis}`);
-            // const keys = Object.keys(portsConfig);
-            // for (let i = 0; i < keys.length; i++) {
-            //   if (isPlaying) {
-            //     // portsConfig[keys].chart.playerIsRunning(positionMillis);
-            //   } else if (positionMillisStabilized()) {
-            //     // portsConfig[keys[i]].chart.playerStopped(positionMillis);
-            //   }
-            // }
           }}
         />
       </View>
