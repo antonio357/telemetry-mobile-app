@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { useEffect, useState, useRef } from "react";
 import { Camera } from "expo-camera";
-import { Video } from "expo-av";
 import * as MediaLibrary from "expo-media-library";
 import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from "../../screens/sensores/SensoresList.js";
