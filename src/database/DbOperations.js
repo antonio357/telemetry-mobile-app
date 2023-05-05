@@ -197,6 +197,10 @@ const findLogsByPort = async (portId, logsTime, bufferLimit=30000) => {
   }
 }
 
+const getAllExecutions = async () => {
+  return await Executions.getAllRecords();
+}
+
 
 const appendLogsOnPort = (logs, portId) => {
   Logs.appendLogsOnPort(logs, portId);
@@ -218,5 +222,6 @@ export default {
   appendLogsOnPort,
   findLastExecutionInfo,
   findAllLogsByPortId,
-  findLogsByPort
+  findLogsByPort,
+  getAllExecutions,
 };

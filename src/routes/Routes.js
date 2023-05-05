@@ -49,6 +49,11 @@ export function AppRoutes() {
           drawerIcon: () => <MaterialIcons name="photo-camera" size={defaultIconStyles.size} color={defaultIconStyles.color} />
         }}
       />
+      {/* <Screen // telas que não tem icone no drawer so são acessíveis por links de outras telas
+        name="execution-player"
+        options={{ drawerItemStyle: { display: 'none' } }}
+        component={Recording}
+      /> */}
     </Navigator >
   )
 }
