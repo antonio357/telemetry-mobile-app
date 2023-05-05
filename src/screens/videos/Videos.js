@@ -23,16 +23,18 @@ function Execution({ name, initDate, videoUri }) {
     })();
   }, []);
 
-  return <TouchableOpacity style={styles.execution} onPress={() => {
-    // navigation.navigate('execution-player');
-  }}>
-    {thumbnailImageUri ? <>
-      <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} />
-      <TouchableOpacity style={styles.executionMenu}>
-        <MaterialIcons name="menu" size={20} color={'black'} />
-      </TouchableOpacity>
-    </> : <Text>no thumbnail avaliable</Text>}
-  </TouchableOpacity>
+  return (
+    <TouchableOpacity style={styles.execution} onPress={() => {
+      // navigation.navigate('execution-player');
+    }}>
+      {thumbnailImageUri ? <>
+        <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} />
+        <TouchableOpacity style={styles.executionMenu}>
+          <MaterialIcons name="menu" size={20} color={'black'} />
+        </TouchableOpacity>
+      </> : <Text>no thumbnail avaliable</Text>}
+    </TouchableOpacity>
+  );
 }
 
 
@@ -55,7 +57,9 @@ export default function Videos({ navigation }) {
       {allExecutions.length > 0 ?
         //<View style={styles.view}>
         <ScrollView style={styles.scrollView}>
-          {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
+          <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
+            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
+          </View>
         </ScrollView>
         //</View>
         : <Text>no executions found</Text>}
@@ -65,22 +69,15 @@ export default function Videos({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  thumbnail: { width: 150, height: 150 },
-  scrollView: { flexWrap: "wrap" },
   view: {
     flex: 1,
-    // flexDirection: "column",
     margin: 30,
-    flexWrap: "wrap"
   },
-  execution: {
-    flex: 1,
-    flexDirection: 'column',
-    flexWrap: "wrap",
-  },
+  scrollView: {},
+  scrollViewInternalViewToPutItensSideBySide: { flex: 1, flexDirection: 'row' },
+  execution: {},
+  thumbnail: { width: 150, height: 150 },
   executionMenu: {
-    // position: "relative",
-    // left: 30,
     position: "absolute",
     right: 7,
     top: 7,
