@@ -27,12 +27,20 @@ function Execution({ name, initDate, videoUri }) {
     <TouchableOpacity style={styles.execution} onPress={() => {
       // navigation.navigate('execution-player');
     }}>
-      {thumbnailImageUri ? <>
-        <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} />
-        <TouchableOpacity style={styles.executionMenu}>
-          <MaterialIcons name="menu" size={20} color={'black'} />
-        </TouchableOpacity>
-      </> : <Text>no thumbnail avaliable</Text>}
+      {thumbnailImageUri ?
+        <View style={styles.noThumbnailView}>
+          <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} />
+          <TouchableOpacity style={styles.executionMenu}>
+            <MaterialIcons name="menu" size={20} color={'black'} />
+          </TouchableOpacity>
+        </View> :
+        <View style={styles.noThumbnailView}>
+          <Text>no thumbnail avaliable</Text>
+          <TouchableOpacity style={styles.executionMenu}>
+            <MaterialIcons name="menu" size={20} color={'black'} />
+          </TouchableOpacity>
+        </View>
+      }
     </TouchableOpacity>
   );
 }
@@ -82,6 +90,12 @@ const styles = StyleSheet.create({
   scrollViewInternalViewToPutItensSideBySide: { flex: 1, flexDirection: "row", flexWrap: "wrap" },
   execution: { width: '45%', height: 150, marginBottom: 10, marginLeft: 10 },
   thumbnail: { width: '100%', height: 150, borderRadius: 10 },
+  noThumbnailView: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    backgroundColor:'#d9d9d9',
+    shadowOpacity: 0.8,
+    borderRadius: 10,
+  },
   executionMenu: {
     position: "absolute",
     right: 7,
