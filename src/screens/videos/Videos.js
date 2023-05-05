@@ -1,6 +1,5 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Button } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
-import { styles as commonStyles } from '../../../App.styles';
 import { useEffect, useState } from "react";
 import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
@@ -63,7 +62,6 @@ export default function Videos({ navigation }) {
   return (
     <View style={styles.view}>
       {allExecutions.length > 0 ?
-        //<View style={styles.view}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
@@ -74,7 +72,6 @@ export default function Videos({ navigation }) {
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
           </View>
         </ScrollView>
-        //</View>
         : <Text>no executions found</Text>}
       <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
     </View>
@@ -85,6 +82,8 @@ const styles = StyleSheet.create({
   view: {
     flex: 1,
     padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scrollView: {},
   scrollViewInternalViewToPutItensSideBySide: { flex: 1, flexDirection: "row", flexWrap: "wrap" },
