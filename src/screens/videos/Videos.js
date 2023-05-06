@@ -1,23 +1,39 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { useEffect, useState } from "react";
 import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
 // import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { Divider, useTheme } from '@rneui/themed';
+
+function Line() {
+  const { width } = Dimensions.get('window')
+
+  return (
+      <View style={{
+        borderBottomColor: 'black', 
+        borderBottomWidth: 0.5, 
+        width: 70,
+        marginBottom: 2
+      }} />
+  )
+}
 
 function ExecutionMenu() {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const { theme } = useTheme();
 
   return (
     <>
       {menuIsOpen ?
         <View style={styles.executionMenuOptionsList}>
-          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => setMenuIsOpen(false)}>
+          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {}}>
             <Text>DELETAR</Text>
           </TouchableOpacity>
+          <Line />
           <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => setMenuIsOpen(false)}>
-            <MaterialIcons name="return" size={20} color={'black'} />
+            <AntDesign name="closecircleo" size={18} color={'black'} />
           </TouchableOpacity>
         </View> :
         <TouchableOpacity style={styles.executionMenu} onPress={() => setMenuIsOpen(true)}>
@@ -49,9 +65,6 @@ function Execution({ name, initDate, videoUri }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        {/* <TouchableOpacity style={styles.executionMenu} onBlur={() => {console.log(`onBlur`)}}>
-          <MaterialIcons name="menu" size={20} color={'black'} />
-        </TouchableOpacity> */}
         <ExecutionMenu />
       </View>
     </TouchableOpacity>
@@ -120,6 +133,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  executionMenuOptionsList: {width: 50, height: 25},
-  executionMenuOptionItem: { height: 10},
+  executionMenuOptionsList: {
+    position: "absolute",
+    right: 7,
+    top: 7,
+    width: 80,
+    height: 45,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  executionMenuOptionItem: { height: 20 },
 }); 
