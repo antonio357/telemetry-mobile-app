@@ -6,6 +6,27 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 // import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 
+function ExecutionMenu() {
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
+  return (
+    <>
+      {menuIsOpen ?
+        <View style={styles.executionMenuOptionsList}>
+          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => setMenuIsOpen(false)}>
+            <Text>DELETAR</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => setMenuIsOpen(false)}>
+            <MaterialIcons name="return" size={20} color={'black'} />
+          </TouchableOpacity>
+        </View> :
+        <TouchableOpacity style={styles.executionMenu} onPress={() => setMenuIsOpen(true)}>
+          <MaterialIcons name="menu" size={20} color={'black'} />
+        </TouchableOpacity>}
+    </>
+  );
+}
+
 function Execution({ name, initDate, videoUri }) {
   // const navigation = useNavigation(); 
   // 'file:///data/user/0/host.exp.exponent/cache/VideoThumbnails/360d3210-cc28-4fbd-a457-b6188c6bd21e.jpg'
@@ -28,9 +49,10 @@ function Execution({ name, initDate, videoUri }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        <TouchableOpacity style={styles.executionMenu}>
+        {/* <TouchableOpacity style={styles.executionMenu} onBlur={() => {console.log(`onBlur`)}}>
           <MaterialIcons name="menu" size={20} color={'black'} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <ExecutionMenu />
       </View>
     </TouchableOpacity>
   );
@@ -97,5 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  executionMenuOptionsList: {width: 50, height: 25},
+  executionMenuOptionItem: { height: 10},
 }); 
