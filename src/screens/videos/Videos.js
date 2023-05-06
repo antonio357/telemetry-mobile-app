@@ -5,7 +5,6 @@ import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
 // import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-import { Divider, useTheme } from '@rneui/themed';
 
 function Line() {
   const { width } = Dimensions.get('window')
@@ -20,9 +19,8 @@ function Line() {
   )
 }
 
-function ExecutionMenu() {
+function ExecutionMenu({id, videoUri}) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
-  const { theme } = useTheme();
 
   return (
     <>
@@ -43,7 +41,7 @@ function ExecutionMenu() {
   );
 }
 
-function Execution({ name, initDate, videoUri }) {
+function Execution({ id, name, initDate, videoUri }) {
   // const navigation = useNavigation(); 
   // 'file:///data/user/0/host.exp.exponent/cache/VideoThumbnails/360d3210-cc28-4fbd-a457-b6188c6bd21e.jpg'
   const [thumbnailImageUri, setThumbnailImageUri] = useState('');
@@ -65,7 +63,7 @@ function Execution({ name, initDate, videoUri }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        <ExecutionMenu />
+        <ExecutionMenu executionId={id} videoUri={videoUri}/>
       </View>
     </TouchableOpacity>
   );
