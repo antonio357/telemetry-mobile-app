@@ -5,10 +5,9 @@ import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
 // import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import * as MediaLibrary from "expo-media-library";
 
 function Line() {
-  const { width } = Dimensions.get('window')
-
   return (
       <View style={{
         borderBottomColor: 'black', 
@@ -19,14 +18,19 @@ function Line() {
   )
 }
 
-function ExecutionMenu({id, videoUri}) {
+function ExecutionMenu({executionId, videoUri}) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   return (
     <>
       {menuIsOpen ?
         <View style={styles.executionMenuOptionsList}>
-          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {}}>
+          <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {
+            // DbOperations.removeExecution(executionId);
+            MediaLibrary.deleteAssetsAsync([videoUri])
+            .then(obj => console.log(`deleteAssetsAsync videoUri = ${videoUri}, obj =  ${JSON.stringify(obj)}`))
+            .catch(e => console.log(`e = ${JSON.stringify(e)}, videoUri = ${videoUri}`));
+          }}>
             <Text>DELETAR</Text>
           </TouchableOpacity>
           <Line />
@@ -90,11 +94,11 @@ export default function Videos({ navigation }) {
         <ScrollView style={styles.scrollView}>
           <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
+            {/* {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
+            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)} */}
           </View>
         </ScrollView>
         : <Text>no executions found</Text>}
