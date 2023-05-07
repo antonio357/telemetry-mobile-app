@@ -5,20 +5,20 @@ import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
 // import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from 'expo-file-system';
 
 function Line() {
   return (
-      <View style={{
-        borderBottomColor: 'black', 
-        borderBottomWidth: 0.5, 
-        width: 70,
-        marginBottom: 2
-      }} />
+    <View style={{
+      borderBottomColor: 'black',
+      borderBottomWidth: 0.5,
+      width: 70,
+      marginBottom: 2
+    }} />
   )
 }
 
-function ExecutionMenu({executionId, videoUri}) {
+function ExecutionMenu({ executionId, videoUri }) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   return (
@@ -26,10 +26,8 @@ function ExecutionMenu({executionId, videoUri}) {
       {menuIsOpen ?
         <View style={styles.executionMenuOptionsList}>
           <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {
-            // DbOperations.removeExecution(executionId);
-            MediaLibrary.deleteAssetsAsync([videoUri])
-            .then(obj => console.log(`deleteAssetsAsync videoUri = ${videoUri}, obj =  ${JSON.stringify(obj)}`))
-            .catch(e => console.log(`e = ${JSON.stringify(e)}, videoUri = ${videoUri}`));
+            DbOperations.removeExecution(executionId);
+            FileSystem.deleteAsync(videoUri).then(obj => console.log(`obj =${JSON.stringify(obj)}`)).catch(e => console.log(`e = ${JSON.stringify(e)}`));
           }}>
             <Text>DELETAR</Text>
           </TouchableOpacity>
@@ -67,7 +65,7 @@ function Execution({ id, name, initDate, videoUri }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        <ExecutionMenu executionId={id} videoUri={videoUri}/>
+        <ExecutionMenu executionId={id} videoUri={videoUri} />
       </View>
     </TouchableOpacity>
   );
