@@ -109,7 +109,6 @@ let actualPositionMillis = 0;
 export default function ExecutionPlayer({ execution }) {
   const [executionConfig, setExecutionConfig] = useState({});
   const [portsConfig, setPortsConfig] = useState({});
-  const logs = {};
 
   useEffect(() => {
     (async () => {
