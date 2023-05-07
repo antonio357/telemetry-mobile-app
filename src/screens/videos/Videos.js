@@ -18,7 +18,7 @@ function Line() {
   )
 }
 
-function ExecutionMenu({ executionId, videoUri }) {
+function ExecutionMenu({ executionId, videoUri, removeExecution }) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   return (
@@ -27,7 +27,8 @@ function ExecutionMenu({ executionId, videoUri }) {
         <View style={styles.executionMenuOptionsList}>
           <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {
             DbOperations.removeExecution(executionId);
-            FileSystem.deleteAsync(videoUri).then(obj => console.log(`obj =${JSON.stringify(obj)}`)).catch(e => console.log(`e = ${JSON.stringify(e)}`));
+            removeExecution(executionId);
+            // FileSystem.deleteAsync(videoUri).then(obj => console.log(`obj =${JSON.stringify(obj)}`)).catch(e => console.log(`e = ${JSON.stringify(e)}`));
           }}>
             <Text>DELETAR</Text>
           </TouchableOpacity>
@@ -43,7 +44,7 @@ function ExecutionMenu({ executionId, videoUri }) {
   );
 }
 
-function Execution({ id, name, initDate, videoUri }) {
+function Execution({ id, name, initDate, videoUri, removeExecution }) {
   // const navigation = useNavigation(); 
   // 'file:///data/user/0/host.exp.exponent/cache/VideoThumbnails/360d3210-cc28-4fbd-a457-b6188c6bd21e.jpg'
   const [thumbnailImageUri, setThumbnailImageUri] = useState('');
@@ -65,7 +66,7 @@ function Execution({ id, name, initDate, videoUri }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        <ExecutionMenu executionId={id} videoUri={videoUri} />
+        <ExecutionMenu executionId={id} removeExecution={removeExecution} videoUri={videoUri} />
       </View>
     </TouchableOpacity>
   );
@@ -76,6 +77,9 @@ export default function Videos({ navigation }) {
   /* allExecutions = [{"id":2,"name":"temporary name","initDate":"2023-5-1","initTime":"20:40:16:483","endTime":"",
   "videoUri":"file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ftelemetry-mobile-app-7b0b405f-9f51-43ee-8c03-7c233789326a/Camera/aad3124b-ffdf-4dfb-873a-95e32a3077c6.mp4"}]*/
   const [allExecutions, setAllExecutions] = useState([]);
+  const removeExecution = executionId => {
+    setAllExecutions(allExecutions.filter(execution => execution.id != executionId));
+  }
 
   useEffect(() => {
     (async () => {
@@ -91,7 +95,7 @@ export default function Videos({ navigation }) {
       {allExecutions.length > 0 ?
         <ScrollView style={styles.scrollView}>
           <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
+            {allExecutions.map(execution => <Execution {...execution} removeExecution={removeExecution} key={execution.id} />)}
           </View>
         </ScrollView>
         : <Text>no executions found</Text>}
