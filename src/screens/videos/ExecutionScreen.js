@@ -2,6 +2,7 @@ import { Text, View, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import DbOperations from "../../database/DbOperations";
 import { ScreenBase } from "../common/ScreenBase";
+import ExecutionPlayer from "../../player/ExecutionPlayer";
 
 export default function ExecutionScreen({ route, navigation }) {
     const { executionId } = route.params;
@@ -10,7 +11,9 @@ export default function ExecutionScreen({ route, navigation }) {
     useEffect(() => {
         (async () => {
             if (executionId && typeof executionId === 'number') {
-                setExecution(await DbOperations.findExecution(executionId));
+                const auxExecution = await DbOperations.findExecution(executionId);
+                auxExecution.executionId = auxExecution.id;
+                setExecution(auxExecution);
             }
         })();
     }, []);
@@ -18,7 +21,7 @@ export default function ExecutionScreen({ route, navigation }) {
     let screen = <></>;
     if (executionId && typeof executionId === 'number') {
         if (execution) {
-            screen = <></>;
+            screen = <ExecutionPlayer execution={execution} />;
         } else {
             screen = <Text>Could not find an execution from id {executionId}</Text>;
         }
@@ -27,10 +30,10 @@ export default function ExecutionScreen({ route, navigation }) {
     }
 
     return (
-        <View style={styles.returnView}>
+        <>
             {screen}
             <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-        </View>
+        </>
     );
 }
 
