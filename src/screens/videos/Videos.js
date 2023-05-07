@@ -1,11 +1,11 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { ScreenBase } from "../common/ScreenBase";
 import { useEffect, useState } from "react";
 import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
-// import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system';
+// import * as FileSystem from 'expo-file-system';
 
 function Line() {
   return (
@@ -45,7 +45,7 @@ function ExecutionMenu({ executionId, videoUri, removeExecution }) {
 }
 
 function Execution({ id, name, initDate, videoUri, removeExecution }) {
-  // const navigation = useNavigation(); 
+  const navigation = useNavigation();
   // 'file:///data/user/0/host.exp.exponent/cache/VideoThumbnails/360d3210-cc28-4fbd-a457-b6188c6bd21e.jpg'
   const [thumbnailImageUri, setThumbnailImageUri] = useState('');
 
@@ -62,7 +62,7 @@ function Execution({ id, name, initDate, videoUri, removeExecution }) {
 
   return (
     <TouchableOpacity style={styles.execution} onPress={() => {
-      // navigation.navigate('execution-player');
+      navigation.navigate('execution-player', { executionId: id });
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
