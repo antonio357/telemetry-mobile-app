@@ -33,7 +33,7 @@ function ExecutionMenu({ executionId, videoUri }) {
           </TouchableOpacity>
           <Line />
           <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => setMenuIsOpen(false)}>
-            <AntDesign name="closecircleo" size={18} color={'black'} />
+            <AntDesign name="closecircleo" size={20} color={'black'} />
           </TouchableOpacity>
         </View> :
         <TouchableOpacity style={styles.executionMenu} onPress={() => setMenuIsOpen(true)}>
@@ -133,11 +133,11 @@ const styles = StyleSheet.create({
     right: 7,
     top: 7,
     width: 80,
-    height: 45,
+    height: 50,
     backgroundColor: 'white',
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  executionMenuOptionItem: { height: 20 },
+  executionMenuOptionItem: { height: 22 },
 }); 
