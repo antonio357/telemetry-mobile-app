@@ -3,6 +3,7 @@ import RegisteredSniffers from '../screens/sniffers/RegisteredSniffers';
 import Sensores from '../screens/sensores/Sensores';
 import Videos from '../screens/videos/Videos';
 import Recording from '../screens/recording/Recording';
+import ExecutionScreen from '../screens/videos/ExecutionScreen';
 
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
@@ -48,6 +49,11 @@ export function AppRoutes() {
         options={{
           drawerIcon: () => <MaterialIcons name="photo-camera" size={defaultIconStyles.size} color={defaultIconStyles.color} />
         }}
+      />
+      <Screen
+        name="execution-player"
+        options={{ drawerItemStyle: { display: 'none' } }} // telas que não tem icone no drawer so são acessíveis por links de outras telas
+        component={ExecutionScreen}
       />
     </Navigator >
   )
