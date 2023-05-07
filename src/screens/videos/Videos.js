@@ -92,11 +92,6 @@ export default function Videos({ navigation }) {
         <ScrollView style={styles.scrollView}>
           <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
             {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {/* {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)}
-            {allExecutions.map(execution => <Execution {...execution} key={execution.id} />)} */}
           </View>
         </ScrollView>
         : <Text>no executions found</Text>}
@@ -114,7 +109,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {},
   scrollViewInternalViewToPutItensSideBySide: { flex: 1, flexDirection: "row", flexWrap: "wrap" },
-  execution: { width: '45%', height: 150, marginBottom: 10, marginLeft: 10 },
+  execution: { width: 150, height: 150, marginBottom: 10, marginLeft: 10 },
   thumbnail: { width: '100%', height: 150, borderRadius: 10 },
   noThumbnailView: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
