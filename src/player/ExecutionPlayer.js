@@ -24,7 +24,8 @@ class DbLogsChart {
     this.queryBufferLimit = 30000;
     this.queryBuffer = [];
     this.queryBufferWindowIndexes = { begin: -1, end: -1 }
-    this.lasPositionCall = null;
+    this.playerStoppedLastCallTimeline = -1;
+    this.playerIsRunningLastCallTimeline = -1;
   }
 
   getPath = () => {
@@ -61,9 +62,10 @@ class DbLogsChart {
   }
 
   playerStopped = async timelinePosition => {
-    if (timelinePosition == this.lasPositionCall) return;
+    this.playerIsRunningLastCallTimeline = -1;
+    if (timelinePosition == this.playerStoppedLastCallTimeline) return;
 
-    this.lasPositionCall = timelinePosition;
+    this.playerStoppedLastCallTimeline = timelinePosition;
     this.queryBuffer = await DbOperations.findLogsByPort(this.queryPort, timelinePosition);
     // console.log(`timelinePosition = ${timelinePosition}`);
     // console.log(`this.queryBuffer.length = ${this.queryBuffer.length}`);
@@ -97,7 +99,23 @@ class DbLogsChart {
   }
 
   playerIsRunning = timelinePosition => {
-
+    if (this.playerIsRunningLastCallTimeline > -1) {
+      const timePassed = timelinePosition - this.playerIsRunningLastCallTimeline;
+      const previousLastIndex = this.queryBufferWindowIndexes.end;
+      let newLastIndex = this.queryBufferWindowIndexes.end;
+      for (let i = this.queryBufferWindowIndexes.end; i < this.queryBuffer.length; i++) {
+        if (this.queryBuffer[i].time - this.queryBuffer[previousLastIndex].time >= timePassed) {
+          newLastIndex = i;
+          break;
+        }
+      }
+      console.log(`playerIsRunning pushed ${newLastIndex - previousLastIndex} data`);
+      this.path.rewind();
+      for (let j = previousLastIndex + 1; j < newLastIndex + 1; j++) {
+        this.pushData(this.queryBuffer[j]);
+      }
+    }
+    this.playerIsRunningLastCallTimeline = timelinePosition;
   }
 }
 
@@ -159,6 +177,7 @@ export default function ExecutionPlayer({ execution }) {
     <>
       <VideoPlayer
         style={styles.video}
+        // progressUpdateIntervalMillis={100}
         videoProps={{
           source: {
             // resizeMode: ResizeMode.CONTAIN,
@@ -168,12 +187,12 @@ export default function ExecutionPlayer({ execution }) {
         playbackCallback={obj => {
           // const obj =  {"isMuted":false,"isBuffering":false,"audioPan":0,"uri":"/data/user/0/host.exp.exponent/cache/ExperienceData/%40antonio357%2Ftelemetry-mobile-app/Camera/c7b797b4-f741-4898-9a8b-738a248c840a.mp4","shouldPlay":false,"durationMillis":5461,"isLoaded":true,"didJustFinish":false,"androidImplementation":"SimpleExoPlayer","isLooping":false,"progressUpdateIntervalMillis":500,"volume":1,"playableDurationMillis":5461,"shouldCorrectPitch":false,"isPlaying":false,"rate":1,"positionMillis":5461}
           const { isPlaying, positionMillis } = obj;
-          console.log(`playbackCallback {isPlaying: ${isPlaying}, positionMillis: ${positionMillis}} `);
+          const keys = Object.keys(portsConfig);
+          // console.log(`playbackCallback {isPlaying: ${isPlaying}, positionMillis: ${positionMillis}} `);
           if (isPlaying) {
-
+            for (let i = 0; i < 1; i++) portsConfig[keys[i]].chart.playerIsRunning(positionMillis);
           } else {
-            const keys = Object.keys(portsConfig);
-            for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerStopped(positionMillis);
+            for (let i = 0; i < 1; i++) portsConfig[keys[i]].chart.playerStopped(positionMillis);
           }
         }}
       />
