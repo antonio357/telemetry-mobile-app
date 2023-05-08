@@ -189,9 +189,9 @@ export default function ExecutionPlayer({ execution }) {
           const keys = Object.keys(portsConfig);
           // console.log(`playbackCallback {isPlaying: ${isPlaying}, positionMillis: ${positionMillis}} `);
           if (isPlaying) {
-            for (let i = 0; i < 1; i++) portsConfig[keys[i]].chart.playerIsRunning(positionMillis);
+            for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerIsRunning(positionMillis);
           } else {
-            for (let i = 0; i < 1; i++) portsConfig[keys[i]].chart.playerStopped(positionMillis);
+            for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerStopped(positionMillis);
           }
         }}
       />
