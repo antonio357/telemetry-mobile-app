@@ -109,8 +109,7 @@ class DbLogsChart {
           break;
         }
       }
-      console.log(`playerIsRunning pushed ${newLastIndex - previousLastIndex} data`);
-      this.path.rewind();
+      this.queryBufferWindowIndexes.end = newLastIndex;
       for (let j = previousLastIndex + 1; j < newLastIndex + 1; j++) {
         this.pushData(this.queryBuffer[j]);
       }
