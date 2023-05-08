@@ -1,10 +1,12 @@
-import { StyleSheet, View, ScrollView} from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { Video } from "expo-av";
 import DbOperations from "../database/DbOperations.js";
 import { useEffect, useState } from "react";
 import { ChartCardsList } from "../charts/ChartCardsList.js";
 import { Skia } from "@shopify/react-native-skia";
 import { CanvasDimensions } from "../charts/CanvasDimensions.js";
+import { VideoPlayer } from './index.tsx';
+// import { ResizeMode } from 'expo-av';
 
 
 class DbLogsChart {
@@ -49,7 +51,6 @@ class DbLogsChart {
   }
 
   loadWindow = () => {
-    // console.log(`loadWindow = ${JSON.stringify(this.queryBufferWindowIndexes)}`);
     const data = this.queryBuffer[this.queryBufferWindowIndexes.begin];
     const y = ((this.yBounds.max - parseInt(data.value)) * this.dimensionsUnits.y);
     const x = (data.time - this.lastPointTime) * this.dimensionsUnits.x;
@@ -58,7 +59,6 @@ class DbLogsChart {
     for (let i = this.queryBufferWindowIndexes.begin + 1; i < this.queryBufferWindowIndexes.end + 1; i++) {
       this.pushData(this.queryBuffer[i]);
     }
-    // console.log(`loadWindow = ${this.path.toSVGString()}`);
   }
 
   playerStopped = async timelinePosition => {
@@ -101,10 +101,6 @@ class DbLogsChart {
 
   }
 }
-
-let playerStoppedTimer = null;
-let lastOnPlaybackStatusUpdateEventTime = Date.now();
-let actualPositionMillis = 0;
 
 export default function ExecutionPlayer({ execution }) {
   const [executionConfig, setExecutionConfig] = useState({});
@@ -162,29 +158,26 @@ export default function ExecutionPlayer({ execution }) {
 
   return (
     <>
-      <View style={styles.viewContainer}>
-        <Video
-          style={styles.video}
-          source={{ uri: execution.videoUri }}
-          useNativeControls
-          onPlaybackStatusUpdate={(obj) => {
-            lastOnPlaybackStatusUpdateEventTime = Date.now();
-            const { isPlaying, durationMillis, positionMillis, isBuffering } = obj;
-            actualPositionMillis = positionMillis;
-            // capturePositionMillis(positionMillis);
-            if (!isBuffering) {
-              clearTimeout(playerStoppedTimer);
-              playerStoppedTimer = setTimeout(() => {
-                if (Date.now() - lastOnPlaybackStatusUpdateEventTime >= 1000) {
-                  // console.log(`PLAYER STOPPED`);
-                  const keys = Object.keys(portsConfig);
-                  for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerStopped(actualPositionMillis);
-                }
-              }, 1000);
-            };
-          }}
-        />
-      </View>
+      <VideoPlayer
+        style={styles.video}
+        videoProps={{
+          source: {
+            // resizeMode: ResizeMode.CONTAIN,
+            uri: execution.videoUri,
+          },
+        }}
+        playbackCallback={obj => {
+          // const obj =  {"isMuted":false,"isBuffering":false,"audioPan":0,"uri":"/data/user/0/host.exp.exponent/cache/ExperienceData/%40antonio357%2Ftelemetry-mobile-app/Camera/c7b797b4-f741-4898-9a8b-738a248c840a.mp4","shouldPlay":false,"durationMillis":5461,"isLoaded":true,"didJustFinish":false,"androidImplementation":"SimpleExoPlayer","isLooping":false,"progressUpdateIntervalMillis":500,"volume":1,"playableDurationMillis":5461,"shouldCorrectPitch":false,"isPlaying":false,"rate":1,"positionMillis":5461}
+          const { isPlaying, positionMillis } = obj;
+          console.log(`playbackCallback {isPlaying: ${isPlaying}, positionMillis: ${positionMillis}} `);
+          if (isPlaying) {
+
+          } else {
+            const keys = Object.keys(portsConfig);
+            for (let i = 0; i < keys.length; i++) portsConfig[keys[i]].chart.playerStopped(positionMillis);
+          }
+        }}
+      />
       <ScrollView>
         <View style={styles.ButtonAndScrollView}>
           <ChartCardsList sensorConfigsArray={Object.values(portsConfig)} />
@@ -196,10 +189,8 @@ export default function ExecutionPlayer({ execution }) {
 
 const styles = StyleSheet.create({
   ButtonAndScrollView: { marginHorizontal: 10, marginTop: 24 },
-  viewContainer: {
-    height: 300,
-  },
   video: {
     flex: 1,
+    height: 300,
   },
 });
