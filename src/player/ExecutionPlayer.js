@@ -1,5 +1,4 @@
 import { StyleSheet, View, ScrollView } from "react-native";
-import { Video } from "expo-av";
 import DbOperations from "../database/DbOperations.js";
 import { useEffect, useState } from "react";
 import { ChartCardsList } from "../charts/ChartCardsList.js";
