@@ -197,10 +197,10 @@ const findLogsByPort = async (portId, logsTime, bufferLimit = 30000) => {
   }
 }
 
-// const findLogsByPortAndInterval = async (portId, interval, bufferLimit = 15000) => {
-//   const { begin, end } = interval;
-//   return await Logs.findLogsBuffer(portId, { begin, end }, bufferLimit);
-// }
+const findLogsByPortAndInterval = async (portId, interval, bufferLimit = 15000) => {
+  const { begin, end } = interval;
+  return await Logs.findLogsBuffer(portId, { begin, end }, bufferLimit);
+}
 
 const getAllExecutions = async () => {
   return await Executions.getAllRecords();
@@ -228,6 +228,6 @@ export default {
   findLastExecutionInfo,
   findAllLogsByPortId,
   findLogsByPort,
-  // findLogsByPortAndInterval,
+  findLogsByPortAndInterval,
   getAllExecutions,
 };

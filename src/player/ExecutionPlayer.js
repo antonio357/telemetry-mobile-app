@@ -98,22 +98,17 @@ class DbLogsChart {
     this.loadWindow();
   }
 
-  // buffer = async () => {
-  //   const lastBufferDataTime = this.queryBuffer[this.queryBuffer.length - 1].time;
-  //   const newDataBuffer = await DbOperations.findLogsByPortAndInterval(this.queryPort, { begin: lastBufferDataTime, end: lastBufferDataTime + 13000 }, 15000);
-  //   const diff = Math.abs(this.queryBufferLimit - (this.queryBuffer.length + newDataBuffer.length));
-  //   this.queryBuffer = [...this.queryBuffer.slice(diff), ...this.newDataBuffer];
-  //   this.queryBufferWindowIndexes.end -= diff;
-  //   if (this.queryBufferWindowIndexes.end < 0) this.queryBufferWindowIndexes.end = 0;
-  // }
+  buffer = async () => {
+    const lastBufferDataTime = this.queryBuffer[this.queryBuffer.length - 1].time;
+    const newDataBuffer = await DbOperations.findLogsByPortAndInterval(this.queryPort, { begin: lastBufferDataTime, end: lastBufferDataTime + 13000 }, 15000);
+    const diff = Math.abs(this.queryBufferLimit - (this.queryBuffer.length + newDataBuffer.length));
+    this.queryBuffer = [...this.queryBuffer.slice(diff), ...newDataBuffer];
+    this.queryBufferWindowIndexes.end -= diff;
+    if (this.queryBufferWindowIndexes.end < 0) this.queryBufferWindowIndexes.end = 0;
+  }
 
   playerIsRunning = timelinePosition => {
-    const timeLeftOnBuffer = this.queryBuffer[this.queryBuffer.length - 1].time - this.queryBuffer[this.queryBufferWindowIndexes.end].time;
-    if (timeLeftOnBuffer <= 3000) {
-      this.playerStopped(timelinePosition);
-    }
-    
-    else if (this.playerIsRunningLastCallTimeline > -1) {
+    if (this.playerIsRunningLastCallTimeline > -1) {
       const timePassed = timelinePosition - this.playerIsRunningLastCallTimeline;
       const previousLastIndex = this.queryBufferWindowIndexes.end;
       let newLastIndex = this.queryBufferWindowIndexes.end;
@@ -130,10 +125,10 @@ class DbLogsChart {
     }
     this.playerIsRunningLastCallTimeline = timelinePosition;
 
-    // const timeLeftOnBuffer = this.queryBuffer[this.queryBuffer.length - 1].time - this.queryBuffer[this.queryBufferWindowIndexes.end].time;
-    // if (timeLeftOnBuffer <= 3000) {
-    //   this.buffer();
-    // }
+    const timeLeftOnBuffer = this.queryBuffer[this.queryBuffer.length - 1].time - this.queryBuffer[this.queryBufferWindowIndexes.end].time;
+    if (timeLeftOnBuffer <= 3000) {
+      this.buffer();
+    }
   }
 }
 
