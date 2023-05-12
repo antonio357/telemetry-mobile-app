@@ -62,7 +62,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setIsRecording(true);
     let options = {
       quality: "1080p",
-      maxDuration: 60,
+      maxDuration: 60 * 30, // 60 segundos * 30 = 30 min
       mute: false,
     };
 
