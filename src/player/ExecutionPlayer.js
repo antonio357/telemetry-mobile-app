@@ -182,7 +182,7 @@ export default function ExecutionPlayer({ execution }) {
         setPortsConfig(ptsConfig);
       });
     })();
-  }, [])
+  }, [execution])
 
   if (Object.values(executionConfig).length == 0) return <></>;
 

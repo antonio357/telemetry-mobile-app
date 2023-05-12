@@ -16,7 +16,7 @@ export default function ExecutionScreen({ route, navigation }) {
                 setExecution(auxExecution);
             }
         })();
-    }, []);
+    }, [executionId]);
 
     let screen = <></>;
     if (executionId && typeof executionId === 'number') {
