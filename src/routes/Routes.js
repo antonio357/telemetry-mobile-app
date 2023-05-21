@@ -4,7 +4,6 @@ import Sensores from '../screens/sensores/Sensores';
 import Videos from '../screens/videos/Videos';
 import Recording from '../screens/recording/Recording';
 import ExecutionScreen from '../screens/videos/ExecutionScreen';
-
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 
@@ -19,6 +18,9 @@ export function AppRoutes() {
   return (
     <Navigator
       screenOptions={{
+        /* unmountOnBlur: true, faz com que as telas sejam que não estão sendo utilizadas sejam destruídas, 
+         * economiza recursos mem e cpu, além de ser necessário para garantir o refresh das telas cada vez que forem acessadas */
+        unmountOnBlur: true,
         headerShown: false,
       }}
     >
@@ -52,7 +54,8 @@ export function AppRoutes() {
       />
       <Screen
         name="execution-player"
-        options={{ drawerItemStyle: { display: 'none' } }} // telas que não tem icone no drawer so são acessíveis por links de outras telas
+        /* drawerItemStyle: { display: 'none' } esconde o ícone de seleção no drawer, isso serve para as telas que só devem ser acessadas a partir de outras telas */
+        options={{ drawerItemStyle: { display: 'none' } }}
         component={ExecutionScreen}
       />
     </Navigator >
