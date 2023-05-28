@@ -149,7 +149,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   return (
     <View style={styles.returnView}>
       <View style={styles.viewContainer}>
-        <Camera style={styles.cameraContainer} ref={cameraRef}>
+        <Camera ratio='16:9' style={styles.cameraContainer} ref={cameraRef}>
           <Button
             title={isRecording ? "Stop Recording" : "Record Video"}
             onPress={isRecording ? stopRecording : recordVideo}
