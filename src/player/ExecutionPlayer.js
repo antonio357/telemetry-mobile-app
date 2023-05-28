@@ -5,7 +5,7 @@ import { ChartCardsList } from "../charts/ChartCardsList.js";
 import { Skia } from "@shopify/react-native-skia";
 import { CanvasDimensions } from "../charts/CanvasDimensions.js";
 import { VideoPlayer } from './index.tsx';
-// import { ResizeMode } from 'expo-av';
+import { ResizeMode } from 'expo-av';
 
 
 class DbLogsChart {
@@ -192,8 +192,8 @@ export default function ExecutionPlayer({ execution }) {
         style={styles.video}
         // progressUpdateIntervalMillis={100}
         videoProps={{
+          resizeMode: ResizeMode.STRETCH,
           source: {
-            // resizeMode: ResizeMode.CONTAIN,
             uri: execution.videoUri,
           },
         }}
