@@ -17,7 +17,7 @@ const init = async () => {
           initDate TEXT, 
           initTime TEXT,
           endTime TEXT,
-          videoUri TEXT);`,
+          videoAsset TEXT);`,
         [],
         (_, { rowsAffected, insertId }) => resolve(console.log(`created ${tableName} table, rowsAffected = ${rowsAffected}, insertId = ${insertId}`)),
         (_, error) => {
@@ -66,7 +66,13 @@ const getAllRecords = () => {
         `SELECT * FROM ${tableName};`,
         [],
         //-----------------------
-        (_, { rows }) => resolve(rows._array),
+        (_, { rows }) => {
+          const appExecutions = rows._array.map(execution => {
+            execution.videoAsset = JSON.parse(execution.videoAsset);
+            return execution;
+          });
+          resolve(appExecutions);
+        },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
     });
@@ -115,7 +121,9 @@ const findExecution = async (executionId) => {
         //-----------------------
         (_, { rows }) => {
           console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
-          resolve(rows._array[0]);
+          const appExecution = rows._array[0];
+          appExecution.videoAsset = JSON.parse(appExecution.videoAsset);
+          resolve(appExecution);
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -133,7 +141,9 @@ const findLastExecution = async (executionId) => {
         //-----------------------
         (_, { rows }) => {
           console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
-          resolve(rows._array[0]);
+          const appExecution = rows._array[0];
+          appExecution.videoAsset = JSON.parse(appExecution.videoAsset);
+          resolve(appExecution);
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -146,12 +156,16 @@ const findAllTempExecutions = async () => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `SELECT * FROM ${tableName} WHERE videoUri IS NULL;`,
+        `SELECT * FROM ${tableName} WHERE videoAsset IS NULL;`,
         [],
         //-----------------------
         (_, { rows }) => {
           console.log(`find ${tableName} rows = ${JSON.stringify(rows)}`);
-          resolve(rows._array);
+          const appExecutions = rows._array.map(execution => {
+            execution.videoAsset = JSON.parse(execution.videoAsset);
+            return execution;
+          });
+          resolve(appExecutions);
         },
         (_, error) => reject(error) // erro interno em tx.executeSql
       );
@@ -160,12 +174,14 @@ const findAllTempExecutions = async () => {
 }
 
 const update = async (id, execution) => {
+  const dbExecution = execution;
+  dbExecution.videoAsset = typeof execution.videoAsset === 'string' ? execution.videoAsset : JSON.stringify(execution.videoAsset);
   return await new Promise((resolve, reject) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        `UPDATE ${tableName} SET name=?, initDate=?, initTime=?, endTime=?, videoUri=? WHERE id=?;`,
-        [execution.name, execution.initDate, execution.initTime, execution.endTime, execution.videoUri, id],
+        `UPDATE ${tableName} SET name=?, initDate=?, initTime=?, endTime=?, videoAsset=? WHERE id=?;`,
+        [dbExecution.name, dbExecution.initDate, dbExecution.initTime, dbExecution.endTime, dbExecution.videoAsset, id],
         //-----------------------
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) resolve(rowsAffected);

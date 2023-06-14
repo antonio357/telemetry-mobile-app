@@ -5,7 +5,24 @@ import DbOperations from "../../database/DbOperations";
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-// import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+
+
+async function deleteAsset(videoAsset) {
+  try {
+    // Request permission to access the media library
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+
+    if (status === 'granted') {
+      await MediaLibrary.deleteAssetsAsync([videoAsset]);
+      console.log('Assets deleted successfully.');
+    } else {
+      console.log('Permission to access the media library was not granted.');
+    }
+  } catch (error) {
+    console.log('An error occurred while deleting assets:', error);
+  }
+}
 
 function Line() {
   return (
@@ -18,7 +35,7 @@ function Line() {
   )
 }
 
-function ExecutionMenu({ executionId, videoUri, removeExecution }) {
+function ExecutionMenu({ executionId, videoAsset, removeExecution }) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   return (
@@ -28,7 +45,7 @@ function ExecutionMenu({ executionId, videoUri, removeExecution }) {
           <TouchableOpacity style={styles.executionMenuOptionItem} onPress={() => {
             DbOperations.removeExecution(executionId);
             removeExecution(executionId);
-            // FileSystem.deleteAsync(videoUri).then(obj => console.log(`obj =${JSON.stringify(obj)}`)).catch(e => console.log(`e = ${JSON.stringify(e)}`));
+            deleteAsset(videoAsset);
           }}>
             <Text>DELETAR</Text>
           </TouchableOpacity>
@@ -44,18 +61,20 @@ function ExecutionMenu({ executionId, videoUri, removeExecution }) {
   );
 }
 
-function Execution({ id, name, initDate, videoUri, removeExecution }) {
+function Execution({ id, name, initDate, videoAsset, removeExecution }) {
   const navigation = useNavigation();
-  // 'file:///data/user/0/host.exp.exponent/cache/VideoThumbnails/360d3210-cc28-4fbd-a457-b6188c6bd21e.jpg'
+  // 'file:///storage/emulated/0/DCIM/1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4'
   const [thumbnailImageUri, setThumbnailImageUri] = useState('');
 
   useEffect(() => {
     (async () => {
-      try {
-        const { uri } = await VideoThumbnails.getThumbnailAsync(videoUri);
-        setThumbnailImageUri(uri);
-      } catch (e) {
-        console.warn(e);
+      if (videoAsset?.uri) {
+        try {
+          const { uri } = await VideoThumbnails.getThumbnailAsync(videoAsset?.uri);
+          setThumbnailImageUri(uri);
+        } catch (e) {
+          console.warn(e);
+        }
       }
     })();
   }, []);
@@ -66,7 +85,7 @@ function Execution({ id, name, initDate, videoUri, removeExecution }) {
     }}>
       <View style={styles.noThumbnailView}>
         {thumbnailImageUri ? <Image source={{ uri: thumbnailImageUri }} style={styles.thumbnail} /> : <Text>no thumbnail avaliable</Text>}
-        <ExecutionMenu executionId={id} removeExecution={removeExecution} videoUri={videoUri} />
+        <ExecutionMenu executionId={id} removeExecution={removeExecution} videoAsset={videoAsset} />
       </View>
     </TouchableOpacity>
   );
@@ -74,8 +93,25 @@ function Execution({ id, name, initDate, videoUri, removeExecution }) {
 
 
 export default function Videos({ navigation }) {
-  /* allExecutions = [{"id":2,"name":"temporary name","initDate":"2023-5-1","initTime":"20:40:16:483","endTime":"",
-  "videoUri":"file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ftelemetry-mobile-app-7b0b405f-9f51-43ee-8c03-7c233789326a/Camera/aad3124b-ffdf-4dfb-873a-95e32a3077c6.mp4"}]*/
+  /* allExecutions = [{
+      "id":2,
+      "name":"temporary name",
+      "initDate":"2023-5-1",
+      "initTime":"20:40:16:483",
+      "endTime":"",
+      "videoAsset":{
+        "mediaType": "video",
+        "modificationTime": 1686517909000,
+        "uri": "file:///storage/emulated/0/DCIM/1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+        "filename": "1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+        "width": 1080,
+        "id": "1000010523",
+        "creationTime": 1686517904000,
+        "albumId": "-2075821635",
+        "height": 1920,
+        "duration": 7.783
+      }
+    }]*/
   const [allExecutions, setAllExecutions] = useState([]);
   const removeExecution = executionId => {
     setAllExecutions(allExecutions.filter(execution => execution.id != executionId));
@@ -88,14 +124,15 @@ export default function Videos({ navigation }) {
     })();
   }, []);
 
-
-
   return (
     <View style={styles.view}>
       {allExecutions.length > 0 ?
         <ScrollView style={styles.scrollView}>
           <View style={styles.scrollViewInternalViewToPutItensSideBySide}>
-            {allExecutions.map(execution => <Execution {...execution} removeExecution={removeExecution} key={execution.id} />)}
+            {allExecutions.map(execution => {
+              console.log(`execution = ${JSON.stringify(execution)}`);
+              return <Execution {...execution} removeExecution={removeExecution} key={execution.id} />;
+            })}
           </View>
         </ScrollView>
         : <Text>no executions found</Text>}

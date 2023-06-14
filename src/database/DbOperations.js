@@ -151,7 +151,7 @@ const findExecutionInfo = async (executionId, logsTime = null) => {
   executionInfo['initDate'] = execution.initDate;
   executionInfo['initTime'] = execution.initTime;
   executionInfo['endTime'] = execution.endTime;
-  executionInfo['videoUri'] = execution.videoUri;
+  executionInfo['videoAsset'] = execution.videoAsset;
   executionInfo['sniffers'] = [];
   const sniffers = await Sniffers.findSniffers(executionId);
   for (let i = 0; i < sniffers.length; i++) {

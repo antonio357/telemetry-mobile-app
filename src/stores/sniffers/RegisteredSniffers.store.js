@@ -262,9 +262,10 @@ class RegisteredSniffersStore {
     }
   }
 
-  setExecutionVideo = async videoUri => {
+  setExecutionVideo = async asset => {
+    // salva a referencia do video no banco
     const execution = await DbOperations.findLastExecutionInfo();
-    execution['videoUri'] = videoUri;
+    execution['videoAsset'] = asset;
     await DbOperations.updateExecution(execution.id, execution);
   }
 
