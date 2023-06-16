@@ -140,30 +140,41 @@ export default function ExecutionPlayer({ execution }) {
     (async () => {
       DbOperations.findExecutionInfo(execution.executionId).then(executionConfig => {
         setExecutionConfig(executionConfig);
-        // executionConfig = { 
-        //   "id": 2, 
-        //   "name": "new name inserted by user", 
-        //   "initDate": "2023-4-10", 
-        //   "initTime": "17:59:33:793", 
-        //   "endTime": "18:0:6:127", 
-        //   "videoUri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540antonio357%252Ftelemetry-mobile-app/Camera/c75c2da9-b610-4377-9992-26511ad019f8.mp4", 
-        //   "sniffers": [{ 
-        //     "id": 2, 
-        //     "name": "ws://192.168.1.199:81", 
-        //     "wsClientUrl": "ws://192.168.1.199:81", 
-        //     "ports": [{ 
-        //       "id": 3, 
-        //       "name": "port1", 
-        //       "sensorName": "sensor de distância", 
-        //       "sensorType": "ultrassonic" 
-        //     }, { 
-        //       "id": 4, 
-        //       "name": "port2", 
-        //       "sensorName": "sensor de distância", 
-        //       "sensorType": "ultrassonic" 
-        //     }] 
-        //   }] 
-        // }
+        /* executionConfig = { 
+          "id": 2, 
+          "name": "new name inserted by user", 
+          "initDate": "2023-4-10", 
+          "initTime": "17:59:33:793", 
+          "endTime": "18:0:6:127", 
+          "videoAsset": {
+            "mediaType": "video",
+            "modificationTime": 1686517909000,
+            "uri": "file:///storage/emulated/0/DCIM/1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+            "filename": "1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+            "width": 1080,
+            "id": "1000010523",
+            "creationTime": 1686517904000,
+            "albumId": "-2075821635",
+            "height": 1920,
+            "duration": 7.783
+          }, 
+          "sniffers": [{ 
+            "id": 2, 
+            "name": "ws://192.168.1.199:81", 
+            "wsClientUrl": "ws://192.168.1.199:81", 
+            "ports": [{ 
+              "id": 3, 
+              "name": "port1", 
+              "sensorName": "sensor de distância", 
+              "sensorType": "ultrassonic" 
+            }, { 
+              "id": 4, 
+              "name": "port2", 
+              "sensorName": "sensor de distância", 
+              "sensorType": "ultrassonic" 
+            }] 
+          }] 
+        } */
         const ptsConfig = {};
         const sniffers = executionConfig.sniffers;
         for (let i = 0; i < sniffers.length; i++) {
@@ -194,7 +205,7 @@ export default function ExecutionPlayer({ execution }) {
         videoProps={{
           resizeMode: ResizeMode.STRETCH,
           source: {
-            uri: execution.videoUri,
+            uri: execution.videoAsset.uri,
           },
         }}
         playbackCallback={obj => {

@@ -80,28 +80,37 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
   if (video) {
     const execution = getExecutionInfo();
-    execution['videoUri'] = video.uri;
-    // const execution = {
-    //   executionId: 2,
-    //   sniffers: [
-    //     {
-    //       wsClientUrl: "ws://192.168.1.199:81",
-    //       id: 2,
-    //       portIds: [
-    //         { id: 3, portName: "port1" },
-    //         { id: 4, portName: "port2" },
-    //       ],
-    //     },
-    //   ],
-    //   videoUri:
-    //     "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540antonio357%252Ftelemetry-mobile-app/Camera/c75c2da9-b610-4377-9992-26511ad019f8.mp4",
-    // };
+    execution['videoAsset'] = {uri: video.uri};
+    /* const execution = {
+      executionId: 2,
+      sniffers: [
+        {
+          wsClientUrl: "ws://192.168.1.199:81",
+          id: 2,
+          portIds: [
+            { id: 3, portName: "port1" },
+            { id: 4, portName: "port2" },
+          ],
+        },
+      ],
+      videoAsset: {
+        "mediaType": "video",
+        "modificationTime": 1686517909000,
+        "uri": "file:///storage/emulated/0/DCIM/1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+        "filename": "1e37dd68-3a55-462e-9a66-7d2c7dcc77d2.mp4",
+        "width": 1080,
+        "id": "1000010523",
+        "creationTime": 1686517904000,
+        "albumId": "-2075821635",
+        "height": 1920,
+        "duration": 7.783
+      },
+    }; */
 
-    let saveVideo = () => {
-      MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
-        setExecutionVideo(video.uri);
-        setVideo(undefined);
-      });
+    let saveVideo = async () => {
+      const asset = await MediaLibrary.createAssetAsync(video.uri);
+      setExecutionVideo(asset);
+      setVideo(undefined);
     };
 
     return (
