@@ -61,7 +61,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     startLogs();
     setIsRecording(true);
     let options = {
-      quality: "1080p",
+      quality: "480p",
       maxDuration: 60 * 30, // 60 segundos * 30 = 30 min
       mute: false,
     };
@@ -158,7 +158,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   return (
     <View style={styles.returnView}>
       <View style={styles.viewContainer}>
-        <Camera ratio='16:9' style={styles.cameraContainer} ref={cameraRef}>
+        <Camera style={styles.cameraContainer} ref={cameraRef}>
           <Button
             title={isRecording ? "Stop Recording" : "Record Video"}
             onPress={isRecording ? stopRecording : recordVideo}
