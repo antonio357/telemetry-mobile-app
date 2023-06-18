@@ -62,7 +62,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setIsRecording(true);
     let options = {
       quality: "480p",
-      maxDuration: 60 * 30, // 60 segundos * 30 = 30 min
+      maxDuration: 30 * 60, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
       mute: false,
     };
 
@@ -80,7 +80,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
   if (video) {
     const execution = getExecutionInfo();
-    execution['videoAsset'] = {uri: video.uri};
+    execution['videoAsset'] = { uri: video.uri };
     /* const execution = {
       executionId: 2,
       sniffers: [
@@ -158,7 +158,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   return (
     <View style={styles.returnView}>
       <View style={styles.viewContainer}>
-        <Camera style={styles.cameraContainer} ref={cameraRef}>
+        <Camera style={styles.cameraContainer} ref={cameraRef} >
           <Button
             title={isRecording ? "Stop Recording" : "Record Video"}
             onPress={isRecording ? stopRecording : recordVideo}
