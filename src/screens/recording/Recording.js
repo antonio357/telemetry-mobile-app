@@ -15,6 +15,31 @@ import { observer, inject } from "mobx-react";
 import DbOperations from "../../database/DbOperations";
 import ExecutionPlayer from "../../player/ExecutionPlayer";
 
+let thread = null;
+let timeoutEvent = null;
+
+const TimerDisplay = () => {
+  const [timer, setTimer] = useState(3);
+
+  useEffect(() => {
+    thread = setInterval(() => {
+      console.log(`called setInterval`);
+      setTimer((timer) => {
+        if (timer > 0) return timer - 1;
+        else {
+          return timer;
+        }
+      });
+    }, 1000);
+  }, []);
+
+  return (
+    <View style={styles.timerBackground}>
+      <Text style={styles.timer}>{timer}</Text>
+    </View>
+  );
+}
+
 function Recording({ navigation, RegisteredSniffersStore }) {
   const {
     startLogs,
@@ -22,6 +47,8 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setExecutionVideo,
     getExecutionInfo,
   } = RegisteredSniffersStore;
+
+  const [timeOutComponent, setTimeOutComponent] = useState(null);
 
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -62,23 +89,28 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setIsRecording(true);
     let options = {
       quality: "480p",
-      maxDuration: 30 * 60, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
+      maxDuration: 5, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
       mute: false,
     };
 
     cameraRef.current.recordAsync(options).then((recordedVideo) => {
+      // this is called when stopRecording(), maxDuration o maxFileSize is reached
+      stopLogs();
       setVideo(recordedVideo);
       setIsRecording(false);
     });
-  };
 
-  let stopRecording = () => {
-    setIsRecording(false);
-    cameraRef.current.stopRecording();
-    stopLogs();
+    timeoutEvent = setTimeout(() => {
+      setTimeOutComponent(<TimerDisplay />);
+    }, 2000);
   };
 
   if (video) {
+    clearInterval(thread);
+    thread = null;
+    clearTimeout(timeoutEvent);
+    timeoutEvent = null;
+    // setTimeOutComponent(null);
     const execution = getExecutionInfo();
     execution['videoAsset'] = { uri: video.uri };
     /* const execution = {
@@ -161,8 +193,9 @@ function Recording({ navigation, RegisteredSniffersStore }) {
         <Camera style={styles.cameraContainer} ref={cameraRef} >
           <Button
             title={isRecording ? "Stop Recording" : "Record Video"}
-            onPress={isRecording ? stopRecording : recordVideo}
+            onPress={isRecording ? () => { cameraRef.current.stopRecording(); } : recordVideo}
           />
+          {timeOutComponent}
         </Camera>
       </View>
       <ScrollView>
@@ -198,6 +231,18 @@ const styles = StyleSheet.create({
   returnView: {
     flex: 1,
   },
+  timer: {
+    fontSize: 20,
+    color: 'white',
+  },
+  timerBackground: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Half the width and height to create a circle
+    backgroundColor: '#3B3B3B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
 
 export default inject("RegisteredSniffersStore")(observer(Recording));
