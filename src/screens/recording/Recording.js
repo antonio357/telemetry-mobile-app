@@ -4,7 +4,6 @@ import {
   View,
   Button,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState, useRef } from "react";
 import { Camera } from "expo-camera";
@@ -13,7 +12,6 @@ import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from "../../screens/sensores/SensoresList.js";
 import { observer, inject } from "mobx-react";
 import DbOperations from "../../database/DbOperations";
-import ExecutionPlayer from "../../player/ExecutionPlayer";
 
 let thread = null;
 let timeoutEvent = null;
@@ -44,7 +42,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
   const {
     startLogs,
     stopLogs,
-    setExecutionVideo,
     getExecutionInfo,
   } = RegisteredSniffersStore;
 
@@ -98,6 +95,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
       stopLogs();
       setVideo(recordedVideo);
       setIsRecording(false);
+      // navigation.navigate('execution-preview', {video: recordedVideo, execution});
     });
 
     timeoutEvent = setTimeout(() => {
@@ -139,52 +137,54 @@ function Recording({ navigation, RegisteredSniffersStore }) {
       },
     }; */
 
-    let saveVideo = async () => {
-      const asset = await MediaLibrary.createAssetAsync(video.uri);
-      setExecutionVideo(asset);
-      setVideo(undefined);
-    };
+    navigation.navigate('execution-preview', { execution: execution });
 
-    return (
-      <>
-        <ExecutionPlayer execution={execution} />
-        {hasMediaLibraryPermission ? (
-          <TouchableOpacity
-            style={{
-              position: "absolute",
-              width: 45,
-              height: 40,
-              alignItems: "center",
-              justifyContent: "center",
-              left: 100,
-              bottom: 10,
-              backgroundColor: "#1299FA",
-              borderRadius: 2,
-            }}
-            onPress={saveVideo}
-          >
-            <Text style={{ color: "white" }}>SAVE</Text>
-          </TouchableOpacity>
-        ) : undefined}
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            width: 70,
-            height: 40,
-            alignItems: "center",
-            justifyContent: "center",
-            left: 180,
-            bottom: 10,
-            backgroundColor: "#1299FA",
-            borderRadius: 2,
-          }}
-          onPress={() => setVideo(undefined)}
-        >
-          <Text style={{ color: "white" }}>DISCARD</Text>
-        </TouchableOpacity>
-        <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-      </>
-    );
+    // let saveVideo = async () => {
+    //   const asset = await MediaLibrary.createAssetAsync(video.uri);
+    //   setExecutionVideo(asset);
+    //   setVideo(undefined);
+    // };
+
+    // return (
+    //   <>
+    //     <ExecutionPlayer execution={execution} />
+    //     {hasMediaLibraryPermission ? (
+    //       <TouchableOpacity
+    //         style={{
+    //           position: "absolute",
+    //           width: 45,
+    //           height: 40,
+    //           alignItems: "center",
+    //           justifyContent: "center",
+    //           left: 100,
+    //           bottom: 10,
+    //           backgroundColor: "#1299FA",
+    //           borderRadius: 2,
+    //         }}
+    //         onPress={saveVideo}
+    //       >
+    //         <Text style={{ color: "white" }}>SAVE</Text>
+    //       </TouchableOpacity>
+    //     ) : undefined}
+    //     <TouchableOpacity
+    //       style={{
+    //         position: "absolute",
+    //         width: 70,
+    //         height: 40,
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //         left: 180,
+    //         bottom: 10,
+    //         backgroundColor: "#1299FA",
+    //         borderRadius: 2,
+    //       }}
+    //       onPress={() => setVideo(undefined)}
+    //     >
+    //       <Text style={{ color: "white" }}>DISCARD</Text>
+    //     </TouchableOpacity>
+    //     <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
+    //   </>
+    // );
   }
 
   return (
