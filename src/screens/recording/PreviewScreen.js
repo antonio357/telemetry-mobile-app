@@ -34,8 +34,8 @@ function PreviewScreen({ route, navigation, RegisteredSniffersStore }) {
                 {hasMediaLibraryPermission ? (
                     <TouchableOpacity
                         style={styles.saveButton}
-                        onPress={() => {
-                            saveExecution(execution.videoAsset.uri);
+                        onPress={async () => {
+                            await saveExecution(execution.videoAsset.uri);
                             navigation.navigate('gravar');
                         }}
                     >
