@@ -35,6 +35,7 @@ function PreviewScreen({ route, navigation, RegisteredSniffersStore }) {
                     <TouchableOpacity
                         style={styles.saveButton}
                         onPress={async () => {
+                            // it needs to wait to make sure the video execution is saved before exiting and destroying the page 
                             await saveExecution(execution.videoAsset.uri);
                             navigation.navigate('gravar');
                         }}
