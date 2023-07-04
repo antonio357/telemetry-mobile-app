@@ -23,7 +23,7 @@ let thread = null;
 let timeoutEvent = null;
 
 const TimerDisplay = () => {
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(30);
 
   useEffect(() => {
     thread = setInterval(() => {
