@@ -13,6 +13,12 @@ import SensoresList from "../../screens/sensores/SensoresList.js";
 import { observer, inject } from "mobx-react";
 import DbOperations from "../../database/DbOperations";
 
+
+const minutes = 30; // base em minutos
+const timeLimit = 60 * minutes; // base em 60 segundos = 1 min
+const seconds32 = 32 * 1000; // base em milisegundos = 1000 -> 32 segundos
+const timeLimitTimeout = (60000 * minutes) - seconds32; // (60000 = 1 minuto * minutes) - 32 segundos
+
 let thread = null;
 let timeoutEvent = null;
 
@@ -86,7 +92,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setIsRecording(true);
     let options = {
       quality: "480p",
-      maxDuration: 5, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
+      maxDuration: timeLimit, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
       mute: false,
     };
 
@@ -100,7 +106,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
     timeoutEvent = setTimeout(() => {
       setTimeOutComponent(<TimerDisplay />);
-    }, 2000);
+    }, timeLimitTimeout);
   };
 
   if (video) {
