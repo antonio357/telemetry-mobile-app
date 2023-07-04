@@ -4,7 +4,6 @@ import {
   View,
   Button,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState, useRef } from "react";
 import { Camera } from "expo-camera";
@@ -13,15 +12,45 @@ import { ScreenBase } from "../common/ScreenBase";
 import SensoresList from "../../screens/sensores/SensoresList.js";
 import { observer, inject } from "mobx-react";
 import DbOperations from "../../database/DbOperations";
-import ExecutionPlayer from "../../player/ExecutionPlayer";
+
+
+const minutes = 30; // base em minutos
+const timeLimit = 60 * minutes; // base em 60 segundos = 1 min
+const seconds32 = 32 * 1000; // base em milisegundos = 1000 -> 32 segundos
+const timeLimitTimeout = (60000 * minutes) - seconds32; // (60000 = 1 minuto * minutes) - 32 segundos
+
+let thread = null;
+let timeoutEvent = null;
+
+const TimerDisplay = () => {
+  const [timer, setTimer] = useState(30);
+
+  useEffect(() => {
+    thread = setInterval(() => {
+      setTimer((timer) => {
+        if (timer > 0) return timer - 1;
+        else {
+          return timer;
+        }
+      });
+    }, 1000);
+  }, []);
+
+  return (
+    <View style={styles.timerBackground}>
+      <Text style={styles.timer}>{timer}</Text>
+    </View>
+  );
+}
 
 function Recording({ navigation, RegisteredSniffersStore }) {
   const {
     startLogs,
     stopLogs,
-    setExecutionVideo,
     getExecutionInfo,
   } = RegisteredSniffersStore;
+
+  const [timeOutComponent, setTimeOutComponent] = useState(null);
 
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -40,11 +69,9 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
-      // console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
       await DbOperations.removeAllTempExecutions();
-      // console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
     })();
   }, []);
 
@@ -62,23 +89,29 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     setIsRecording(true);
     let options = {
       quality: "480p",
-      maxDuration: 30 * 60, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
+      maxDuration: timeLimit, // 60 segundos * 30 = 30 min, 30 minuto funciona bem
       mute: false,
     };
 
     cameraRef.current.recordAsync(options).then((recordedVideo) => {
+      // this is called when stopRecording(), maxDuration o maxFileSize is reached
+      stopLogs();
       setVideo(recordedVideo);
       setIsRecording(false);
+      // navigation.navigate('execution-preview', {video: recordedVideo, execution});
     });
-  };
 
-  let stopRecording = () => {
-    setIsRecording(false);
-    cameraRef.current.stopRecording();
-    stopLogs();
+    timeoutEvent = setTimeout(() => {
+      setTimeOutComponent(<TimerDisplay />);
+    }, timeLimitTimeout);
   };
 
   if (video) {
+    clearInterval(thread);
+    thread = null;
+    clearTimeout(timeoutEvent);
+    timeoutEvent = null;
+    // setTimeOutComponent(null);
     const execution = getExecutionInfo();
     execution['videoAsset'] = { uri: video.uri };
     /* const execution = {
@@ -107,52 +140,7 @@ function Recording({ navigation, RegisteredSniffersStore }) {
       },
     }; */
 
-    let saveVideo = async () => {
-      const asset = await MediaLibrary.createAssetAsync(video.uri);
-      setExecutionVideo(asset);
-      setVideo(undefined);
-    };
-
-    return (
-      <>
-        <ExecutionPlayer execution={execution} />
-        {hasMediaLibraryPermission ? (
-          <TouchableOpacity
-            style={{
-              position: "absolute",
-              width: 45,
-              height: 40,
-              alignItems: "center",
-              justifyContent: "center",
-              left: 100,
-              bottom: 10,
-              backgroundColor: "#1299FA",
-              borderRadius: 2,
-            }}
-            onPress={saveVideo}
-          >
-            <Text style={{ color: "white" }}>SAVE</Text>
-          </TouchableOpacity>
-        ) : undefined}
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            width: 70,
-            height: 40,
-            alignItems: "center",
-            justifyContent: "center",
-            left: 180,
-            bottom: 10,
-            backgroundColor: "#1299FA",
-            borderRadius: 2,
-          }}
-          onPress={() => setVideo(undefined)}
-        >
-          <Text style={{ color: "white" }}>DISCARD</Text>
-        </TouchableOpacity>
-        <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-      </>
-    );
+    navigation.navigate('execution-preview', { execution: execution });
   }
 
   return (
@@ -161,8 +149,9 @@ function Recording({ navigation, RegisteredSniffersStore }) {
         <Camera style={styles.cameraContainer} ref={cameraRef} >
           <Button
             title={isRecording ? "Stop Recording" : "Record Video"}
-            onPress={isRecording ? stopRecording : recordVideo}
+            onPress={isRecording ? () => { cameraRef.current.stopRecording(); } : recordVideo}
           />
+          {timeOutComponent}
         </Camera>
       </View>
       <ScrollView>
@@ -198,6 +187,21 @@ const styles = StyleSheet.create({
   returnView: {
     flex: 1,
   },
+  timer: {
+    fontSize: 18,
+    color: 'white',
+  },
+  timerBackground: {
+    width: 40,
+    height: 40,
+    borderRadius: 20, // Half the width and height to create a circle
+    backgroundColor: '#3B3B3B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 4,
+    bottom: 4,
+  }
 });
 
 export default inject("RegisteredSniffersStore")(observer(Recording));

@@ -4,6 +4,7 @@ import Sensores from '../screens/sensores/Sensores';
 import Videos from '../screens/videos/Videos';
 import Recording from '../screens/recording/Recording';
 import ExecutionScreen from '../screens/videos/ExecutionScreen';
+import PreviewScreen from '../screens/recording/PreviewScreen';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 
@@ -57,6 +58,11 @@ export function AppRoutes() {
         /* drawerItemStyle: { display: 'none' } esconde o ícone de seleção no drawer, isso serve para as telas que só devem ser acessadas a partir de outras telas */
         options={{ drawerItemStyle: { display: 'none' } }}
         component={ExecutionScreen}
+      />
+      <Screen
+        name="execution-preview"
+        options={{ drawerItemStyle: { display: 'none' } }}
+        component={PreviewScreen}
       />
     </Navigator >
   )
