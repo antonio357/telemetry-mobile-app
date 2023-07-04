@@ -27,7 +27,6 @@ const TimerDisplay = () => {
 
   useEffect(() => {
     thread = setInterval(() => {
-      console.log(`called setInterval`);
       setTimer((timer) => {
         if (timer > 0) return timer - 1;
         else {
@@ -70,11 +69,9 @@ function Recording({ navigation, RegisteredSniffersStore }) {
 
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMicrophonePermission(microphonePermission.status === "granted");
-      // console.log(`mediaLibraryPermission = ${JSON.stringify(mediaLibraryPermission)}`);
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
       await DbOperations.removeAllTempExecutions();
-      // console.log(`conferindo permissoes de mídia ${JSON.stringify(MediaLibrary.getPermissionsAsync())}`);
     })();
   }, []);
 
@@ -144,53 +141,6 @@ function Recording({ navigation, RegisteredSniffersStore }) {
     }; */
 
     navigation.navigate('execution-preview', { execution: execution });
-
-    // let saveVideo = async () => {
-    //   const asset = await MediaLibrary.createAssetAsync(video.uri);
-    //   setExecutionVideo(asset);
-    //   setVideo(undefined);
-    // };
-
-    // return (
-    //   <>
-    //     <ExecutionPlayer execution={execution} />
-    //     {hasMediaLibraryPermission ? (
-    //       <TouchableOpacity
-    //         style={{
-    //           position: "absolute",
-    //           width: 45,
-    //           height: 40,
-    //           alignItems: "center",
-    //           justifyContent: "center",
-    //           left: 100,
-    //           bottom: 10,
-    //           backgroundColor: "#1299FA",
-    //           borderRadius: 2,
-    //         }}
-    //         onPress={saveVideo}
-    //       >
-    //         <Text style={{ color: "white" }}>SAVE</Text>
-    //       </TouchableOpacity>
-    //     ) : undefined}
-    //     <TouchableOpacity
-    //       style={{
-    //         position: "absolute",
-    //         width: 70,
-    //         height: 40,
-    //         alignItems: "center",
-    //         justifyContent: "center",
-    //         left: 180,
-    //         bottom: 10,
-    //         backgroundColor: "#1299FA",
-    //         borderRadius: 2,
-    //       }}
-    //       onPress={() => setVideo(undefined)}
-    //     >
-    //       <Text style={{ color: "white" }}>DISCARD</Text>
-    //     </TouchableOpacity>
-    //     <ScreenBase openRoutesMenu={() => navigation.openDrawer()} />
-    //   </>
-    // );
   }
 
   return (
