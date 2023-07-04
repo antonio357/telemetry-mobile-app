@@ -238,16 +238,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timer: {
-    fontSize: 20,
+    fontSize: 18,
     color: 'white',
   },
   timerBackground: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Half the width and height to create a circle
+    width: 40,
+    height: 40,
+    borderRadius: 20, // Half the width and height to create a circle
     backgroundColor: '#3B3B3B',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    right: 4,
+    bottom: 4,
   }
 });
 
