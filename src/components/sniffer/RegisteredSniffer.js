@@ -8,11 +8,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(sensorType);
-  const [items, setItems] = useState([
-    { label: 'undefined', value: undefined },
-    { label: 'touch', value: 'touch' },
-    { label: 'ultrasonic', value: 'ultrasonic' }
-  ]);
 
   return (
     <View>
@@ -22,7 +17,10 @@ function DefineSensor({ url, portName, sensorType, zIndex, setSensorType }) {
         zIndex={zIndex}
         open={open}
         value={value}
-        items={items}
+        items={[
+          { label: 'undefined', value: undefined },
+          { label: 'ultrasonic', value: 'ultrasonic' }
+        ]}
         setOpen={setOpen}
         setValue={setValue}
         onChangeValue={value => setSensorType(url, portName, value)}

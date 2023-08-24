@@ -9,9 +9,7 @@ export class ChartDrawPath {
 
     this.xBounds = { min: 0, max: timeFrame * logsRate };
     this.yBounds = { min: 0 };
-    if (sensorType == 'touch') {
-      this.yBounds['max'] = 1;
-    } else if (sensorType == 'ultrassonic') {
+    if (sensorType == 'ultrassonic') {
       this.yBounds['max'] = 2550;
     }
     // this.canvasDimensions = new CanvasDimensions();
