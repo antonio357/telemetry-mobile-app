@@ -71,7 +71,7 @@ class WsClient {
 
 
   bufferDbLogs = logs => {
-    const ports = Object.keys(logs);
+    const ports = Object.keys(this.dbLogsBuffer);
     for (let i = 0; i < ports.length; i++) {
       const port = ports[i];
       this.dbLogsBuffer[port].logs = [...this.dbLogsBuffer[port].logs, ...logs[port]];
