@@ -8,8 +8,6 @@ class WsClient {
   ws = null;
   logsBuffer = {};
 
-  detDbInfoThread = null;
-  database = null;
   // dbLogsBuffer = {
   //   port1: {
   //     id: 'id do banco',
