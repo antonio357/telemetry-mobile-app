@@ -71,7 +71,7 @@ class RegisteredSniffersStore {
       stopLogs: action,
     })
 
-    this.register('pré cadastrado', 'ws://192.168.1.199:81'); // just for testing
+    this.register('pré cadastrado', 'ws://192.168.7.5:81'); // just for testing
     // this.register('pré cadastrado', 'ws://192.168.0.246:81'); // just for testing judenilson
 
     // thread gets logs from WsClient buffers and pushes them to the charts
